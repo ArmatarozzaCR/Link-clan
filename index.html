@@ -25,20 +25,43 @@
     .button:hover {
       background: #666;
     }
+    #mobileContent {
+      display: none;
+    }
+    #desktopMessage {
+      display: none;
+      font-size: 20px;
+      padding: 20px;
+      background: #333;
+      border-radius: 10px;
+      margin: 20px;
+    }
   </style>
   <script>
     function goToLink(link) {
       window.location.href = link;
     }
+
+    function detectDevice() {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        document.getElementById('mobileContent').style.display = 'block';
+      } else {
+        document.getElementById('desktopMessage').style.display = 'block';
+      }
+    }
   </script>
 </head>
-<body>
-  <h1>I miei link utili</h1>
+<body onload="detectDevice()">
 
-  <div class="button" onclick="goToLink('https://link.clashroyale.com/invite/clan/it?tag=YC89P002&token=s8r4a4cb&platform=iOS')">🎮 Entra nel Clan</div>
-  <div class="button" onclick="goToLink('LINK_2')">💎 Offerta Speciale</div>
-  <div class="button" onclick="goToLink('LINK_3')">📢 Annuncio</div>
-  <div class="button" onclick="goToLink('LINK_4')">🔗 Altro Link</div>
+  <div id="desktopMessage">
+    ⚠️ Questo sito può essere aperto solo da dispositivi mobili.<br>
+    Per favore aprilo sul tuo smartphone o tablet con Clash Royale installato.
+  </div>
 
-</body>
-</html>
+  <div id="mobileContent">
+    <h1>I miei link utili</h1>
+    <div class="button" onclick="goToLink('https://link.clashroyale.com/invite/clan/it?tag=YC89P002&token=s8r4a4cb&platform=iOS')">🎮 Entra nel Clan</div>
+    <div class="button" onclick="goToLink('LINK_2')">💎 Offerta Speciale</div>
+    <div class="button" onclick="goToLink('LINK_3')">📢 Annuncio</div>
+    <div class="button" onclick="goToLink('LINK_4')">🔗 Altro Link</div>_
