@@ -6,16 +6,20 @@
   <title>I miei link - Armata Rozza</title>
   <style>
     html, body {
-      height: 100%;
       margin: 0;
       padding: 0;
     }
 
     body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom right, #000000, #4d0000);
       background-repeat: no-repeat;
-      background-attachment: fixed;
+      background-size: cover;
       color: #ffffff;
       text-align: center;
       padding: 40px 20px;
@@ -53,6 +57,7 @@
 
     #mobileContent {
       display: none;
+      width: 100%;
     }
 
     #desktopMessage {
