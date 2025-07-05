@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- AGGIUNTO -->
   <title>I miei link - Armata Rozza</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #000000; /* sfondo unico nero */
+      background: linear-gradient(to bottom right, #000000, #4d0000); /* sfondo sfumato */
       color: #ffffff;
       text-align: center;
-      padding: 20px;
+      padding: 30px 15px;
     }
     h1 {
-      font-size: 24px;
+      font-size: 22px;
       margin-bottom: 25px;
       color: #ffffff;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
     }
     .button {
       display: block;
-      width: 220px;
+      width: 90%;
+      max-width: 280px;
       margin: 15px auto;
       padding: 14px;
       background: #222;
-      border: 1px solid #ff0000;
-      border-radius: 8px;
+      border: 2px solid #ff0000;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 16px;
       font-weight: 500;
@@ -42,8 +44,8 @@
     }
     #desktopMessage {
       display: none;
-      font-size: 18px;
-      padding: 16px;
+      font-size: 17px;
+      padding: 18px;
       background: #333;
       border-radius: 8px;
       margin: 20px auto;
@@ -74,7 +76,7 @@
   </div>
 
   <div id="mobileContent">
-    <h1>I miei link</h1>
+    <h1>I miei link - Armata Rozza</h1>
     <div class="button" onclick="goToLink('https://link.clashroyale.com/invite/clan/it?tag=YC89P002&token=s8r4a4cb&platform=iOS')">🎮 Entra nel Clan</div>
     <div class="button" onclick="goToLink('LINK_2')">💎 Offerta Speciale</div>
     <div class="button" onclick="goToLink('LINK_3')">📢 Annuncio</div>
