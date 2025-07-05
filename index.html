@@ -95,25 +95,55 @@
   </div>
 
   <div id="mobileContent">
-  <h1>Link - Armata Rozza</h1>
+    <h1>Link - Armata Rozza</h1>
 
-  <div class="button" onclick="goToLink('https://link.clashroyale.com/invite/clan/it?tag=YC89P002&token=s8r4a4cb&platform=iOS')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-    <img src="armata.png" alt="Armata Rozza" style="width: 75px; height: 75px; object-fit: cover;">
-    <span style="font-size: 24px; flex-grow: 1; text-align: left;">Armata Rozza</span>
+    <div class="button" onclick="goToLink('https://link.clashroyale.com/invite/clan/it?tag=YC89P002&token=s8r4a4cb&platform=iOS')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+      <img src="armata.png" alt="Armata Rozza" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Armata Rozza</span>
+    </div>
+
+    <div class="button" onclick="goToLink('LINK_2')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+      <img src="magnamm.png" alt="Ce Magnamm" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Ce Magnamm</span>
+    </div>
+
+    <div class="button" onclick="goToLink('LINK_3')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+      <img src="tori.png" alt="I Tori Feroci" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">I Tori Feroci</span>
+    </div>
+
+    <div class="button" onclick="goToLink('LINK_4')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+      <img src="dog.png" alt="Dog Rider" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
+    </div>
   </div>
 
-  <div class="button" onclick="goToLink('LINK_2')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-    <img src="magnamm.png" alt="Ce Magnamm" style="width: 75px; height: 75px; object-fit: cover;">
-    <span style="font-size: 24px; flex-grow: 1; text-align: left;">Ce Magnamm</span>
-  </div>
+  <script>
+    (function oscuramentoAutomatico() {
+      const now = new Date();
 
-  <div class="button" onclick="goToLink('LINK_3')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-    <img src="tori.png" alt="I Tori Feroci" style="width: 75px; height: 75px; object-fit: cover;">
-    <span style="font-size: 24px; flex-grow: 1; text-align: left;">I Tori Feroci</span>
-  </div>
+      // Ottieni data locale in Italia
+      const localeDate = new Date(now.toLocaleString("it-IT", { timeZone: "Europe/Rome" }));
+      const day = localeDate.getDay(); // 0 = Domenica, 1 = Lunedì, ..., 6 = Sabato
+      const hour = localeDate.getHours();
 
-  <div class="button" onclick="goToLink('LINK_4')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-    <img src="dog.png" alt="Dog Rider" style="width: 75px; height: 75px; object-fit: cover;">
-    <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
-  </div>
-</div>
+      // Calcola se il sito deve essere oscurato
+      const isGiovedìPomeriggio = (day === 4 && hour >= 12);
+      const isVenerdì = (day === 5);
+      const isSabato = (day === 6);
+      const isDomenica = (day === 0);
+      const isLunedìMattina = (day === 1 && hour < 12);
+
+      const oscurare = isGiovedìPomeriggio || isVenerdì || isSabato || isDomenica || isLunedìMattina;
+
+      if (oscurare) {
+        document.body.innerHTML = `
+          <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:2em;text-align:center;padding:20px;">
+            ⛔ Il sito è offline durante i giorni di war, vi è andata male Russi 🇷🇺.<br><br>Orari di apertura:<br>🕛 Lunedì ore 12:00 → Giovedì ore 12:00.
+          </div>
+        `;
+      }
+    })();
+  </script>
+</body>
+</html>
