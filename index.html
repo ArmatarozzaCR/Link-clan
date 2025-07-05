@@ -4,6 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Link - Armata Rozza</title>
+
+  <!-- Script di oscuramento -->
+  <script>
+    (function oscuramentoAutomatico() {
+      const now = new Date();
+      const localeDate = new Date(now.toLocaleString("it-IT", { timeZone: "Europe/Rome" }));
+      const day = localeDate.getDay(); // 0 = Domenica, 1 = Lunedì, ..., 6 = Sabato
+      const hour = localeDate.getHours();
+
+      const isGiovedìPomeriggio = (day === 4 && hour >= 12);
+      const isVenerdì = (day === 5);
+      const isSabato = (day === 6);
+      const isDomenica = (day === 0);
+      const isLunedìMattina = (day === 1 && hour < 12);
+
+      const oscurare = isGiovedìPomeriggio || isVenerdì || isSabato || isDomenica || isLunedìMattina;
+
+      if (oscurare) {
+        document.write(`
+          <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:1.8em;text-align:center;padding:20px;line-height:1.6">
+            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
+          </div>
+        `);
+        throw new Error("Sito offline: interruzione caricamento");
+      }
+    })();
+  </script>
+
   <style>
     html, body {
       margin: 0;
@@ -87,6 +115,7 @@
     }
   </script>
 </head>
+
 <body onload="detectDevice()">
 
   <div id="desktopMessage">
@@ -118,32 +147,5 @@
     </div>
   </div>
 
-  <script>
-    (function oscuramentoAutomatico() {
-      const now = new Date();
-
-      // Ottieni data locale in Italia
-      const localeDate = new Date(now.toLocaleString("it-IT", { timeZone: "Europe/Rome" }));
-      const day = localeDate.getDay(); // 0 = Domenica, 1 = Lunedì, ..., 6 = Sabato
-      const hour = localeDate.getHours();
-
-      // Calcola se il sito deve essere oscurato
-      const isGiovedìPomeriggio = (day === 4 && hour >= 12);
-      const isVenerdì = (day === 5);
-      const isSabato = (day === 6);
-      const isDomenica = (day === 0);
-      const isLunedìMattina = (day === 1 && hour < 12);
-
-      const oscurare = isGiovedìPomeriggio || isVenerdì || isSabato || isDomenica || isLunedìMattina;
-
-      if (oscurare) {
-        document.body.innerHTML = `
-          <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:2em;text-align:center;padding:20px;">
-            ⛔ Il sito è offline durante i giorni di war, vi è andata male Russi 🇷🇺.<br><br>Orari di apertura:<br>🕛 Lunedì ore 12:00 → Giovedì ore 12:00.
-          </div>
-        `;
-      }
-    })();
-  </script>
 </body>
 </html>
