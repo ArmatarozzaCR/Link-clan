@@ -2,46 +2,51 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- AGGIUNTO -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I miei link - Armata Rozza</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom right, #000000, #4d0000); /* sfondo sfumato */
+      background: linear-gradient(to bottom right, #000000, #4d0000);
       color: #ffffff;
       text-align: center;
-      padding: 30px 15px;
+      padding: 40px 20px;
     }
+
     h1 {
-      font-size: 22px;
-      margin-bottom: 25px;
+      font-size: 24px;
+      margin-bottom: 30px;
       color: #ffffff;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
     }
+
     .button {
       display: block;
-      width: 90%;
-      max-width: 280px;
-      margin: 15px auto;
-      padding: 14px;
+      width: 100%;
+      max-width: 320px;
+      margin: 20px auto;
+      padding: 18px;
       background: #222;
       border: 2px solid #ff0000;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
+      font-size: 18px;
+      font-weight: 600;
       transition: all 0.3s ease;
-      box-shadow: 0 0 6px rgba(255,0,0,0.3);
+      box-shadow: 0 0 10px rgba(255,0,0,0.5);
     }
+
     .button:hover {
       background: #440000;
-      transform: translateY(-2px);
-      box-shadow: 0 0 12px rgba(255,0,0,0.6);
+      transform: translateY(-3px);
+      box-shadow: 0 0 16px rgba(255,0,0,0.7);
     }
+
     #mobileContent {
       display: none;
     }
+
     #desktopMessage {
       display: none;
       font-size: 17px;
@@ -53,6 +58,7 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     }
   </style>
+
   <script>
     function goToLink(link) {
       window.location.href = link;
