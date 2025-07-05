@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Link - Armata Rozza</title>
   <style>
     html, body {
@@ -70,17 +70,6 @@
       max-width: 300px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     }
-
-    #warBlock {
-      display: none;
-      text-align: center;
-      padding: 40px;
-      font-size: 22px;
-      background-color: black;
-      color: white;
-      min-height: 100vh;
-      box-sizing: border-box;
-    }
   </style>
 
   <script>
@@ -103,26 +92,34 @@
       const day = itNow.getDay(); // 0=dom, 1=lun, ..., 6=sab
       const hour = itNow.getHours();
 
-      const isBlocked =
+      return (
         (day === 4 && hour >= 12) || // giovedì dalle 12
         day === 5 ||                 // venerdì
         day === 6 ||                 // sabato
         day === 0 ||                 // domenica
-        (day === 1 && hour < 12);    // lunedì prima di mezzogiorno
-
-      if (isBlocked) {
-        document.body.innerHTML = `
-          <div id="warBlock">
-            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
-          </div>
-        `;
-        return true;
-      }
-      return false;
+        (day === 1 && hour < 12)     // lunedì prima di mezzogiorno
+      );
     }
 
     window.onload = function () {
-      if (!checkWarTime()) detectDevice();
+      if (checkWarTime()) {
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.background = 'black';
+        document.body.style.color = 'white';
+        document.body.style.display = 'flex';
+        document.body.style.justifyContent = 'center';
+        document.body.style.alignItems = 'center';
+        document.body.style.height = '100vh';
+        document.body.style.textAlign = 'center';
+        document.body.innerHTML = `
+          <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">
+            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
+          </div>
+        `;
+      } else {
+        detectDevice();
+      }
     };
   </script>
 </head>
