@@ -5,33 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Link - Armata Rozza</title>
 
-  <!-- Script di oscuramento -->
-  <script>
-    (function oscuramentoAutomatico() {
-      const now = new Date();
-      const localeDate = new Date(now.toLocaleString("it-IT", { timeZone: "Europe/Rome" }));
-      const day = localeDate.getDay(); // 0 = Domenica, 1 = Lunedì, ..., 6 = Sabato
-      const hour = localeDate.getHours();
-
-      const isGiovedìPomeriggio = (day === 4 && hour >= 12);
-      const isVenerdì = (day === 5);
-      const isSabato = (day === 6);
-      const isDomenica = (day === 0);
-      const isLunedìMattina = (day === 1 && hour < 12);
-
-      const oscurare = isGiovedìPomeriggio || isVenerdì || isSabato || isDomenica || isLunedìMattina;
-
-      if (oscurare) {
-        document.write(`
-          <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:1.8em;text-align:center;padding:20px;line-height:1.6">
-            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
-          </div>
-        `);
-        throw new Error("Sito offline: interruzione caricamento");
-      }
-    })();
-  </script>
-
   <style>
     html, body {
       margin: 0;
@@ -100,23 +73,8 @@
     }
   </style>
 
-  <script>
-    function goToLink(link) {
-      window.location.href = link;
-    }
-
-    function detectDevice() {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        document.getElementById('mobileContent').style.display = 'block';
-      } else {
-        document.getElementById('desktopMessage').style.display = 'block';
-      }
-    }
-  </script>
 </head>
-
-<body onload="detectDevice()">
+<body>
 
   <div id="desktopMessage">
     ⚠️ Questo sito può essere aperto solo da dispositivi mobili.<br>
@@ -146,6 +104,47 @@
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
     </div>
   </div>
+
+  <script>
+    function goToLink(link) {
+      window.location.href = link;
+    }
+
+    function detectDevice() {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        document.getElementById('mobileContent').style.display = 'block';
+      } else {
+        document.getElementById('desktopMessage').style.display = 'block';
+      }
+    }
+
+    window.onload = function () {
+      // Calcolo ora italiana
+      const now = new Date();
+      const itDate = new Date(now.toLocaleString("it-IT", { timeZone: "Europe/Rome" }));
+      const day = itDate.getDay(); // 0 domenica, 1 lunedì, ..., 6 sabato
+      const hour = itDate.getHours();
+
+      const isGiovedìPomeriggio = (day === 4 && hour >= 12);
+      const isVenerdì = (day === 5);
+      const isSabato = (day === 6);
+      const isDomenica = (day === 0);
+      const isLunedìMattina = (day === 1 && hour < 12);
+
+      const oscurare = isGiovedìPomeriggio || isVenerdì || isSabato || isDomenica || isLunedìMattina;
+
+      if (oscurare) {
+        document.body.innerHTML = `
+          <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:1.8em;text-align:center;padding:20px;line-height:1.6">
+            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
+          </div>
+        `;
+      } else {
+        detectDevice();
+      }
+    };
+  </script>
 
 </body>
 </html>
