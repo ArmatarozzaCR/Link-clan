@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Link - Armata Rozza</title>
-
   <style>
     html, body {
       margin: 0;
@@ -71,8 +70,61 @@
       max-width: 300px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     }
+
+    #warBlock {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      font-size: 22px;
+      background-color: black;
+      color: white;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
   </style>
 
+  <script>
+    function goToLink(link) {
+      window.location.href = link;
+    }
+
+    function detectDevice() {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        document.getElementById('mobileContent').style.display = 'block';
+      } else {
+        document.getElementById('desktopMessage').style.display = 'block';
+      }
+    }
+
+    function checkWarTime() {
+      const now = new Date();
+      const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
+      const day = itNow.getDay(); // 0=dom, 1=lun, ..., 6=sab
+      const hour = itNow.getHours();
+
+      const isBlocked =
+        (day === 4 && hour >= 12) || // giovedì dalle 12
+        day === 5 ||                 // venerdì
+        day === 6 ||                 // sabato
+        day === 0 ||                 // domenica
+        (day === 1 && hour < 12);    // lunedì prima di mezzogiorno
+
+      if (isBlocked) {
+        document.body.innerHTML = `
+          <div id="warBlock">
+            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
+          </div>
+        `;
+        return true;
+      }
+      return false;
+    }
+
+    window.onload = function () {
+      if (!checkWarTime()) detectDevice();
+    };
+  </script>
 </head>
 <body>
 
@@ -104,47 +156,5 @@
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
     </div>
   </div>
-
-  <script>
-    function goToLink(link) {
-      window.location.href = link;
-    }
-
-    function detectDevice() {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        document.getElementById('mobileContent').style.display = 'block';
-      } else {
-        document.getElementById('desktopMessage').style.display = 'block';
-      }
-    }
-
-    window.onload = function () {
-      // Calcolo ora italiana
-      const now = new Date();
-      const itDate = new Date(now.toLocaleString("it-IT", { timeZone: "Europe/Rome" }));
-      const day = itDate.getDay(); // 0 domenica, 1 lunedì, ..., 6 sabato
-      const hour = itDate.getHours();
-
-      const isGiovedìPomeriggio = (day === 4 && hour >= 12);
-      const isVenerdì = (day === 5);
-      const isSabato = (day === 6);
-      const isDomenica = (day === 0);
-      const isLunedìMattina = (day === 1 && hour < 12);
-
-      const oscurare = isGiovedìPomeriggio || isVenerdì || isSabato || isDomenica || isLunedìMattina;
-
-      if (oscurare) {
-        document.body.innerHTML = `
-          <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;font-size:1.8em;text-align:center;padding:20px;line-height:1.6">
-            ⛔ Il sito è offline durante i giorni di war,<br>vi è andata male Russi 🇷🇺
-          </div>
-        `;
-      } else {
-        detectDevice();
-      }
-    };
-  </script>
-
 </body>
 </html>
