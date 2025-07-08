@@ -33,8 +33,16 @@
       text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
     }
 
+    #mobileContent > div {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
     .button {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 24px;
       width: 100%;
       max-width: 320px;
       margin: 20px auto;
@@ -47,6 +55,7 @@
       font-weight: 600;
       transition: all 0.3s ease;
       box-shadow: 0 0 10px rgba(255,0,0,0.5);
+      box-sizing: border-box;
     }
 
     .button:hover {
@@ -57,41 +66,12 @@
   </style>
 
   <script>
-    if (window.top !== window.self) window.top.location = window.self.location;
-    setInterval(function() {
-      const before = new Date();
-      debugger;
-      const after = new Date();
-      if (after - before > 200) window.location.href = "about:blank";
-    }, 1000);
-    (function() {
-      const element = new Image();
-      Object.defineProperty(element, 'id', {
-        get: function () {
-          location.href = 'about:blank';
-        }
-      });
-      console.log(element);
-    })();
-    document.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (
-        e.keyCode === 123 ||
-        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
-        (e.ctrlKey && e.keyCode === 85) ||
-        (e.ctrlKey && e.keyCode === 83)
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    });
     window.onload = function () {
       const now = new Date();
       const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
       const day = itNow.getDay();
       const hour = itNow.getHours();
+
       const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
       if (isWarTime) {
         document.body.style.margin = '0';
@@ -103,9 +83,14 @@
         document.body.style.alignItems = 'center';
         document.body.style.height = '100vh';
         document.body.style.textAlign = 'center';
-        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+        document.body.innerHTML = `
+          <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">
+            ⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺
+          </div>
+        `;
         return;
       }
+
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       if (!isMobile) {
         document.body.style.margin = '0';
@@ -117,41 +102,70 @@
         document.body.style.alignItems = 'center';
         document.body.style.height = '100vh';
         document.body.style.textAlign = 'center';
-        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
+        document.body.innerHTML = `
+          <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">
+            ⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>
+            Per favore aprilo sul tuo smartphone o tablet.
+          </div>
+        `;
         return;
       }
+
       document.getElementById('mobileContent').style.display = 'block';
     };
+
     function decodeAndGo(encodedLink) {
       const decoded = atob(encodedLink);
       window.location.href = decoded;
     }
+
     function goToLink(link) {
       window.location.href = link;
     }
   </script>
 </head>
 <body>
-  <div id="mobileContent" style="display:none;">
-    <h1>Link - Armata Rozza</h1>
-    <div style="width: 100%; max-width: 400px; margin: 0 auto;">
-      <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9UDJVUVA5Q0omdG9rZW49azlwa3BhZ2cmcGxhdGZvcm09aU9T')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-        <img src="armata.png" alt="Armata Rozza" style="width: 75px; height: 75px; object-fit: cover;">
-        <span style="font-size: 24px; flex-grow: 1; text-align: left;">Armata Rozza</span>
-      </div>
-      <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9TDA4VkdVSjkmdG9rZW49d3gyYWJzbWgmcGxhdGZvcm09aU9T')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-        <img src="magnamm.png" alt="Ce Magnamm" style="width: 75px; height: 75px; object-fit: cover;">
-        <span style="font-size: 24px; flex-grow: 1; text-align: left;">Ce Magnamm</span>
-      </div>
-      <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9WUM4OVAwMDImdG9rZW49enA4Yzc3ZWgmcGxhdGZvcm09aU9T')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-        <img src="tori.png" alt="I Tori Feroci" style="width: 75px; height: 75px; object-fit: cover;">
-        <span style="font-size: 24px; flex-grow: 1; text-align: left;">I Tori Feroci</span>
-      </div>
-      <div class="button" onclick="goToLink('Link4')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
-        <img src="dog.png" alt="Dog Rider" style="width: 75px; height: 75px; object-fit: cover;">
-        <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
-      </div>
+
+<div id="mobileContent" style="display:none;">
+  <h1>Link - Armata Rozza</h1>
+  
+  <div>
+    <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9UDJVUVA5Q0omdG9rZW49azlwa3BhZ2cmcGxhdGZvcm09aU9T')">
+      <img src="armata.png" alt="Armata Rozza" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Armata Rozza</span>
+    </div>
+
+    <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9TDA4VkdVSjkmdG9rZW49d3gyYWJzbWgmcGxhdGZvcm09aU9T')">
+      <img src="magnamm.png" alt="Ce Magnamm" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Ce Magnamm</span>
+    </div>
+
+    <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9WUM4OVAwMDImdG9rZW49enA4Yzc3ZWgmcGxhdGZvcm09aU9T')">
+      <img src="tori.png" alt="I Tori Feroci" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">I Tori Feroci</span>
+    </div>
+
+    <div class="button" onclick="goToLink('Link4')">
+      <img src="dog.png" alt="Dog Rider" style="width: 75px; height: 75px; object-fit: cover;">
+      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
     </div>
   </div>
+</div>
+<script>
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (
+      e.keyCode === 123 ||
+      (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+      (e.ctrlKey && e.keyCode === 85) ||
+      (e.ctrlKey && e.keyCode === 83)
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
 </body>
 </html>
