@@ -54,34 +54,36 @@
       transform: translateY(-3px);
       box-shadow: 0 0 16px rgba(255,0,0,0.7);
     }
-
-   {
-      display: none;
-      width: 100%;
-    }
-
-     {
-      display: none;
-      font-size: 17px;
-      padding: 18px;
-      background: #333;
-      border-radius: 8px;
-      margin: 20px auto;
-      max-width: 300px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.5);
-    }
   </style>
 
   <script>
-    function goToLink(link) {
-      window.location.href = link;
-    }
+    window.onload = function () {
+      const now = new Date();
+      const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
+      const day = itNow.getDay();
+      const hour = itNow.getHours();
 
-    function detectDevice() {
+      const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
+      if (isWarTime) {
+        document.body.style.margin = '0';
+        document.body.style.padding = '0';
+        document.body.style.background = 'black';
+        document.body.style.color = 'white';
+        document.body.style.display = 'flex';
+        document.body.style.justifyContent = 'center';
+        document.body.style.alignItems = 'center';
+        document.body.style.height = '100vh';
+        document.body.style.textAlign = 'center';
+        document.body.innerHTML = `
+          <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">
+            ⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺
+          </div>
+        `;
+        return;
+      }
+
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        document.getElementById('mobileContent').style.display = 'block';
-      } else {
+      if (!isMobile) {
         document.body.style.margin = '0';
         document.body.style.padding = '0';
         document.body.style.background = 'black';
@@ -97,57 +99,23 @@
             Per favore aprilo sul tuo smartphone o tablet.
           </div>
         `;
+        return;
       }
-    }
 
-    function checkWarTime() {
-      const now = new Date();
-      const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
-      const day = itNow.getDay(); 
-      const hour = itNow.getHours();
-
-      return (
-        (day === 4 && hour >= 12) || 
-        day === 5 ||                 
-        day === 6 ||                 
-        day === 0 ||                 
-        (day === 1 && hour < 12)     
-      );
-    }
+      document.getElementById('mobileContent').style.display = 'block';
+    };
 
     function decodeAndGo(encodedLink) {
       const decoded = atob(encodedLink);
       window.location.href = decoded;
     }
 
-    window.onload = function () {
-      if (checkWarTime()) {
-        document.body.style.margin = '0';
-        document.body.style.padding = '0';
-        document.body.style.background = 'black';
-        document.body.style.color = 'white';
-        document.body.style.display = 'flex';
-        document.body.style.justifyContent = 'center';
-        document.body.style.alignItems = 'center';
-        document.body.style.height = '100vh';
-        document.body.style.textAlign = 'center';
-        document.body.innerHTML = `
-          <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box;">
-            ⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺
-          </div>
-        `;
-      } else {
-        detectDevice();
-      }
-    };
+    function goToLink(link) {
+      window.location.href = link;
+    }
   </script>
 </head>
 <body>
-
-  <div id="desktopMessage">
-    ⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>
-    Per favore aprilo sul tuo smartphone o tablet.
-  </div>
 
   <div id="mobileContent" style="display:none;">
     <h1>Link - Armata Rozza</h1>
@@ -172,5 +140,6 @@
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
     </div>
   </div>
+
 </body>
 </html>
