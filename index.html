@@ -55,12 +55,12 @@
       box-shadow: 0 0 16px rgba(255,0,0,0.7);
     }
 
-    #mobileContent {
+   {
       display: none;
       width: 100%;
     }
 
-    #desktopMessage {
+     {
       display: none;
       font-size: 17px;
       padding: 18px;
@@ -89,19 +89,18 @@
     function checkWarTime() {
       const now = new Date();
       const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
-      const day = itNow.getDay(); // 0=dom, 1=lun, ..., 6=sab
+      const day = itNow.getDay(); 
       const hour = itNow.getHours();
 
       return (
-        (day === 4 && hour >= 12) || // giovedì dalle 12
-        day === 5 ||                 // venerdì
-        day === 6 ||                 // sabato
-        day === 0 ||                 // domenica
-        (day === 1 && hour < 12)     // lunedì prima di mezzogiorno
+        (day === 4 && hour >= 12) || 
+        day === 5 ||                 
+        day === 6 ||                 
+        day === 0 ||                 
+        (day === 1 && hour < 12)     
       );
     }
 
-    // Nuova funzione per decodificare Base64 e aprire il link
     function decodeAndGo(encodedLink) {
       const decoded = atob(encodedLink);
       window.location.href = decoded;
