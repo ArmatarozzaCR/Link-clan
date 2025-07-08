@@ -101,6 +101,12 @@
       );
     }
 
+    // Nuova funzione per decodificare Base64 e aprire il link
+    function decodeAndGo(encodedLink) {
+      const decoded = atob(encodedLink);
+      window.location.href = decoded;
+    }
+
     window.onload = function () {
       if (checkWarTime()) {
         document.body.style.margin = '0';
@@ -133,25 +139,26 @@
   <div id="mobileContent">
     <h1>Link - Armata Rozza</h1>
 
-    <div class="button" onclick="goToLink('https://link.clashroyale.com/invite/clan/it?tag=YC89P002&token=s8r4a4cb&platform=iOS')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+    <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9UDI1VVFQOUpKJnRva2VuPWs5cGtwYWdnJnBsYXRmb3JtPWlPUw==')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
       <img src="armata.png" alt="Armata Rozza" style="width: 75px; height: 75px; object-fit: cover;">
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">Armata Rozza</span>
     </div>
 
-    <div class="button" onclick="goToLink('LINK_2')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+    <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9TDA4VkdVSjkmdG9rZW49d3gyYWJzbWgmcGxhdGZvcm09aU9T')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
       <img src="magnamm.png" alt="Ce Magnamm" style="width: 75px; height: 75px; object-fit: cover;">
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">Ce Magnamm</span>
     </div>
 
-    <div class="button" onclick="goToLink('LINK_3')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+    <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9WUM4OVAwMDImdG9rZW49enA4Yzc3ZWhyJnBsYXRmb3JtPWlPUw==')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
       <img src="tori.png" alt="I Tori Feroci" style="width: 75px; height: 75px; object-fit: cover;">
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">I Tori Feroci</span>
     </div>
 
-    <div class="button" onclick="goToLink('LINK_4')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
+    <div class="button" onclick="goToLink('Link4')" style="display: flex; align-items: center; justify-content: flex-start; gap: 24px;">
       <img src="dog.png" alt="Dog Rider" style="width: 75px; height: 75px; object-fit: cover;">
       <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
     </div>
+
   </div>
 </body>
 </html>
