@@ -33,18 +33,13 @@
       text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
     }
 
-    #mobileContent > div {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
     .button {
       display: flex;
       align-items: center;
       justify-content: flex-start;
       gap: 24px;
       width: 100%;
-      max-width: 320px;
+      max-width: 400px;
       margin: 20px auto;
       padding: 18px;
       background: #222;
@@ -62,6 +57,13 @@
       background: #440000;
       transform: translateY(-3px);
       box-shadow: 0 0 16px rgba(255,0,0,0.7);
+    }
+
+    .button span {
+      font-size: 24px;
+      flex-grow: 1;
+      text-align: left;
+      white-space: nowrap;
     }
   </style>
 
@@ -129,25 +131,25 @@
 <div id="mobileContent" style="display:none;">
   <h1>Link - Armata Rozza</h1>
   
-  <div>
+  <div style="width: 100%; max-width: 400px; margin: 0 auto;">
     <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9UDJVUVA5Q0omdG9rZW49azlwa3BhZ2cmcGxhdGZvcm09aU9T')">
       <img src="armata.png" alt="Armata Rozza" style="width: 75px; height: 75px; object-fit: cover;">
-      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Armata Rozza</span>
+      <span>Armata Rozza</span>
     </div>
 
     <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9TDA4VkdVSjkmdG9rZW49d3gyYWJzbWgmcGxhdGZvcm09aU9T')">
       <img src="magnamm.png" alt="Ce Magnamm" style="width: 75px; height: 75px; object-fit: cover;">
-      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Ce Magnamm</span>
+      <span>Ce Magnamm</span>
     </div>
 
     <div class="button" onclick="decodeAndGo('aHR0cHM6Ly9saW5rLmNsYXNocm95YWxlLmNvbS9pbnZpdGUvY2xhbi9pdD90YWc9WUM4OVAwMDImdG9rZW49enA4Yzc3ZWgmcGxhdGZvcm09aU9T')">
       <img src="tori.png" alt="I Tori Feroci" style="width: 75px; height: 75px; object-fit: cover;">
-      <span style="font-size: 24px; flex-grow: 1; text-align: left;">I Tori Feroci</span>
+      <span>I Tori Feroci</span>
     </div>
 
     <div class="button" onclick="goToLink('Link4')">
       <img src="dog.png" alt="Dog Rider" style="width: 75px; height: 75px; object-fit: cover;">
-      <span style="font-size: 24px; flex-grow: 1; text-align: left;">Dog Rider</span>
+      <span>Dog Rider</span>
     </div>
   </div>
 </div>
