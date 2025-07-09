@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Link - Armata Rozza</title>
   <style>
-    html, body { margin: 0; padding: 0; }
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
     body {
       min-height: 100vh;
       display: flex;
@@ -16,7 +19,7 @@
       background: linear-gradient(to bottom right, #000000, #4d0000);
       background-repeat: no-repeat;
       background-size: cover;
-      color: #fff;
+      color: #ffffff;
       text-align: center;
       padding: 40px 20px;
       box-sizing: border-box;
@@ -24,7 +27,7 @@
     h1 {
       font-size: 24px;
       margin-bottom: 30px;
-      color: #fff;
+      color: #ffffff;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
     }
     .button {
@@ -37,7 +40,7 @@
       margin: 20px auto;
       padding: 18px;
       background: #222;
-      border: 2px solid #f00;
+      border: 2px solid #ff0000;
       border-radius: 12px;
       cursor: pointer;
       font-size: 18px;
@@ -59,11 +62,9 @@
     }
   </style>
   <script>
-    const baseUrl = "https://nameless-brook-094f.stefanosanna12345.workers.dev";
-
     async function caricaLink() {
       try {
-        const res = await fetch(baseUrl + "/");
+        const res = await fetch("https://nameless-brook-094f.stefanosanna12345.workers.dev/");
         const data = await res.json();
         const container = document.getElementById("linkContainer");
         for (const item of data) {
@@ -71,12 +72,11 @@
           div.className = "button";
           div.onclick = async () => {
             try {
-              const tokenRes = await fetch(`${baseUrl}/?id=${item.id}`);
-              if (!tokenRes.ok) throw new Error("Errore nel token");
+              const tokenRes = await fetch(`https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}`);
+              if (!tokenRes.ok) throw new Error();
               const { token } = await tokenRes.json();
-              if (!token) throw new Error("Token non ricevuto");
-              // Redirect con token
-              window.location.href = `${baseUrl}/?id=${item.id}&token=${token}`;
+              if (!token) throw new Error();
+              window.location.href = `https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}&token=${token}`;
             } catch {
               alert("Errore nel caricamento del link.");
             }
@@ -132,7 +132,4 @@
 <body>
   <div id="mobileContent" style="display:none;">
     <h1>Link - Armata Rozza</h1>
-    <div id="linkContainer" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-  </div>
-</body>
-</html>
+    <div
