@@ -75,11 +75,14 @@ h1 {
 }
 </style>
 <script>
-const API_KEY = "inserisci_la_tua_api_key_qua";
+const API_KEY = "mioSegreto123";
+const WORKER_URL = "https://tuo-worker-url";
 
 async function caricaLink() {
   try {
-    const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { "X-API-KEY": API_KEY } });
+    const res = await fetch(WORKER_URL, {
+      headers: { "X-API-KEY": API_KEY }
+    });
     if(!res.ok) throw new Error();
     const data = await res.json();
     const container = document.getElementById("linkContainer");
@@ -88,11 +91,15 @@ async function caricaLink() {
       div.className = "button";
       div.onclick = async () => {
         try {
-          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { "X-API-KEY": API_KEY } });
+          const tokenRes = await fetch(`${WORKER_URL}?id=${item.id}`, {
+            headers: { "X-API-KEY": API_KEY }
+          });
           if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
-          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { "X-API-KEY": API_KEY } });
+          const urlRes = await fetch(`${WORKER_URL}?id=${item.id}&token=${tokenData.token}`, {
+            headers: { "X-API-KEY": API_KEY }
+          });
           if(!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
