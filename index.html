@@ -5,60 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Link - Armata Rozza</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-    }
+    html, body { margin:0; padding:0; }
     body {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(to bottom right, #000000, #4d0000);
-      background-repeat: no-repeat;
-      background-size: cover;
-      color: #ffffff;
-      text-align: center;
-      padding: 40px 20px;
-      box-sizing: border-box;
+      color:#fff;
+      text-align:center;
+      padding:40px 20px;
+      box-sizing:border-box;
     }
     h1 {
-      font-size: 24px;
-      margin-bottom: 30px;
-      color: #ffffff;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+      font-size:24px;
+      margin-bottom:30px;
+      color:#fff;
+      text-shadow:1px 1px 3px rgba(0,0,0,0.7);
     }
     .button {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 24px;
-      width: 100%;
-      max-width: 400px;
-      margin: 20px auto;
-      padding: 18px;
-      background: #222;
-      border: 2px solid #ff0000;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: 600;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:24px;
+      width:100%;
+      max-width:400px;
+      margin:20px auto;
+      padding:18px;
+      background:#222;
+      border:2px solid #ff0000;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:18px;
+      font-weight:600;
       transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(255,0,0,0.5);
-      box-sizing: border-box;
+      box-shadow:0 0 10px rgba(255,0,0,0.5);
+      box-sizing:border-box;
     }
     .button:hover {
-      background: #440000;
+      background:#440000;
       transform: translateY(-3px);
-      box-shadow: 0 0 16px rgba(255,0,0,0.7);
+      box-shadow:0 0 16px rgba(255,0,0,0.7);
     }
     .button span {
-      font-size: 24px;
-      flex-grow: 1;
-      text-align: left;
-      white-space: nowrap;
+      font-size:24px;
+      flex-grow:1;
+      text-align:left;
+      white-space:nowrap;
     }
   </style>
   <script>
@@ -67,14 +62,22 @@
         const res = await fetch("https://nameless-brook-094f.stefanosanna12345.workers.dev/");
         const data = await res.json();
         const container = document.getElementById("linkContainer");
+        const immagini = {
+          armata: "https://github.com/ArmatarozzaCR/Link-clan/blob/main/armata.png",
+          magnamm: "https://github.com/ArmatarozzaCR/Link-clan/blob/main/magnamm.png",
+          tori: "https://github.com/ArmatarozzaCR/Link-clan/blob/main/tori.png",
+          dog: "https://github.com/ArmatarozzaCR/Link-clan/blob/main/dog.png"
+        };
         for (const item of data) {
           const div = document.createElement("div");
           div.className = "button";
-          div.onclick = () => window.location.href = atob(item.link);
+          div.onclick = () => {
+            window.location.href = `https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}`;
+          };
           const img = document.createElement("img");
-          img.src = item.img;
+          img.src = immagini[item.id] || "";
           img.alt = item.nome;
-          img.style = "width: 75px; height: 75px; object-fit: cover;";
+          img.style = "width:75px; height:75px; object-fit:cover;";
           const span = document.createElement("span");
           span.textContent = item.nome;
           div.appendChild(img);
@@ -86,45 +89,15 @@
         document.body.innerHTML = "<div style='padding:20px;font-size:20px;'>Errore nel caricamento dei link.</div>";
       }
     }
-
     window.onload = function () {
-      const now = new Date();
-      const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
-      const day = itNow.getDay();
-      const hour = itNow.getHours();
-      const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
-      if (isWarTime) {
-        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
-        return;
-      }
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (!isMobile) {
-        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
-        return;
-      }
       caricaLink();
     };
-
-    document.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (
-        e.keyCode === 123 ||
-        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
-        (e.ctrlKey && e.keyCode === 85) ||
-        (e.ctrlKey && e.keyCode === 83)
-      ) {
-        e.preventDefault();
-        return false;
-      }
-    });
   </script>
 </head>
 <body>
-<div id="mobileContent" style="display:none;">
-  <h1>Link - Armata Rozza</h1>
-  <div id="linkContainer" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-</div>
+  <div id="mobileContent" style="display:none;">
+    <h1>Link - Armata Rozza</h1>
+    <div id="linkContainer" style="width:100%; max-width:400px; margin:0 auto;"></div>
+  </div>
 </body>
 </html>
