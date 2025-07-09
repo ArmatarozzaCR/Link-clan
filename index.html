@@ -73,7 +73,7 @@ async function caricaLink() {
       div.className = "button";
       div.onclick = async () => {
         try {
-          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.dev/?id=${item.id}`, { headers: { referer: location.origin } });
+          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
