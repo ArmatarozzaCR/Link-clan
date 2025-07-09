@@ -109,20 +109,6 @@ async function caricaLink() {
 }
 
 window.onload = function () {
-  const now = new Date();
-  const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
-  const day = itNow.getDay();
-  const hour = itNow.getHours();
-  const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
-  if (isWarTime) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
-    return;
-  }
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (!isMobile) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
-    return;
-  }
   caricaLink();
 };
 
