@@ -48,11 +48,13 @@ h1 {
   transition: all 0.3s ease;
   box-shadow: 0 0 10px rgba(255,0,0,0.5);
   box-sizing: border-box;
+  animation: glowPulse 3s infinite alternate ease-in-out;
 }
 .button:hover {
   background: #440000;
   transform: translateY(-3px);
   box-shadow: 0 0 16px rgba(255,0,0,0.7);
+  animation-play-state: paused;
 }
 .button span {
   font-size: 24px;
@@ -60,19 +62,23 @@ h1 {
   text-align: left;
   white-space: nowrap;
 }
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(255, 80, 0, 1);
+  }
+  100% {
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+  }
+}
 </style>
 <script>
 async function caricaLink() {
   try {
-    // Controllo se il dispositivo supporta touch
-    const touchSupported = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    
-    const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { 
-      headers: { 
-        referer: location.origin,
-        "x-touch-supported": touchSupported ? "true" : "false"
-      } 
-    });
+    const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
     if(!res.ok) throw new Error();
     const data = await res.json();
     const container = document.getElementById("linkContainer");
@@ -81,21 +87,11 @@ async function caricaLink() {
       div.className = "button";
       div.onclick = async () => {
         try {
-          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { 
-            headers: { 
-              referer: location.origin,
-              "x-touch-supported": touchSupported ? "true" : "false"
-            } 
-          });
+          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
-          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { 
-            headers: { 
-              referer: location.origin,
-              "x-touch-supported": touchSupported ? "true" : "false"
-            } 
-          });
+          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
           if(!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
@@ -136,7 +132,6 @@ window.onload = function () {
     document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
     return;
   }
-  // Tieni il controllo originale userAgent (anche se lo tieni, backend bloccherà se non touch)
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
     document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
