@@ -62,6 +62,7 @@ h1 {
   text-align: left;
   white-space: nowrap;
 }
+
 @keyframes glowPulse {
   0% {
     box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
@@ -75,14 +76,9 @@ h1 {
 }
 </style>
 <script>
-const API_KEY = "mioSegreto123";
-const WORKER_URL = "https://tuo-worker-url";
-
 async function caricaLink() {
   try {
-    const res = await fetch(WORKER_URL, {
-      headers: { "X-API-KEY": API_KEY }
-    });
+    const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
     if(!res.ok) throw new Error();
     const data = await res.json();
     const container = document.getElementById("linkContainer");
@@ -91,15 +87,11 @@ async function caricaLink() {
       div.className = "button";
       div.onclick = async () => {
         try {
-          const tokenRes = await fetch(`${WORKER_URL}?id=${item.id}`, {
-            headers: { "X-API-KEY": API_KEY }
-          });
+          const tokenRes = await fetch(https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
-          const urlRes = await fetch(`${WORKER_URL}?id=${item.id}&token=${tokenData.token}`, {
-            headers: { "X-API-KEY": API_KEY }
-          });
+          const urlRes = await fetch(https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}, { headers: { referer: location.origin } });
           if(!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
@@ -137,13 +129,12 @@ window.onload = function () {
   const hour = itNow.getHours();
   const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
   if (isWarTime) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+    document.body.innerHTML = <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>;
     return;
   }
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  if (!isMobile || !hasTouch) {
-    document.body.innerHTML = `<div style="font-size: 22px; padding: 20px; color: white; background: black;">⚠️ Apri il sito da un dispositivo mobile reale con Clash Royale installato.</div>`;
+  if (!isMobile) {
+    document.body.innerHTML = <div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>;
     return;
   }
   caricaLink();
