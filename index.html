@@ -70,7 +70,16 @@
         for (const item of data) {
           const div = document.createElement("div");
           div.className = "button";
-          div.onclick = () => window.location.href = `https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}`;
+          div.onclick = async () => {
+            try {
+              const linkRes = await fetch(`https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}`);
+              const linkData = await linkRes.json();
+              if(linkData.url) window.location.href = linkData.url;
+              else alert("Link non disponibile.");
+            } catch {
+              alert("Errore nel caricamento del link.");
+            }
+          };
           const img = document.createElement("img");
           img.src = item.img;
           img.alt = item.nome;
