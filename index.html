@@ -62,7 +62,6 @@ h1 {
   text-align: left;
   white-space: nowrap;
 }
-
 @keyframes glowPulse {
   0% {
     box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
@@ -129,12 +128,13 @@ window.onload = function () {
   const hour = itNow.getHours();
   const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
   if (isWarTime) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
     return;
   }
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (!isMobile) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  if (!isMobile || !hasTouch) {
+    document.body.innerHTML = `<div style="font-size: 22px; padding: 20px; color: white; background: black;">⚠️ Apri il sito da un dispositivo mobile reale con Clash Royale installato.</div>`;
     return;
   }
   caricaLink();
