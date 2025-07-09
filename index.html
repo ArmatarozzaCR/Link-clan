@@ -65,7 +65,7 @@ h1 {
 async function caricaLink() {
   try {
     const res = await fetch("https://nameless-brook-094f.stefanosanna12345.workers.dev/");
-    if(!res.ok) throw new Error('Errore caricamento');
+    if(!res.ok) throw new Error();
     const data = await res.json();
     const container = document.getElementById("linkContainer");
     for (const item of data) {
@@ -74,22 +74,21 @@ async function caricaLink() {
       div.onclick = async () => {
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}`);
-          if(!tokenRes.ok) throw new Error('Errore token');
+          if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
-          if(!tokenData.token) {
-            alert("Token non ricevuto");
-            return;
+          if(!tokenData.token) return alert("Token non ricevuto");
+          const urlRes = await fetch(`https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}&token=${tokenData.token}`);
+          if(!urlRes.ok) {
+            const text = await urlRes.text();
+            return alert("Errore apertura link: " + text);
           }
-          const redirectRes = await fetch(`https://nameless-brook-094f.stefanosanna12345.workers.dev/?id=${item.id}&token=${tokenData.token}`, {redirect: 'manual'});
-          if(redirectRes.status === 302) {
-            const url = redirectRes.headers.get('Location');
-            if(url) window.location.href = url;
-            else alert("Link non disponibile");
+          const urlData = await urlRes.json();
+          if(urlData.url) {
+            window.location.href = urlData.url;
           } else {
-            const text = await redirectRes.text();
-            alert("Errore apertura link: " + text);
+            alert("Link non disponibile");
           }
-        } catch(e) {
+        } catch {
           alert("Errore apertura link");
         }
       };
