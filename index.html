@@ -62,7 +62,6 @@ h1 {
   text-align: left;
   white-space: nowrap;
 }
-
 @keyframes glowPulse {
   0% {
     box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
@@ -79,7 +78,13 @@ h1 {
 async function caricaLink() {
   try {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
-    if(!res.ok) throw new Error();
+    if(!res.ok) {
+      if (res.status === 403) {
+        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+        return;
+      }
+      throw new Error();
+    }
     const data = await res.json();
     const container = document.getElementById("linkContainer");
     for (const item of data) {
@@ -123,15 +128,6 @@ async function caricaLink() {
 }
 
 window.onload = function () {
-  const now = new Date();
-  const itNow = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Rome" }));
-  const day = itNow.getDay();
-  const hour = itNow.getHours();
-  const isWarTime = (day === 4 && hour >= 12) || day === 5 || day === 6 || day === 0 || (day === 1 && hour < 12);
-  if (isWarTime) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
-    return;
-  }
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
     document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
