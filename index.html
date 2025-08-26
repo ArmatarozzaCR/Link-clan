@@ -63,15 +63,32 @@ h1 {
   white-space: nowrap;
 }
 @keyframes glowPulse {
-  0% {
-    box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
-  }
-  50% {
-    box-shadow: 0 0 18px rgba(255, 80, 0, 1);
-  }
-  100% {
-    box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
-  }
+  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.6); }
+  50% { box-shadow: 0 0 18px rgba(255, 80, 0, 1); }
+  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.6); }
+}
+#verificaContainer {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 30px auto;
+}
+#verificaInput {
+  width: calc(100% - 40px);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #ff0000;
+  font-size: 18px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+#verificaBtn {
+  width: 100%;
+}
+#verificaRisultato {
+  margin-top: 12px;
+  font-size: 18px;
+  color: #ffcc00;
+  text-align: center;
 }
 </style>
 <script>
@@ -127,12 +144,59 @@ async function caricaLink() {
   }
 }
 
+async function verificaConvocazione() {
+  const tag = document.getElementById("verificaInput").value.trim();
+  if(!tag) return;
+  try {
+    const res = await fetch(`https://docs.google.com/spreadsheets/d/<ID_SHEET>/gviz/tq?tqx=out:json`);
+    const text = await res.text();
+    const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+    const rows = jsonData.table.rows;
+    let risultati = [];
+    for (const r of rows) {
+      const nome = r.c[0]?.v;
+      const clan = r.c[1]?.v;
+      const tagCell = r.c[2]?.v;
+      if(tagCell && tagCell.toLowerCase() === tag.toLowerCase()) {
+        risultati.push(`sei convocato in: ${clan} con l'account ${nome}`);
+      }
+    }
+    const output = risultati.length ? risultati.join("<br>") : "Tag non trovato";
+    document.getElementById("verificaRisultato").innerHTML = output;
+  } catch {
+    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento convocazioni";
+  }
+}
+
 window.onload = function () {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
     document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
+
+  const mobileContent = document.getElementById("mobileContent");
+  const verificaDiv = document.createElement("div");
+  verificaDiv.id = "verificaContainer";
+
+  const input = document.createElement("input");
+  input.id = "verificaInput";
+  input.placeholder = "Inserisci il tuo tag Telegram";
+  verificaDiv.appendChild(input);
+
+  const btn = document.createElement("div");
+  btn.className = "button";
+  btn.id = "verificaBtn";
+  btn.textContent = "Verifica convocazione";
+  btn.onclick = verificaConvocazione;
+  verificaDiv.appendChild(btn);
+
+  const output = document.createElement("div");
+  output.id = "verificaRisultato";
+  verificaDiv.appendChild(output);
+
+  mobileContent.insertBefore(verificaDiv, document.getElementById("linkContainer"));
+
   caricaLink();
 };
 
