@@ -148,7 +148,7 @@ async function verificaConvocazione() {
   const tag = document.getElementById("verificaInput").value.trim();
   if(!tag) return;
   try {
-    const res = await fetch(`https://docs.google.com/spreadsheets/d/<1jWqVQewVc15icv2vJscPlbgOWZGB-e7m0VWVuT5_mts>/gviz/tq?tqx=out:json`);
+    const res = await fetch(`https://docs.google.com/spreadsheets/d/1jWqVQewVc15icv2vJscPlbgOWZGB-e7m0VWVuT5_mts/gviz/tq?tqx=out:json`);
     const text = await res.text();
     const jsonData = JSON.parse(text.substr(47).slice(0, -2));
     const rows = jsonData.table.rows;
