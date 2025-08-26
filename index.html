@@ -1,62 +1,20 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Link - Armata Rozza</title>
-<style>
-html, body { margin: 0; padding: 0; }
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom right, #000000, #4d0000);
-  color: #ffffff;
-  text-align: center;
-  padding: 40px 20px;
-  box-sizing: border-box;
-}
-h1 { font-size: 24px; margin-bottom: 30px; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.7); }
-.button {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 24px;
-  width: 100%;
-  max-width: 400px;
-  margin: 20px auto;
-  padding: 18px;
-  background: #222;
-  border: 2px solid #ff0000;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(255,0,0,0.5);
-  box-sizing: border-box;
-  animation: glowPulse 3s infinite alternate ease-in-out;
-}
-.button:hover { background: #440000; transform: translateY(-3px); box-shadow: 0 0 16px rgba(255,0,0,0.7); animation-play-state: paused; }
-.button span { font-size: 24px; flex-grow: 1; text-align: left; white-space: nowrap; }
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 8px rgba(255,0,0,0.6); }
-  50% { box-shadow: 0 0 18px rgba(255,80,0,1); }
-  100% { box-shadow: 0 0 8px rgba(255,0,0,0.6); }
-}
-#verificaContainer { margin-bottom: 20px; }
-input { padding: 10px; border-radius: 8px; border: 1px solid #ff0000; width: 70%; margin-right: 10px; }
-</style>
+<div id="mobileContent" style="display:none;">
+  <h1>Link - Armata Rozza</h1>
+  <div id="verificaContainer" style="margin-bottom: 30px;">
+    <input type="text" id="tagInput" placeholder="Inserisci il tuo tag Telegram" style="padding:10px; font-size:16px; width: 70%;"/>
+    <button id="verificaBtn" style="padding:10px 20px; font-size:16px; margin-left:10px;">Verifica convocazione</button>
+    <div id="risultatoVerifica" style="margin-top:15px; font-size:16px; color:#fff;"></div>
+  </div>
+  <div id="linkContainer" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+</div>
+
 <script>
 async function caricaLink() {
   try {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
     if(!res.ok) {
       if (res.status === 403) {
-        document.body.innerHTML = `<div style="font-size:22px; padding:20px; color:white; background:black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
         return;
       }
       throw new Error();
@@ -75,14 +33,13 @@ async function caricaLink() {
           const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
           if(!urlRes.ok) { const text = await urlRes.text(); return alert("Errore apertura link: " + text); }
           const urlData = await urlRes.json();
-          if(urlData.url) window.location.href = urlData.url;
-          else alert("Link non disponibile");
+          if(urlData.url) window.location.href = urlData.url; else alert("Link non disponibile");
         } catch { alert("Errore apertura link"); }
       };
       const img = document.createElement("img");
       img.src = item.img;
       img.alt = item.nome;
-      img.style = "width:75px; height:75px; object-fit:cover;";
+      img.style = "width: 75px; height: 75px; object-fit: cover;";
       const span = document.createElement("span");
       span.textContent = item.nome;
       div.appendChild(img);
@@ -90,54 +47,35 @@ async function caricaLink() {
       container.appendChild(div);
     }
     document.getElementById("mobileContent").style.display = 'block';
-  } catch { document.body.innerHTML = "<div style='padding:20px;font-size:20px;'>Errore nel caricamento dei link.</div>"; }
-}
-
-async function verificaTag() {
-  const input = document.getElementById("tagInput");
-  const tag = input.value.trim();
-  if(!tag) return alert("Inserisci il tuo tag Telegram");
-  try {
-    const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/verifica", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "referer": location.origin },
-      body: JSON.stringify({ tag })
-    });
-    const data = await res.json();
-    const output = document.getElementById("verificaOutput");
-    if(!data.trovato) { output.textContent = "Tag non trovato"; return; }
-    let testo = "Sei convocato in:\n";
-    for(const c of data.convocazioni) {
-      testo += `${c.clan} con l'account ${c.nome}\n`;
-    }
-    output.textContent = testo;
-  } catch { alert("Errore durante la verifica"); }
+  } catch {
+    document.body.innerHTML = "<div style='padding:20px;font-size:20px;'>Errore nel caricamento dei link.</div>";
+  }
 }
 
 window.onload = function () {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (!isMobile) {
-    document.body.innerHTML = `<div style="font-size:22px; padding:20px; color:white; background:black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
-    return;
-  }
+  if (!isMobile) { document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`; return; }
   caricaLink();
+  document.getElementById("verificaBtn").onclick = async () => {
+    const tag = document.getElementById("tagInput").value.trim();
+    if(!tag) return alert("Inserisci un tag Telegram");
+    try {
+      const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/verifica", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag })
+      });
+      const data = await res.json();
+      const risultatoDiv = document.getElementById("risultatoVerifica");
+      if(data.trovato) {
+        risultatoDiv.innerHTML = data.convocazioni.map(c => `Sei convocato in ${c.clan} con l'account ${c.nome}`).join("<br>");
+      } else risultatoDiv.textContent = "Tag non trovato";
+    } catch { alert("Errore nella verifica"); }
+  };
 };
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
-  if (e.keyCode===123 || (e.ctrlKey&&e.shiftKey&&(e.keyCode===73||e.keyCode===74)) || (e.ctrlKey&&e.keyCode===85) || (e.ctrlKey&&e.keyCode===83)) { e.preventDefault(); return false; }
+  if(e.keyCode===123||(e.ctrlKey&&e.shiftKey&&(e.keyCode===73||e.keyCode===74))||(e.ctrlKey&&e.keyCode===85)||(e.ctrlKey&&e.keyCode===83)) { e.preventDefault(); return false; }
 });
 </script>
-</head>
-<body>
-<div id="mobileContent" style="display:none;">
-  <h1>Link - Armata Rozza</h1>
-  <div id="verificaContainer">
-    <input id="tagInput" type="text" placeholder="Inserisci il tuo tag Telegram" />
-    <button class="button" style="width:100px;" onclick="verificaTag()">Verifica</button>
-    <pre id="verificaOutput" style="text-align:left; white-space:pre-wrap; color:#fff; margin-top:10px;"></pre>
-  </div>
-  <div id="linkContainer" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
-</div>
-</body>
-</html>
