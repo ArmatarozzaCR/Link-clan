@@ -147,7 +147,6 @@ async function caricaLink() {
 async function verificaConvocazione() {
   const tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
-
   try {
     const res = await fetch('https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.csv');
     const csvText = await res.text();
