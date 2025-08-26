@@ -148,19 +148,19 @@ async function verificaConvocazione() {
   const tag = document.getElementById("verificaInput").value.trim();
   if(!tag) return;
   try {
-    const res = await fetch(`https://docs.google.com/spreadsheets/d/<ID_SHEET>/gviz/tq?tqx=out:json`);
-    const text = await res.text();
-    const jsonData = JSON.parse(text.substr(47).slice(0, -2));
-    const rows = jsonData.table.rows;
-    let risultati = [];
-    for (const r of rows) {
-      const nome = r.c[0]?.v;
-      const clan = r.c[1]?.v;
-      const tagCell = r.c[2]?.v;
-      if(tagCell && tagCell.toLowerCase() === tag.toLowerCase()) {
-        risultati.push(`sei convocato in: ${clan} con l'account ${nome}`);
-      }
+    const res = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?tag=${tag}`);
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    if(data.length === 0) {
+      document.getElementById("verificaRisultato").innerHTML = "Tag non trovato";
+    } else {
+      const output = data.map(d => `sei convocato in: ${d.clan} con l'account ${d.nome}`).join("<br>");
+      document.getElementById("verificaRisultato").innerHTML = output;
     }
+  } catch {
+    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento convocazioni";
+  }
+}
     const output = risultati.length ? risultati.join("<br>") : "Tag non trovato";
     document.getElementById("verificaRisultato").innerHTML = output;
   } catch {
