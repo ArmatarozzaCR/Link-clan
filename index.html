@@ -146,20 +146,21 @@ async function caricaLink() {
 
 async function verificaConvocazione() {
   const tag = document.getElementById("verificaInput").value.trim();
-  if (!tag) return;
+  if(!tag) return;
   try {
-    const res = await fetch('https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.csv');
-    const csvText = await res.text();
-    const righe = csvText.split(/\r?\n/).map(r => r.split(','));
-    const risultati = righe
-      .slice(1)
-      .filter(r => r[0]?.trim().toLowerCase() === tag.toLowerCase())
-      .map(r => `sei convocato in: ${r[2]?.trim()} con l'account ${r[1]?.trim()}`);
-    document.getElementById("verificaRisultato").innerHTML = risultati.length ? risultati.join('<br>') : 'Tag non trovato';
-  } catch {
-    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento convocazioni";
-  }
-}
+    const res = await fetch(`https://docs.google.com/spreadsheets/d/<1jWqVQewVc15icv2vJscPlbgOWZGB-e7m0VWVuT5_mts>/gviz/tq?tqx=out:json`);
+    const text = await res.text();
+    const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+    const rows = jsonData.table.rows;
+    let risultati = [];
+    for (const r of rows) {
+      const nome = r.c[0]?.v;
+      const clan = r.c[1]?.v;
+      const tagCell = r.c[2]?.v;
+      if(tagCell && tagCell.toLowerCase() === tag.toLowerCase()) {
+        risultati.push(`sei convocato in: ${clan} con l'account ${nome}`);
+      }
+    }
     const output = risultati.length ? risultati.join("<br>") : "Tag non trovato";
     document.getElementById("verificaRisultato").innerHTML = output;
   } catch {
