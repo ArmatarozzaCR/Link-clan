@@ -157,11 +157,11 @@ async function verificaConvocazione() {
     let risultati = [];
 
     for (let i = 1; i < rows.length; i++) {
-      const tagCell = rows[i][0]?.trim().replace("@", "").toLowerCase();
-      const nome = rows[i][1]?.trim();
-      const clan = rows[i][2]?.trim();
+      let tagCell = rows[i][0]?.trim().replace(/(^"|"$)/g, "").replace("@", "").toLowerCase();
+      let nome = rows[i][1]?.trim().replace(/(^"|"$)/g, "");
+      let clan = rows[i][2]?.trim().replace(/(^"|"$)/g, "");
       if(tagCell && tagCell === tag) {
-        risultati.push(`Sei convocato in clan ${clan} con l'account ${nome} (tag @${rows[i][0]?.trim()})`);
+        risultati.push(`Sei convocato in clan ${clan} con l'account ${nome} (tag @${rows[i][0]?.trim().replace(/(^"|"$)/g, "")})`);
       }
     }
 
