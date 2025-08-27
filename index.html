@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Link - Armata Rozza</title>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
 html, body {
   margin: 0;
@@ -168,13 +169,6 @@ async function verificaConvocazione() {
       }
     }
 
-    const output = risultati.length ? risultati.join("<br>") : "Tag non trovato";
-    document.getElementById("verificaRisultato").innerHTML = output;
-
-  } catch {
-    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento convocazioni";
-  }
-}
     const output = risultati.length ? risultati.join("<br>") : "Tag non trovato";
     document.getElementById("verificaRisultato").innerHTML = output;
 
