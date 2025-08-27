@@ -190,14 +190,19 @@ window.onload = function () {
   const verificaDiv = document.createElement("div");
   verificaDiv.id = "verificaContainer";
 
-  const input = document.createElement("input");
-  input.id = "verificaInput";
-  input.placeholder = "Inserisci il tuo tag Telegram";
-  verificaDiv.appendChild(input);
-const ultimoTag = localStorage.getItem("ultimoTag");
+ const input = document.createElement("input");
+input.id = "verificaInput";
+input.placeholder = "Inserisci il tuo tag Telegram";
+verificaDiv.appendChild(input);
+
+// ✅ Usa setTimeout minimo per assicurarsi che il DOM sia aggiornato
+setTimeout(() => {
+  const ultimoTag = localStorage.getItem("ultimoTag");
   if (ultimoTag) {
     input.value = ultimoTag;
   }
+}, 0);
+
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
