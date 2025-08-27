@@ -149,6 +149,7 @@ async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   tag = tag.replace("@", "").toLowerCase();
+localStorage.setItem("ultimoTag", tag);
 
   try {
     const res = await fetch("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.xlsx");
@@ -193,7 +194,10 @@ window.onload = function () {
   input.id = "verificaInput";
   input.placeholder = "Inserisci il tuo tag Telegram";
   verificaDiv.appendChild(input);
-
+const ultimoTag = localStorage.getItem("ultimoTag");
+  if (ultimoTag) {
+    input.value = ultimoTag;
+  }
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
