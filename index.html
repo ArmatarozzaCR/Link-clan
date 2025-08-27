@@ -157,19 +157,20 @@ async function verificaConvocazione() {
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet, { header: ["TagTelegram","Nome","Clan"], defval:"" });
+    const data = XLSX.utils.sheet_to_json(sheet, { header: ["TagTelegram","Nome","Clan","Attivo"], defval:"" });
     let risultati = [];
 
     for (const row of data) {
       let tagCell = row.TagTelegram?.replace("@","").toLowerCase().trim();
       let nome = row.Nome?.trim();
       let clan = row.Clan?.trim();
-      if(tagCell && tagCell === tag) {
+      let attivo = row.Attivo?.trim().toLowerCase();
+      if(tagCell && tagCell === tag && attivo === "si") {
         risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
       }
     }
 
-    const output = risultati.length ? risultati.join("<br>") : "Tag non trovato";
+    const output = risultati.length ? risultati.join("<br>") : "Tag non trovato o non attivo";
     document.getElementById("verificaRisultato").innerHTML = output;
 
   } catch {
