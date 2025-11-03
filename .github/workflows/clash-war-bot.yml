@@ -21,7 +21,7 @@ jobs:
           pip install -r requirements.txt
       
       - run: python bot.py
-        env:
-          ROYALE_API_KEY: ${{ secrets.ROYALE_API_KEY }}
-          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+       env:
+  ROYALE_API_KEY: ${{ vars.ROYALE_API_KEY }}
+  GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
+  GOOGLE_CREDENTIALS: ${{ vars.GOOGLE_CREDENTIALS_MINIFIED }}
