@@ -2,7 +2,7 @@ name: Clash Royale War Bot
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '0 10 * * *'
   workflow_dispatch:
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           pip install -r requirements.txt
       
       - run: python bot.py
-       env:
-  ROYALE_API_KEY: ${{ vars.ROYALE_API_KEY }}
-  GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
-  GOOGLE_CREDENTIALS: ${{ vars.GOOGLE_CREDENTIALS_MINIFIED }}
+        env:
+          ROYALE_API_KEY: ${{ vars.ROYALE_API_KEY }}
+          GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
+          GOOGLE_CREDENTIALS: ${{ vars.GOOGLE_CREDENTIALS_MINIFIED }}
