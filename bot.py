@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot
+Clash Royale War Analysis Bot - Scraping RoyaleAPI
 Raccoglie i dati delle ultime 4 battaglie di guerra di ogni giocatore
-e li scrive nel Google Sheet
+dal sito RoyaleAPI.com usando web scraping (no API key needed!)
 """
 
 import gspread
 from google.oauth2.service_account import Credentials
 import requests
+from bs4 import BeautifulSoup
 import json
 import os
+import time
 from datetime import datetime
 import traceback
 
 # Configuration
-ROYALE_API_KEY = os.getenv('ROYALE_API_KEY')
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
-
-API_BASE_URL = "https://api.clashroyale.com/v1"
 
 def get_google_sheet():
     """Connessione a Google Sheets"""
@@ -35,69 +34,97 @@ def get_google_sheet():
         print(f"❌ Errore connessione Google Sheets: {e}")
         return None
 
-def get_war_results(player_tag):
-    """Ottiene i risultati della guerra da RoyaleAPI"""
+def get_war_results_scraping(player_tag):
+    """
+    Scraping da royaleapi.com per ottenere i risultati della guerra
+    Legge il battlelog senza necessità di API Key
+    """
     try:
         if not player_tag or player_tag == "":
-            return None
+            return 'No'
         
         # Formatta il tag
         tag = player_tag.replace('#', '').upper()
         
-        headers = {
-    'User-Agent': 'Armata-Rozza-Bot'
-}
+        # URL del profilo su RoyaleAPI
+        url = f"https://royaleapi.com/player/{tag}"
         
-        # Ottieni il battlelog
-        url = f"{API_BASE_URL}/players/%23{tag}/battlelog"
-        response = requests.get(url, headers=headers, timeout=10)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        print(f"🔍 Scraping {url}...", end=" ", flush=True)
+        
+        # Fai il request
+        response = requests.get(url, headers=headers, timeout=15)
         
         if response.status_code == 200:
-            battles = response.json()
-            return battles
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            # Cerca la sezione del battlelog nella pagina
+            # RoyaleAPI mostra i battler nella struttura HTML
+            
+            # Cerca tutti gli elementi che contengono "Battle", "Win", "Loss"
+            battles = soup.find_all('div', class_=['battle-log-item', 'battle', 'recent-battle'])
+            
+            if not battles:
+                # Prova un approccio alternativo: cerca nel testo
+                page_text = soup.get_text().lower()
+                
+                if 'battle' not in page_text and 'war' not in page_text:
+                    print("⚠️  Nessun dato")
+                    return 'No'
+            
+            # Conta wins e losses nei dati scritti
+            wins = 0
+            losses = 0
+            
+            # Analizza le righe della pagina
+            for line in soup.find_all('tr'):
+                text = line.get_text().lower()
+                
+                # Cerca negli ultimi 4 scontri
+                if 'win' in text or 'victory' in text:
+                    wins += 1
+                elif 'loss' in text or 'defeat' in text:
+                    losses += 1
+                
+                if wins + losses >= 4:
+                    break
+            
+            # Se non ha trovato battaglie, torna 'No'
+            if wins + losses == 0:
+                print("⚠️  0 battaglie")
+                return 'No'
+            
+            # Logica risultato
+            if losses >= 4 or (wins == 0 and losses > 0):
+                print(f"Sì (0 win, {losses} loss)")
+                return 'Sì'
+            else:
+                print(f"Win ({wins} win, {losses} loss)")
+                return 'Win'
+        
+        elif response.status_code == 404:
+            print("❌ Tag non trovato")
+            return 'No'
         else:
-            print(f"   ⚠️  API Error per {player_tag}: {response.status_code}")
-            return None
+            print(f"⚠️  HTTP {response.status_code}")
+            return 'No'
     
+    except requests.exceptions.Timeout:
+        print("⏱️  Timeout")
+        return 'No'
+    except requests.exceptions.ConnectionError:
+        print("🚫 Connessione fallita")
+        return 'No'
     except Exception as e:
-        print(f"   ⚠️  Errore RoyaleAPI: {e}")
-        return None
-
-def analyze_results(battles):
-    """
-    Analizza i risultati della guerra
-    Ritorna: 
-    - "Win" se ha vinto almeno 1 battaglia
-    - "Sì" se ha perso tutto
-    - "No" se non ha giocato
-    """
-    if not battles:
-        return 'No'  # Non ha giocato
-    
-    # Filtra solo le battaglie di guerra
-    war_battles = [b for b in battles if 'riverRaceWar' in b.get('type', '')][:4]
-    
-    if not war_battles:
-        return 'No'  # Nessuna battaglia di guerra trovata
-    
-    # Conta le sconfitte
-    losses = sum(1 for b in war_battles if not b.get('won', False))
-    
-    if losses == len(war_battles):
-        return 'Sì'  # Perso tutto
-    else:
-        return 'Win'  # Vinto almeno 1
-
-def get_column_index(header_row, column_name):
-    """Trova l'indice della colonna dal nome"""
-    try:
-        return header_row.index(column_name) + 1
-    except ValueError:
-        return None
+        print(f"⚠️  {str(e)[:30]}")
+        return 'No'
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR ANALYSIS")
+    print("🤖 BOT CLASH ROYALE WAR ANALYSIS - ROYALEAPI SCRAPING")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
@@ -117,17 +144,16 @@ def main():
         all_rows = sheet.get_all_values()
         
         if len(all_rows) < 2:
-            print("❌ Foglio vuoto o non inizializzato")
+            print("❌ Foglio vuoto")
             return False
         
-        headers = all_rows[0]
         players = all_rows[1:]
         
         print(f"✅ Trovati {len(players)} giocatori")
         print()
         
         # 3. Raccogli dati
-        print("3️⃣ Raccogliendo dati dalla guerra...")
+        print("3️⃣ Raccogliendo dati da RoyaleAPI...")
         print()
         
         updated_count = 0
@@ -142,20 +168,20 @@ def main():
             if not player_tag or player_tag == "":
                 continue
             
-            print(f"   🎮 {player_name} ({player_tag})...", end=" ", flush=True)
+            print(f"   🎮 {player_name} ({player_tag})... ", end="", flush=True)
             
-            # Ottieni i risultati
-            battles = get_war_results(player_tag)
-            result = analyze_results(battles)
+            # Ottieni i risultati tramite scraping
+            result = get_war_results_scraping(player_tag)
             
-            # Scrivi nella colonna "Lunedì" (colonna C = indice 3)
-            # Puoi cambiare il numero della colonna se serve
+            # Scrivi nella colonna "Lunedì" (colonna 3)
             try:
                 sheet.update_cell(row_idx, 3, result)
-                print(f"✅ {result}")
                 updated_count += 1
             except Exception as e:
-                print(f"❌ Errore: {e}")
+                print(f"❌ Errore scrittura: {e}")
+            
+            # Aspetta un po' tra le richieste
+            time.sleep(2)
         
         print()
         print(f"✅ Aggiornati {updated_count} giocatori!")
@@ -167,9 +193,7 @@ def main():
     
     except Exception as e:
         print()
-        print("❌ ERRORE GENERICO:")
-        print(f"   {e}")
-        print()
+        print(f"❌ ERRORE: {e}")
         traceback.print_exc()
         return False
 
