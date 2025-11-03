@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - WAR EMBLEM DETECTION
-Cerco le battaglie con gli STEMMI specifici delle war
+Clash Royale War Analysis Bot - RIVER RACE BATTLES DETECTION
+Legge le River Race Duel, 1v1, e Colosseum battles
 """
 
 import gspread
@@ -30,12 +30,12 @@ def get_google_sheet():
         sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
         return sheet
     except Exception as e:
-        print(f"❌ Errore Google Sheets: {e}")
+        print(f"❌ Errore: {e}")
         return None
 
 def get_war_battles(player_tag):
     """
-    Legge le battaglie con gli STEMMI specifici delle war
+    Legge le River Race battles (Duel, 1v1, Colosseum)
     """
     driver = None
     try:
@@ -50,99 +50,68 @@ def get_war_battles(player_tag):
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--window-size=1920,1080')
         chrome_options.add_argument('user-agent=Mozilla/5.0')
         
-        print(f"🌐 Checking battles...", end=" ", flush=True)
+        print(f"🌐", end=" ", flush=True)
         
         driver = webdriver.Chrome(options=chrome_options)
+        driver.get(f"https://royaleapi.com/player/{tag}/battles")
         
-        # Vai alla pagina battles
-        url = f"https://royaleapi.com/player/{tag}/battles"
-        driver.get(url)
+        time.sleep(5)
         
-        # Aspetta il caricamento
-        time.sleep(4)
+        # Leggi il testo completo della pagina
+        page_text = driver.find_element(By.TAG_NAME, "body").text
         
-        # Leggi il codice HTML per trovare le immagini degli stemmi
-        page_html = driver.page_source
+        print(f"📄", end=" ", flush=True)
         
-        # Cerca gli STEMMI delle war nel codice HTML
-        # RoyaleAPI usa tag <img> con src che contengono l'id dello stemma
+        # Tipi di River Race battles che cerchiamo
+        war_types = [
+            'River Race Duel',
+            'River Race 1v1',
+            'River Race Duel Colosseum',
+            'river race duel',
+            'river race 1v1',
+            'river race duel colosseum'
+        ]
         
-        # Conta le battaglie con stemmi di guerra
+        # Conta le war battles
         war_wins = 0
         war_losses = 0
         
-        # Trova tutti i container delle battaglie
-        battles = driver.find_elements(By.XPATH, "//tr")
-        
-        for battle in battles:
-            try:
-                # Cerca l'immagine dello stemma nella riga
-                # Gli stemmi delle war hanno classi/id specifiche
+        # Dividi il testo per ogni tipo di war
+        for war_type in war_types:
+            if war_type in page_text:
+                # Trova tutte le occorrenze di questo tipo di battaglia
+                sections = page_text.split(war_type)
                 
-                # Prova a trovare img con attributi che indicano war
-                imgs = battle.find_elements(By.TAG_NAME, "img")
-                
-                is_war_battle = False
-                
-                for img in imgs:
-                    src = img.get_attribute('src') or ""
-                    alt = img.get_attribute('alt') or ""
-                    class_name = img.get_attribute('class') or ""
+                # Per ogni occorrenza (tranne la prima che è testo prima)
+                for section in sections[1:]:
+                    # Guarda i prossimi 300 caratteri
+                    snippet = section[:300].lower()
                     
-                    # Cerca indicatori di war battle:
-                    # - src contiene 'war', 'clan-war', 'river-race'
-                    # - alt contiene war-related keywords
-                    
-                    if any(keyword in src.lower() for keyword in ['war', 'clan-war', 'river', 'boat']):
-                        is_war_battle = True
-                        break
-                    if any(keyword in alt.lower() for keyword in ['war', 'clan', 'river', 'boat']):
-                        is_war_battle = True
-                        break
-                
-                if is_war_battle:
-                    # Leggi se è Victory o Defeat
-                    battle_text = battle.text.lower()
-                    
-                    if 'victory' in battle_text or '1 - 0' in battle_text:
+                    # Cerca il risultato (Victory o Defeat)
+                    if 'victory' in snippet or 'won' in snippet or '1 - 0' in snippet:
                         war_wins += 1
-                    elif 'defeat' in battle_text or '0 - 1' in battle_text:
+                    elif 'defeat' in snippet or 'lost' in snippet or '0 - 1' in snippet or '0 - 3' in snippet:
                         war_losses += 1
-            
-            except:
-                pass
         
-        # Fallback: cerca nel codice HTML raw
-        if war_wins + war_losses == 0:
-            # Conta nel HTML direttamente
-            # Cerca elementi che indicano war battles
-            
-            if 'river-race' in page_html.lower() or 'clan-war' in page_html.lower():
-                # Estrai le vittorie e sconfitte
-                victory_count = page_html.lower().count('victory')
-                defeat_count = page_html.lower().count('defeat')
-                
-                war_wins = max(0, victory_count // 4)  # Approssima
-                war_losses = max(0, defeat_count // 4)
-        
-        # Risultato finale
         total_wars = war_wins + war_losses
         
+        print(f"W:{war_wins} L:{war_losses}", end=" ", flush=True)
+        
+        # Logica risultato
         if total_wars == 0:
-            print("⚠️  0 war")
+            print(f"❌")
             return 'No'
         elif war_losses >= total_wars or war_wins == 0:
-            print(f"Sì (0/{total_wars})")
+            print(f"✅ Sì")
             return 'Sì'
         else:
-            print(f"Win ({war_wins}/{total_wars})")
+            print(f"✅ Win")
             return 'Win'
     
     except Exception as e:
-        print(f"⚠️  {str(e)[:30]}")
+        print(f"⚠️  {str(e)[:20]}")
         return 'No'
     
     finally:
@@ -154,22 +123,19 @@ def get_war_battles(player_tag):
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR ANALYSIS - WAR EMBLEM DETECTION")
+    print("🤖 BOT CLASH ROYALE WAR - RIVER RACE BATTLES")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
     
     try:
-        # 1. Connessione
-        print("1️⃣ Connessione Google Sheets...")
+        print("1️⃣ Google Sheets...")
         sheet = get_google_sheet()
         if not sheet:
-            print("❌ Errore connessione")
             return False
-        print("✅ OK")
+        print("✅")
         print()
         
-        # 2. Lettura giocatori
         print("2️⃣ Lettura giocatori...")
         all_rows = sheet.get_all_values()
         
@@ -178,11 +144,10 @@ def main():
             return False
         
         players = all_rows[1:]
-        print(f"✅ {len(players)} giocatori trovati")
+        print(f"✅ {len(players)} giocatori")
         print()
         
-        # 3. Analisi
-        print("3️⃣ Analisi battaglie war...")
+        print("3️⃣ Analisi River Race battles...")
         print()
         
         updated = 0
@@ -204,15 +169,16 @@ def main():
             try:
                 sheet.update_cell(row_idx, 3, result)
                 updated += 1
-            except Exception as e:
-                print(f"❌ Write error")
+            except:
+                pass
             
-            time.sleep(3)
+            time.sleep(2)
         
         print()
-        print(f"✅ {updated} aggiornati!")
+        print()
+        print(f"✅ Aggiornati: {updated}")
         print("=" * 70)
-        print("✅ BOT COMPLETATO!")
+        print("✅ DONE!")
         print("=" * 70)
         return True
     
