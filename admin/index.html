@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Armata Rozza - War Analysis Admin</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -12,12 +18,27 @@
             min-height: 100vh;
             padding: 20px;
         }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* LOGIN */
         .login-container {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 1000;
         }
+
         .login-box {
             background: rgba(30, 30, 46, 0.95);
             border: 2px solid #e74c3c;
@@ -25,13 +46,22 @@
             padding: 40px;
             width: 100%;
             max-width: 400px;
+            box-shadow: 0 8px 32px rgba(231, 76, 60, 0.3);
             text-align: center;
         }
+
         .login-box h1 {
             color: #e74c3c;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             font-size: 28px;
         }
+
+        .login-box p {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
         .login-box input {
             width: 100%;
             padding: 15px;
@@ -42,6 +72,7 @@
             color: #e0e0e0;
             font-size: 16px;
         }
+
         .login-box button {
             width: 100%;
             padding: 15px;
@@ -54,62 +85,234 @@
             cursor: pointer;
             text-transform: uppercase;
         }
+
         .login-box button:hover {
             transform: translateY(-2px);
         }
-        .error { color: #e74c3c; display: none; }
-        .success { background: rgba(39, 174, 96, 0.2); color: #27ae60; padding: 20px; border-radius: 8px; margin-top: 20px; }
-        .dashboard { display: none; }
+
+        .login-error {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        /* DASHBOARD */
+        .admin-dashboard {
+            display: none;
+        }
+
+        .admin-dashboard.show {
+            display: block;
+        }
+
+        header {
+            background: rgba(30, 30, 46, 0.95);
+            border-bottom: 3px solid #e74c3c;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        header h1 {
+            color: #e74c3c;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            float: right;
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .section {
+            background: rgba(30, 30, 46, 0.95);
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .section h2 {
+            color: #e74c3c;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group label {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .control-group input {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #e0e0e0;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .success {
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <!-- LOGIN -->
+    <div class="login-container" id="loginContainer">
         <div class="login-box">
             <h1>🔐 ADMIN</h1>
             <p>Armata Rozza War Analysis</p>
-            <div class="error" id="error">Password non corretta</div>
-            <input type="password" id="password" placeholder="Inserisci password" />
+            <div class="login-error" id="loginError">Password non corretta</div>
+            <input type="password" id="passwordInput" placeholder="Inserisci password" />
             <button onclick="login()">Accedi</button>
-            <div class="success" id="success" style="display:none;">
-                ✅ Login riuscito!<br>
-                Sistema online e pronto per l'uso.
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="admin-dashboard" id="adminDashboard">
+        <div class="container">
+            <header>
+                <button class="logout-btn" onclick="logout()">Esci</button>
+                <h1>⚔️ ARMATA ROZZA - War Analysis</h1>
+                <p>Dashboard amministrativo per analisi performance guerra</p>
+            </header>
+
+            <div class="section">
+                <h2>📅 Visualizza Giorno Singolo</h2>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="singleDate">Seleziona Data</label>
+                        <input type="date" id="singleDate" />
+                    </div>
+                    <div class="control-group">
+                        <label>&nbsp;</label>
+                        <button class="btn" onclick="loadSingleDay()">🔍 Visualizza</button>
+                    </div>
+                </div>
+                <div id="resultsDay" class="empty-state">
+                    <p>👇 Seleziona una data per visualizzare i risultati</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📈 Analisi Periodo Lungo</h2>
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="periodStart">Data Inizio</label>
+                        <input type="date" id="periodStart" />
+                    </div>
+                    <div class="control-group">
+                        <label for="periodEnd">Data Fine</label>
+                        <input type="date" id="periodEnd" />
+                    </div>
+                </div>
+                <button class="btn" onclick="loadPeriodRecord()">📊 Calcola Record</button>
+                <div id="resultsPeriod" class="empty-state">
+                    <p>👇 Seleziona un periodo per visualizzare i record</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="dashboard" id="dashboard" style="display:none;">
-        <div style="text-align: center; color: #e0e0e0; padding: 40px;">
-            <h1>⚔️ ARMATA ROZZA - War Analysis</h1>
-            <p>Dashboard in costruzione...</p>
-            <button onclick="logout()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px;">Esci</button>
-        </div>
-    </div>
+
     <script>
         const CORRECT_PASSWORD = 'cuorerozzononmente';
-        
+
         function login() {
-            const password = document.getElementById('password').value;
+            const password = document.getElementById('passwordInput').value;
             if (password === CORRECT_PASSWORD) {
-                document.getElementById('success').style.display = 'block';
-                document.getElementById('password').style.display = 'none';
-                document.querySelector('button').style.display = 'none';
-                setTimeout(() => {
-                    document.querySelector('.login-container').parentElement.style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                }, 1500);
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminDashboard').classList.add('show');
+                setDefaultDates();
             } else {
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('password').value = '';
-                setTimeout(() => {
-                    document.getElementById('error').style.display = 'none';
-                }, 3000);
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.classList.add('show');
+                document.getElementById('passwordInput').value = '';
+                setTimeout(() => errorDiv.classList.remove('show'), 3000);
             }
         }
-        
+
         function logout() {
-            location.reload();
+            document.getElementById('adminDashboard').classList.remove('show');
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('passwordInput').value = '';
         }
-        
-        document.getElementById('password').addEventListener('keypress', (e) => {
+
+        function setDefaultDates() {
+            const today = new Date();
+            document.getElementById('singleDate').valueAsDate = today;
+            const sevenDaysAgo = new Date(today);
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+            document.getElementById('periodStart').valueAsDate = sevenDaysAgo;
+            document.getElementById('periodEnd').valueAsDate = today;
+        }
+
+        function loadSingleDay() {
+            document.getElementById('resultsDay').innerHTML = '<div class="success">✅ Dashboard pronto! Il bot aggiornerà i dati automaticamente ogni giorno alle 10:00 AM</div>';
+        }
+
+        function loadPeriodRecord() {
+            document.getElementById('resultsPeriod').innerHTML = '<div class="success">✅ Sistema online! I dati verranno visualizzati qui quando il bot avrà raccolto i risultati.</div>';
+        }
+
+        document.getElementById('passwordInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') login();
         });
     </script>
