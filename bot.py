@@ -1,96 +1,92 @@
-import gspread
-from google.oauth2.service_account import Credentials
+#!/usr/bin/env python3
+print("🤖 BOT STARTED")
+print("================")
+
+import sys
+print(f"Python: {sys.version}")
+
+try:
+    import gspread
+    print("✅ gspread imported")
+except Exception as e:
+    print(f"❌ gspread error: {e}")
+    sys.exit(1)
+
+try:
+    from google.oauth2.service_account import Credentials
+    print("✅ google.oauth2 imported")
+except Exception as e:
+    print(f"❌ google.oauth2 error: {e}")
+    sys.exit(1)
+
 import json
 import os
 from datetime import datetime
-import traceback
+
+print()
+print("=" * 60)
+print("🤖 BOT CLASH ROYALE WAR ANALYSIS")
+print(f"⏰ {datetime.now()}")
+print("=" * 60)
+print()
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
 
-def main():
-    try:
-        print("=" * 60)
-        print("🤖 BOT CLASH ROYALE WAR ANALYSIS")
-        print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("=" * 60)
-        print()
-        
-        # Verifica environment
-        print("1️⃣ Verificando environment variables...")
-        if not GOOGLE_SHEET_ID:
-            print("❌ GOOGLE_SHEET_ID mancante!")
-            return False
-        if not GOOGLE_CREDENTIALS:
-            print("❌ GOOGLE_CREDENTIALS mancante!")
-            return False
-        print("✅ Variables OK")
-        print()
-        
-        # Parse JSON
-        print("2️⃣ Parsando JSON...")
-        try:
-            creds_dict = json.loads(GOOGLE_CREDENTIALS)
-            print("✅ JSON parsato correttamente")
-        except json.JSONDecodeError as e:
-            print(f"❌ Errore JSON: {e}")
-            return False
-        print()
-        
-        # Autenticazione
-        print("3️⃣ Autenticando con Google...")
-        try:
-            creds = Credentials.from_service_account_info(
-                creds_dict,
-                scopes=['https://www.googleapis.com/auth/spreadsheets']
-            )
-            print("✅ Autenticazione OK")
-        except Exception as e:
-            print(f"❌ Errore autenticazione: {e}")
-            return False
-        print()
-        
-        # Connessione Google Sheets
-        print("4️⃣ Connettendosi a Google Sheets...")
-        try:
-            client = gspread.authorize(creds)
-            sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
-            print("✅ Connessione Google Sheets OK")
-        except Exception as e:
-            print(f"❌ Errore connessione: {e}")
-            return False
-        print()
-        
-        # Lettura dati
-        print("5️⃣ Leggendo dati dal foglio...")
-        try:
-            all_rows = sheet.get_all_values()
-            print(f"✅ Foglio letto ({len(all_rows)} righe)")
-        except Exception as e:
-            print(f"❌ Errore lettura: {e}")
-            return False
-        print()
-        
-        # Scrittura dati
-        print("6️⃣ Scrivendo dati nel foglio...")
-        try:
-            for idx, row in enumerate(all_rows[1:], start=2):
-                if len(row) > 1 and row[1]:
-                    sheet.update_cell(idx, 3, "✅ TEST")
-                    print(f"   ✅ Riga {idx}: {row[1]}")
-            print("✅ Dati scritti")
-        except Exception as e:
-            print(f"❌ Errore scrittura: {e}")
-            return False
-        print()
-        
-        print("✅ BOT COMPLETATO CON SUCCESSO!")
-        return True
+print(f"✅ GOOGLE_SHEET_ID: {GOOGLE_SHEET_ID}")
+print(f"✅ GOOGLE_CREDENTIALS: {'Set' if GOOGLE_CREDENTIALS else 'Not set'}")
+print()
+
+try:
+    print("Parsing JSON...")
+    creds_dict = json.loads(GOOGLE_CREDENTIALS)
+    print("✅ JSON parsed OK")
+    print()
     
-    except Exception as e:
+    print("Authenticating with Google...")
+    creds = Credentials.from_service_account_info(
+        creds_dict,
+        scopes=['https://www.googleapis.com/auth/spreadsheets']
+    )
+    print("✅ Auth OK")
+    print()
+    
+    print("Connecting to Google Sheets...")
+    client = gspread.authorize(creds)
+    sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
+    print("✅ Connected!")
+    print()
+    
+    print("Reading sheet...")
+    all_rows = sheet.get_all_values()
+    print(f"✅ Sheet read ({len(all_rows)} rows)")
+    print()
+    
+    if len(all_rows) > 1:
+        print(f"Found {len(all_rows) - 1} players")
         print()
-        print("❌ ERRORE GENERICO:")
-        print(f"   {e}")
+        
+        print("Writing test data...")
+        count = 0
+        for idx, row in enumerate(all_rows[1:], start=2):
+            if len(row) > 1 and row[1]:
+                try:
+                    sheet.update_cell(idx, 3, "✅ TEST")
+                    print(f"  ✅ Row {idx}: {row[1]}")
+                    count += 1
+                except Exception as e:
+                    print(f"  ❌ Error row {idx}: {e}")
+        
         print()
-        print("TRACEBACK:")
-        trac
+        print(f"✅ Written {count} cells!")
+    
+    print()
+    print("✅ BOT COMPLETED SUCCESSFULLY!")
+    
+except Exception as e:
+    import traceback
+    print()
+    print(f"❌ ERROR: {e}")
+    print()
+    traceback.print_exc()
+    sys.exit(1)
