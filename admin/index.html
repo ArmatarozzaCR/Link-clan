@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Armata Rozza - War Analysis Admin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-box {
+            background: rgba(30, 30, 46, 0.95);
+            border: 2px solid #e74c3c;
+            border-radius: 15px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-box h1 {
+            color: #e74c3c;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #e74c3c;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .login-box button:hover {
+            transform: translateY(-2px);
+        }
+        .error { color: #e74c3c; display: none; }
+        .success { background: rgba(39, 174, 96, 0.2); color: #27ae60; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .dashboard { display: none; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <h1>🔐 ADMIN</h1>
+            <p>Armata Rozza War Analysis</p>
+            <div class="error" id="error">Password non corretta</div>
+            <input type="password" id="password" placeholder="Inserisci password" />
+            <button onclick="login()">Accedi</button>
+            <div class="success" id="success" style="display:none;">
+                ✅ Login riuscito!<br>
+                Sistema online e pronto per l'uso.
+            </div>
+        </div>
+    </div>
+    <div class="dashboard" id="dashboard" style="display:none;">
+        <div style="text-align: center; color: #e0e0e0; padding: 40px;">
+            <h1>⚔️ ARMATA ROZZA - War Analysis</h1>
+            <p>Dashboard in costruzione...</p>
+            <button onclick="logout()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px;">Esci</button>
+        </div>
+    </div>
+    <script>
+        const CORRECT_PASSWORD = 'cuorerozzononmente';
+        
+        function login() {
+            const password = document.getElementById('password').value;
+            if (password === CORRECT_PASSWORD) {
+                document.getElementById('success').style.display = 'block';
+                document.getElementById('password').style.display = 'none';
+                document.querySelector('button').style.display = 'none';
+                setTimeout(() => {
+                    document.querySelector('.login-container').parentElement.style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                }, 1500);
+            } else {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('password').value = '';
+                setTimeout(() => {
+                    document.getElementById('error').style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        function logout() {
+            location.reload();
+        }
+        
+        document.getElementById('password').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>
