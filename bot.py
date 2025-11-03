@@ -45,9 +45,8 @@ def get_war_results(player_tag):
         tag = player_tag.replace('#', '').upper()
         
         headers = {
-            'Authorization': f'Bearer {ROYALE_API_KEY}',
-            'User-Agent': 'Armata-Rozza-Bot'
-        }
+    'User-Agent': 'Armata-Rozza-Bot'
+}
         
         # Ottieni il battlelog
         url = f"{API_BASE_URL}/players/%23{tag}/battlelog"
