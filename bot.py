@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - WITH ADVANCED SCRAPING
+Clash Royale War Analysis Bot - WITH PLAYWRIGHT
 """
 
 import gspread
 from google.oauth2.service_account import Credentials
-import requests
-from bs4 import BeautifulSoup
 import json
 import os
 import time
 from datetime import datetime
 import re
+import asyncio
+from playwright.async_api import async_playwright
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
@@ -31,71 +31,59 @@ def get_google_sheet():
         print(f"❌ Errore: {e}")
         return None
 
-def get_clan_war_data(clan_tag):
-    """Scraping avanzato del clan war race"""
+async def get_clan_war_data(clan_tag):
+    """Scraping con Playwright"""
     try:
         tag = clan_tag.replace('#', '').upper()
         url = f"https://royaleapi.com/clan/{tag}/war/race"
         
-        print(f"      📡 GET {url}", end=" ")
+        print(f"      🌐 Playwright...", end=" ", flush=True)
         
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
-        
-        response = requests.get(url, headers=headers, timeout=15)
-        print(f"[{response.status_code}]")
-        
-        if response.status_code != 200:
-            print(f"      ❌ HTTP Error")
-            return {}
-        
-        # METODO 1: Parse con BeautifulSoup
-        print(f"      🔍 Parsing HTML...", end=" ")
-        soup = BeautifulSoup(response.content, 'html.parser')
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True)
+            page = await browser.new_page()
+            
+            await page.goto(url, wait_until='load')
+            await page.wait_for_load_state('networkidle', timeout=10000)
+            
+            # Aspetta che la tabella si carichi
+            await page.wait_for_selector('tr', timeout=5000)
+            
+            # Leggi il testo della pagina
+            page_text = await page.content()
+            
+            await browser.close()
         
         war_data = {}
         
-        # Cerca i dati nel testo RAW
-        html_text = response.text
-        
-        # Cerca il pattern della tabella
-        # Esempio: "ＡＲ❤️Ｔｅｆａｎｏｓ Member 4 0 0 0"
-        
-        lines = html_text.split('\n')
-        found_count = 0
+        # Parse dal contenuto della pagina
+        lines = page_text.split('\n')
         
         for line in lines:
-            # Cerca righe che contengono sia nomi che numeri
             if ('Member' in line or 'Leader' in line or 'Co-leader' in line) and re.search(r'\d+', line):
-                # Estrai tutti i numeri dalla linea
                 numbers = re.findall(r'\d+', line)
                 
                 if len(numbers) >= 2:
                     try:
-                        # Pulisci la linea da numeri e ruoli
                         clean_line = line
                         for num in numbers:
                             clean_line = clean_line.replace(num, ' ')
                         for role in ['Member', 'Leader', 'Co-leader']:
                             clean_line = clean_line.replace(role, ' ')
                         
-                        # Estrai il nome
                         name = ' '.join(clean_line.split()).strip()
                         
-                        if name and len(name) > 2 and name not in ['Participants', 'Battle Types', 'All Battles', 'Ladder', 'Ranked', 'Friendly', 'Boat Battle']:
-                            # I numeri sono: Wins Losses ... (prendi i primi 2)
+                        if name and len(name) > 2:
                             wins = int(numbers[0]) if len(numbers) > 0 else 0
                             losses = int(numbers[1]) if len(numbers) > 1 else 0
                             
                             war_data[name] = (wins, losses)
-                            found_count += 1
                     
                     except:
                         pass
         
-        if found_count > 0:
-            print(f"✅ {found_count} giocatori")
+        if war_data:
+            print(f"✅ {len(war_data)}")
         else:
             print(f"❌")
         
@@ -107,7 +95,7 @@ def get_clan_war_data(clan_tag):
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR - ADVANCED SCRAPING")
+    print("🤖 BOT CLASH ROYALE WAR - PLAYWRIGHT")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
@@ -132,18 +120,19 @@ def main():
         print()
         
         clan_tags = [tag.strip() for tag in CLAN_TAGS.split(',')]
-        print(f"3️⃣ War Race Scraping ({len(clan_tags)} clan)...")
+        print(f"3️⃣ War Race ({len(clan_tags)} clan)...")
         print()
         
         all_war_data = {}
         
         for clan_tag in clan_tags:
             print(f"   📍 {clan_tag}")
-            war_data = get_clan_war_data(clan_tag)
+            
+            # Esegui Playwright in modo asincrono
+            war_data = asyncio.run(get_clan_war_data(clan_tag))
             
             if war_data:
                 all_war_data.update(war_data)
-                print(f"      ✅ Trovati {len(war_data)} giocatori")
             
             time.sleep(1)
         
@@ -152,15 +141,10 @@ def main():
         print()
         
         if not all_war_data:
-            print("❌ Nessun dato trovato!")
-            print()
-            print("   💡 SUGGERIMENTO:")
-            print("   💡 Il clan potrebbe non avere dati visibili")
-            print("   💡 O RoyaleAPI potrebbe bloccare le richieste")
-            print()
+            print("❌ Nessun dato trovato")
             return False
         
-        print("4️⃣ Aggiornamento Google Sheets...")
+        print("4️⃣ Aggiornamento...")
         print()
         
         updated = 0
@@ -192,7 +176,7 @@ def main():
                 print(f"   ❌ {name}: Not found")
         
         print()
-        print(f"✅ Aggiornati: {updated}/{len(players)}")
+        print(f"✅ Aggiornati: {updated}")
         print("=" * 70)
         print("✅ COMPLETATO!")
         print("=" * 70)
