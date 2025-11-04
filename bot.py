@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - MULTIPLE CLANS WAR RACE ANALYSIS
-Legge il War Race di MULTIPLI clan
+Clash Royale War Analysis Bot - MULTIPLE CLANS (FIXED PARSING)
 """
 
 import gspread
@@ -14,10 +13,11 @@ import os
 import time
 from datetime import datetime
 import traceback
+import re
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
-CLAN_TAGS = os.getenv('CLAN_TAGS', 'QC8LRJRP')  # Separati da virgola
+CLAN_TAGS = os.getenv('CLAN_TAGS', 'QC8LRJRP')
 
 def get_google_sheet():
     """Connessione a Google Sheets"""
@@ -37,13 +37,11 @@ def get_google_sheet():
 def get_clan_war_data(clan_tag):
     """
     Legge i dati del War Race di UN clan
-    Ritorna un dizionario con player_name -> (wins, losses)
     """
     driver = None
     try:
         tag = clan_tag.replace('#', '').upper()
         
-        # Configura Chrome
         chrome_options = Options()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
@@ -55,66 +53,80 @@ def get_clan_war_data(clan_tag):
         url = f"https://royaleapi.com/clan/{tag}/war/race"
         driver.get(url)
         
-        time.sleep(4)
+        time.sleep(5)
         
-        # Leggi il testo della pagina
+        # Leggi il testo completo
         page_text = driver.find_element(By.TAG_NAME, "body").text
         
-        # Dizionario per i risultati
         war_data = {}
         
-        # Leggi le righe
-        rows = driver.find_elements(By.TAG_NAME, "tr")
+        # METODO 1: Parse dal testo raw (più robusto)
+        lines = page_text.split('\n')
         
-        for row in rows:
-            try:
-                cells = row.find_elements(By.TAG_NAME, "td")
+        for i, line in enumerate(lines):
+            # Cerca linee con "Member", "Leader", "Co-leader"
+            if any(role in line for role in ['Member', 'Leader', 'Co-leader']):
+                # La linea ha il formato: NAME ROLE WINS LOSSES ...
                 
-                if len(cells) >= 4:
-                    player_name = cells[1].text.strip()
-                    
-                    if player_name and player_name != "Participants:":
-                        try:
-                            wins = int(cells[2].text.strip())
-                            losses = int(cells[3].text.strip())
+                # Prova a estrarre i numeri
+                numbers = re.findall(r'\d+', line)
+                
+                if len(numbers) >= 2:
+                    try:
+                        # Gli ultimi numeri sono tipicamente wins/losses
+                        wins = int(numbers[-2]) if len(numbers) >= 2 else 0
+                        losses = int(numbers[-1]) if len(numbers) >= 1 else 0
+                        
+                        # Estrai il nome (parte prima dei numeri)
+                        # Rimuovi "Member", "Leader", "Co-leader"
+                        clean_line = line
+                        for role in ['Member', 'Leader', 'Co-leader']:
+                            clean_line = clean_line.replace(role, '')
+                        
+                        # Rimuovi i numeri
+                        for num in numbers:
+                            clean_line = clean_line.replace(num, '')
+                        
+                        player_name = clean_line.strip()
+                        
+                        if player_name and len(player_name) > 2:
                             war_data[player_name] = (wins, losses)
+                            print(f"         → {player_name}: {wins}W/{losses}L")
+                    
+                    except:
+                        pass
+        
+        # METODO 2: Se il metodo 1 non ha trovato niente, prova con le celle HTML
+        if not war_data:
+            try:
+                rows = driver.find_elements(By.XPATH, "//tr[td]")
+                
+                for row in rows:
+                    cells = row.find_elements(By.TAG_NAME, "td")
+                    
+                    if len(cells) >= 4:
+                        try:
+                            # cells[1] = nome, cells[2] = wins, cells[3] = losses
+                            player_name = cells[1].text.strip()
+                            wins_text = cells[2].text.strip()
+                            losses_text = cells[3].text.strip()
+                            
+                            if player_name and player_name != "Participants:":
+                                wins = int(wins_text) if wins_text.isdigit() else 0
+                                losses = int(losses_text) if losses_text.isdigit() else 0
+                                
+                                war_data[player_name] = (wins, losses)
+                                print(f"         → {player_name}: {wins}W/{losses}L")
+                        
                         except:
                             pass
             except:
                 pass
         
-        # Fallback: parsing dal testo
-        if not war_data:
-            lines = page_text.split('\n')
-            
-            for line in lines:
-                if 'Member' in line or 'Leader' in line or 'Co-leader' in line:
-                    parts = line.split()
-                    
-                    if len(parts) >= 4:
-                        try:
-                            for i in range(len(parts) - 4, -1, -1):
-                                if parts[i].isdigit():
-                                    wins = int(parts[i])
-                                    losses = int(parts[i + 1]) if i + 1 < len(parts) else 0
-                                    
-                                    name_parts = []
-                                    for j in range(i):
-                                        if 'Member' not in parts[j] and 'Leader' not in parts[j] and 'Co-' not in parts[j]:
-                                            name_parts.append(parts[j])
-                                    
-                                    player_name = ' '.join(name_parts).strip()
-                                    
-                                    if player_name:
-                                        war_data[player_name] = (wins, losses)
-                                    break
-                        except:
-                            pass
-        
         return war_data
     
     except Exception as e:
-        print(f"   ⚠️  Errore clan {tag}: {str(e)[:30]}")
+        print(f"   ⚠️  Errore: {str(e)[:40]}")
         return {}
     
     finally:
@@ -150,12 +162,10 @@ def main():
         print(f"✅ {len(players)} giocatori")
         print()
         
-        # Parsing dei clan tags
         clan_tags = [tag.strip() for tag in CLAN_TAGS.split(',')]
-        print(f"3️⃣ Lettura War Race ({len(clan_tags)} clan)...")
+        print(f"3️⃣ War Race ({len(clan_tags)} clan)...")
         print()
         
-        # Raccogli dati da TUTTI i clan
         all_war_data = {}
         
         for clan_tag in clan_tags:
@@ -163,14 +173,13 @@ def main():
             war_data = get_clan_war_data(clan_tag)
             
             if war_data:
-                print(f"      ✅ {len(war_data)} giocatori trovati")
-                # Merge dei dati
+                print(f"      ✅ {len(war_data)} giocatori")
                 all_war_data.update(war_data)
             else:
                 print(f"      ❌ Nessun dato")
         
         print()
-        print(f"   📊 TOTALE: {len(all_war_data)} giocatori in tutti i clan")
+        print(f"   📊 TOTALE: {len(all_war_data)} giocatori")
         print()
         
         if not all_war_data:
@@ -188,30 +197,29 @@ def main():
             
             name = player_row[1]
             
-            # Cerca il giocatore nei dati di TUTTI i clan
             if name in all_war_data:
                 wins, losses = all_war_data[name]
                 total = wins + losses
                 
                 if total == 0:
                     result = 'No'
-                    print_result = "No"
+                    status = "No"
                 elif losses >= total or wins == 0:
                     result = 'Sì'
-                    print_result = f"Sì"
+                    status = "Sì"
                 else:
                     result = 'Win'
-                    print_result = f"Win"
+                    status = "Win"
                 
-                print(f"   🎮 {name}... {print_result} ({wins}W/{losses}L)")
+                print(f"   🎮 {name}... {status} ({wins}W/{losses}L)")
                 
                 try:
                     sheet.update_cell(row_idx, 3, result)
                     updated += 1
-                except Exception as e:
-                    print(f"      ❌ Error: {e}")
+                except:
+                    pass
             else:
-                print(f"   🎮 {name}... ❌ Not in any clan")
+                print(f"   🎮 {name}... ❌ Not found")
         
         print()
         print(f"✅ Aggiornati: {updated}/{len(players)}")
