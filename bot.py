@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - RIVER RACE FILTER
-Clicca sul dropdown Battle Types e seleziona River Race
+Clash Royale War Analysis Bot - MULTIPLE CLANS WAR RACE ANALYSIS
+Legge il War Race di MULTIPLI clan
 """
 
 import gspread
@@ -9,8 +9,6 @@ from google.oauth2.service_account import Credentials
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import json
 import os
 import time
@@ -19,6 +17,7 @@ import traceback
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
+CLAN_TAGS = os.getenv('CLAN_TAGS', 'QC8LRJRP')  # Separati da virgola
 
 def get_google_sheet():
     """Connessione a Google Sheets"""
@@ -35,18 +34,14 @@ def get_google_sheet():
         print(f"❌ Errore: {e}")
         return None
 
-def get_war_battles(player_tag):
+def get_clan_war_data(clan_tag):
     """
-    Clicca sul dropdown Battle Types
-    Seleziona River Race
-    Legge le vittorie e sconfitte
+    Legge i dati del War Race di UN clan
+    Ritorna un dizionario con player_name -> (wins, losses)
     """
     driver = None
     try:
-        if not player_tag or player_tag == "":
-            return 'No'
-        
-        tag = player_tag.replace('#', '').upper()
+        tag = clan_tag.replace('#', '').upper()
         
         # Configura Chrome
         chrome_options = Options()
@@ -56,104 +51,71 @@ def get_war_battles(player_tag):
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('user-agent=Mozilla/5.0')
         
-        print(f"🌐", end=" ", flush=True)
-        
         driver = webdriver.Chrome(options=chrome_options)
-        driver.get(f"https://royaleapi.com/player/{tag}/battles")
+        url = f"https://royaleapi.com/clan/{tag}/war/race"
+        driver.get(url)
         
         time.sleep(4)
         
-        print(f"🔍", end=" ", flush=True)
-        
-        try:
-            # Trova il dropdown "Battle Types"
-            # Cerca il pulsante select/dropdown
-            dropdown = driver.find_element(By.XPATH, "//select | //button[contains(text(), 'Battle')] | //*[contains(text(), 'Battle Types')]")
-            
-            # Se è un select, usa select_by_value
-            from selenium.webdriver.support.select import Select
-            
-            try:
-                select = Select(dropdown)
-                # Cerca un'opzione che contiene "River Race"
-                options = select.options
-                
-                for option in options:
-                    if 'River Race' in option.text:
-                        select.select_by_value(option.get_attribute('value'))
-                        time.sleep(2)
-                        break
-            except:
-                # Se non è un select, clicca sul pulsante
-                dropdown.click()
-                time.sleep(2)
-        except:
-            pass
-        
-        # Leggi il testo della pagina DOPO il filtro
+        # Leggi il testo della pagina
         page_text = driver.find_element(By.TAG_NAME, "body").text
         
-        print(f"📊", end=" ", flush=True)
+        # Dizionario per i risultati
+        war_data = {}
         
-        # Conta Victory e Defeat nel testo
-        victory_count = page_text.lower().count('victory') + page_text.lower().count('won') + page_text.lower().count('1 - 0')
-        defeat_count = page_text.lower().count('defeat') + page_text.lower().count('lost') + page_text.lower().count('0 - 1') + page_text.lower().count('0 - 3')
+        # Leggi le righe
+        rows = driver.find_elements(By.TAG_NAME, "tr")
         
-        # Approssima: se ci sono "River Race 1v1: 10" significa 10 battaglie
-        # Estrai il numero dal testo
-        import re
-        
-        war_wins = 0
-        war_losses = 0
-        
-        # Cerca pattern come "River Race 1v1: X" o "River Race Duel: X"
-        patterns = [
-            r'River Race 1v1.*?:\s*(\d+)',
-            r'River Race Duel.*?:\s*(\d+)',
-            r'River Race.*?:\s*(\d+)'
-        ]
-        
-        for pattern in patterns:
-            matches = re.findall(pattern, page_text, re.IGNORECASE)
-            if matches:
-                # Prendi il primo match
-                total = int(matches[0])
+        for row in rows:
+            try:
+                cells = row.find_elements(By.TAG_NAME, "td")
                 
-                # Conta vittorie e sconfitte nel testo della pagina
-                snippet = page_text.lower()
-                
-                # Conta "Victory" e "Defeat" nelle righe di battaglia
-                victories = snippet.count('victory')
-                defeats = snippet.count('defeat')
-                
-                war_wins = max(0, victories)
-                war_losses = max(0, defeats)
-                
-                break
+                if len(cells) >= 4:
+                    player_name = cells[1].text.strip()
+                    
+                    if player_name and player_name != "Participants:":
+                        try:
+                            wins = int(cells[2].text.strip())
+                            losses = int(cells[3].text.strip())
+                            war_data[player_name] = (wins, losses)
+                        except:
+                            pass
+            except:
+                pass
         
-        # Se non ha trovato niente, prova un approccio diverso
-        if war_wins + war_losses == 0:
-            # Conta solo le occorrenze nel testo
-            war_wins = page_text.count('Victory')
-            war_losses = page_text.count('Defeat')
+        # Fallback: parsing dal testo
+        if not war_data:
+            lines = page_text.split('\n')
+            
+            for line in lines:
+                if 'Member' in line or 'Leader' in line or 'Co-leader' in line:
+                    parts = line.split()
+                    
+                    if len(parts) >= 4:
+                        try:
+                            for i in range(len(parts) - 4, -1, -1):
+                                if parts[i].isdigit():
+                                    wins = int(parts[i])
+                                    losses = int(parts[i + 1]) if i + 1 < len(parts) else 0
+                                    
+                                    name_parts = []
+                                    for j in range(i):
+                                        if 'Member' not in parts[j] and 'Leader' not in parts[j] and 'Co-' not in parts[j]:
+                                            name_parts.append(parts[j])
+                                    
+                                    player_name = ' '.join(name_parts).strip()
+                                    
+                                    if player_name:
+                                        war_data[player_name] = (wins, losses)
+                                    break
+                        except:
+                            pass
         
-        total = war_wins + war_losses
-        
-        print(f"W:{war_wins} L:{war_losses}", end=" ", flush=True)
-        
-        if total == 0:
-            print(f"❌")
-            return 'No'
-        elif war_losses >= total or war_wins == 0:
-            print(f"✅ Sì")
-            return 'Sì'
-        else:
-            print(f"✅ Win")
-            return 'Win'
+        return war_data
     
     except Exception as e:
-        print(f"⚠️  {str(e)[:20]}")
-        return 'No'
+        print(f"   ⚠️  Errore clan {tag}: {str(e)[:30]}")
+        return {}
     
     finally:
         if driver:
@@ -164,7 +126,7 @@ def get_war_battles(player_tag):
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR - RIVER RACE DETECTION")
+    print("🤖 BOT CLASH ROYALE WAR - MULTIPLE CLANS")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
@@ -177,18 +139,45 @@ def main():
         print("✅")
         print()
         
-        print("2️⃣ Giocatori...")
+        print("2️⃣ Lettura giocatori...")
         all_rows = sheet.get_all_values()
         
         if len(all_rows) < 2:
-            print("❌ Vuoto")
+            print("❌ Foglio vuoto")
             return False
         
         players = all_rows[1:]
-        print(f"✅ {len(players)}")
+        print(f"✅ {len(players)} giocatori")
         print()
         
-        print("3️⃣ River Race Analysis...")
+        # Parsing dei clan tags
+        clan_tags = [tag.strip() for tag in CLAN_TAGS.split(',')]
+        print(f"3️⃣ Lettura War Race ({len(clan_tags)} clan)...")
+        print()
+        
+        # Raccogli dati da TUTTI i clan
+        all_war_data = {}
+        
+        for clan_tag in clan_tags:
+            print(f"   📍 Clan {clan_tag}...")
+            war_data = get_clan_war_data(clan_tag)
+            
+            if war_data:
+                print(f"      ✅ {len(war_data)} giocatori trovati")
+                # Merge dei dati
+                all_war_data.update(war_data)
+            else:
+                print(f"      ❌ Nessun dato")
+        
+        print()
+        print(f"   📊 TOTALE: {len(all_war_data)} giocatori in tutti i clan")
+        print()
+        
+        if not all_war_data:
+            print("❌ Nessun dato trovato")
+            return False
+        
+        print("4️⃣ Aggiornamento...")
         print()
         
         updated = 0
@@ -198,26 +187,34 @@ def main():
                 continue
             
             name = player_row[1]
-            tag = player_row[0] if len(player_row) > 0 else None
             
-            if not tag or tag == "":
-                continue
-            
-            print(f"   🎮 {name} ({tag})... ", end="", flush=True)
-            
-            result = get_war_battles(tag)
-            
-            try:
-                sheet.update_cell(row_idx, 3, result)
-                updated += 1
-            except:
-                pass
-            
-            time.sleep(2)
+            # Cerca il giocatore nei dati di TUTTI i clan
+            if name in all_war_data:
+                wins, losses = all_war_data[name]
+                total = wins + losses
+                
+                if total == 0:
+                    result = 'No'
+                    print_result = "No"
+                elif losses >= total or wins == 0:
+                    result = 'Sì'
+                    print_result = f"Sì"
+                else:
+                    result = 'Win'
+                    print_result = f"Win"
+                
+                print(f"   🎮 {name}... {print_result} ({wins}W/{losses}L)")
+                
+                try:
+                    sheet.update_cell(row_idx, 3, result)
+                    updated += 1
+                except Exception as e:
+                    print(f"      ❌ Error: {e}")
+            else:
+                print(f"   🎮 {name}... ❌ Not in any clan")
         
         print()
-        print()
-        print(f"✅ Aggiornati: {updated}")
+        print(f"✅ Aggiornati: {updated}/{len(players)}")
         print("=" * 70)
         print("✅ COMPLETATO!")
         print("=" * 70)
