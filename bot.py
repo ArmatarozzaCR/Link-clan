@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - REQUESTS (NO SELENIUM)
-Usa requests per prendere i dati direttamente dall'HTML
+Clash Royale War Analysis Bot - FINAL VERSION
+Legge i dati del War Race del clan da RoyaleAPI
 """
 
 import gspread
@@ -12,7 +12,6 @@ import json
 import os
 import time
 from datetime import datetime
-import traceback
 import re
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
@@ -20,7 +19,6 @@ GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
 CLAN_TAGS = os.getenv('CLAN_TAGS', 'QC8LRJRP')
 
 def get_google_sheet():
-    """Connessione a Google Sheets"""
     try:
         creds_dict = json.loads(GOOGLE_CREDENTIALS)
         creds = Credentials.from_service_account_info(
@@ -35,18 +33,12 @@ def get_google_sheet():
         return None
 
 def get_clan_war_data(clan_tag):
-    """
-    Usa requests + BeautifulSoup per scaricare la pagina
-    """
+    """Legge i dati del War Race dal clan"""
     try:
         tag = clan_tag.replace('#', '').upper()
-        
         url = f"https://royaleapi.com/clan/{tag}/war/race"
         
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-        
+        headers = {'User-Agent': 'Mozilla/5.0'}
         response = requests.get(url, headers=headers, timeout=10)
         
         if response.status_code != 200:
@@ -54,10 +46,10 @@ def get_clan_war_data(clan_tag):
             return {}
         
         soup = BeautifulSoup(response.content, 'html.parser')
-        
         war_data = {}
         
-        # Cerca tutte le righe della tabella
+        # METODO 1: Trova tutte le righe con dati di guerra
+        # Cerca i <tr> che contengono le info dei giocatori
         rows = soup.find_all('tr')
         
         for row in rows:
@@ -65,64 +57,35 @@ def get_clan_war_data(clan_tag):
             
             if len(cells) >= 4:
                 try:
-                    # cells[1] = nome player
-                    # cells[2] = wins (primo numero)
-                    # cells[3] = losses (secondo numero)
+                    # Estrai il nome (seconda colonna)
+                    name_cell = cells[1].get_text(strip=True)
+                    wins_cell = cells[2].get_text(strip=True)
+                    losses_cell = cells[3].get_text(strip=True)
                     
-                    player_name = cells[1].get_text().strip()
-                    wins_text = cells[2].get_text().strip()
-                    losses_text = cells[3].get_text().strip()
+                    # Rimuovi prefissi (numeri di ranking)
+                    name = re.sub(r'^\d+\s*', '', name_cell).strip()
                     
-                    if player_name and player_name != "Participants:":
-                        # Estrai solo i numeri
-                        wins = int(re.search(r'\d+', wins_text).group()) if re.search(r'\d+', wins_text) else 0
-                        losses = int(re.search(r'\d+', losses_text).group()) if re.search(r'\d+', losses_text) else 0
-                        
-                        war_data[player_name] = (wins, losses)
-                        print(f"         → {player_name}: {wins}W/{losses}L")
+                    # Estrai i numeri
+                    wins_match = re.search(r'\d+', wins_cell)
+                    losses_match = re.search(r'\d+', losses_cell)
+                    
+                    if name and name not in ['Participants:', ''] and wins_match and losses_match:
+                        wins = int(wins_match.group())
+                        losses = int(losses_match.group())
+                        war_data[name] = (wins, losses)
                 
-                except Exception as e:
+                except:
                     pass
-        
-        # Fallback: parse dal testo raw
-        if not war_data:
-            text = soup.get_text()
-            lines = text.split('\n')
-            
-            for line in lines:
-                if any(role in line for role in ['Member', 'Leader', 'Co-leader']):
-                    numbers = re.findall(r'\d+', line)
-                    
-                    if len(numbers) >= 2:
-                        try:
-                            wins = int(numbers[-4]) if len(numbers) >= 4 else 0
-                            losses = int(numbers[-3]) if len(numbers) >= 3 else 0
-                            
-                            clean_line = line
-                            for role in ['Member', 'Leader', 'Co-leader']:
-                                clean_line = clean_line.replace(role, '')
-                            
-                            for num in numbers:
-                                clean_line = clean_line.replace(num, '')
-                            
-                            player_name = clean_line.strip()
-                            
-                            if player_name and len(player_name) > 2:
-                                war_data[player_name] = (wins, losses)
-                                print(f"         → {player_name}: {wins}W/{losses}L")
-                        
-                        except:
-                            pass
         
         return war_data
     
     except Exception as e:
-        print(f"      ⚠️  {str(e)[:40]}")
+        print(f"      ⚠️  Error: {str(e)[:30]}")
         return {}
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR - MULTIPLE CLANS")
+    print("🤖 BOT CLASH ROYALE WAR - FINAL")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
@@ -153,14 +116,18 @@ def main():
         all_war_data = {}
         
         for clan_tag in clan_tags:
-            print(f"   📍 Clan {clan_tag}...")
+            print(f"   📍 {clan_tag}...")
             war_data = get_clan_war_data(clan_tag)
             
             if war_data:
                 print(f"      ✅ {len(war_data)} giocatori")
+                for name, (wins, losses) in list(war_data.items())[:3]:
+                    print(f"         • {name}: {wins}W/{losses}L")
+                if len(war_data) > 3:
+                    print(f"         ... e altri {len(war_data) - 3}")
                 all_war_data.update(war_data)
             else:
-                print(f"      ❌ Nessun dato")
+                print(f"      ⚠️  Nessun dato")
             
             time.sleep(1)
         
@@ -170,10 +137,6 @@ def main():
         
         if not all_war_data:
             print("❌ Nessun dato trovato")
-            print()
-            print("   💡 DEBUG: Forse RoyaleAPI ha cambiato struttura")
-            print("   💡 Prova a verificare manualmente:")
-            print(f"   💡 <https://royaleapi.com/clan/{clan_tags>[0]}/war/race")
             return False
         
         print("4️⃣ Aggiornamento...")
@@ -193,34 +156,28 @@ def main():
                 
                 if total == 0:
                     result = 'No'
-                    status = "No"
                 elif losses >= total or wins == 0:
                     result = 'Sì'
-                    status = "Sì"
                 else:
                     result = 'Win'
-                    status = "Win"
                 
-                print(f"   🎮 {name}... {status} ({wins}W/{losses}L)")
+                print(f"   ✅ {name}: {result}")
                 
                 try:
                     sheet.update_cell(row_idx, 3, result)
                     updated += 1
                 except:
                     pass
-            else:
-                print(f"   🎮 {name}... ❌ Not found")
         
         print()
-        print(f"✅ Aggiornati: {updated}/{len(players)}")
+        print(f"✅ Aggiornati: {updated}")
         print("=" * 70)
-        print("✅ COMPLETATO!")
+        print("✅ BOT COMPLETATO!")
         print("=" * 70)
         return True
     
     except Exception as e:
         print(f"❌ {e}")
-        traceback.print_exc()
         return False
 
 if __name__ == "__main__":
