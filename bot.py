@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - RIVER RACE BATTLES DETECTION
-Legge le River Race Duel, 1v1, e Colosseum battles
+Clash Royale War Analysis Bot - RIVER RACE FILTER
+Clicca sul dropdown Battle Types e seleziona River Race
 """
 
 import gspread
@@ -9,6 +9,8 @@ from google.oauth2.service_account import Credentials
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import json
 import os
 import time
@@ -35,7 +37,9 @@ def get_google_sheet():
 
 def get_war_battles(player_tag):
     """
-    Legge le River Race battles (Duel, 1v1, Colosseum)
+    Clicca sul dropdown Battle Types
+    Seleziona River Race
+    Legge le vittorie e sconfitte
     """
     driver = None
     try:
@@ -57,53 +61,90 @@ def get_war_battles(player_tag):
         driver = webdriver.Chrome(options=chrome_options)
         driver.get(f"https://royaleapi.com/player/{tag}/battles")
         
-        time.sleep(5)
+        time.sleep(4)
         
-        # Leggi il testo completo della pagina
+        print(f"🔍", end=" ", flush=True)
+        
+        try:
+            # Trova il dropdown "Battle Types"
+            # Cerca il pulsante select/dropdown
+            dropdown = driver.find_element(By.XPATH, "//select | //button[contains(text(), 'Battle')] | //*[contains(text(), 'Battle Types')]")
+            
+            # Se è un select, usa select_by_value
+            from selenium.webdriver.support.select import Select
+            
+            try:
+                select = Select(dropdown)
+                # Cerca un'opzione che contiene "River Race"
+                options = select.options
+                
+                for option in options:
+                    if 'River Race' in option.text:
+                        select.select_by_value(option.get_attribute('value'))
+                        time.sleep(2)
+                        break
+            except:
+                # Se non è un select, clicca sul pulsante
+                dropdown.click()
+                time.sleep(2)
+        except:
+            pass
+        
+        # Leggi il testo della pagina DOPO il filtro
         page_text = driver.find_element(By.TAG_NAME, "body").text
         
-        print(f"📄", end=" ", flush=True)
+        print(f"📊", end=" ", flush=True)
         
-        # Tipi di River Race battles che cerchiamo
-        war_types = [
-            'River Race Duel',
-            'River Race 1v1',
-            'River Race Duel Colosseum',
-            'river race duel',
-            'river race 1v1',
-            'river race duel colosseum'
-        ]
+        # Conta Victory e Defeat nel testo
+        victory_count = page_text.lower().count('victory') + page_text.lower().count('won') + page_text.lower().count('1 - 0')
+        defeat_count = page_text.lower().count('defeat') + page_text.lower().count('lost') + page_text.lower().count('0 - 1') + page_text.lower().count('0 - 3')
         
-        # Conta le war battles
+        # Approssima: se ci sono "River Race 1v1: 10" significa 10 battaglie
+        # Estrai il numero dal testo
+        import re
+        
         war_wins = 0
         war_losses = 0
         
-        # Dividi il testo per ogni tipo di war
-        for war_type in war_types:
-            if war_type in page_text:
-                # Trova tutte le occorrenze di questo tipo di battaglia
-                sections = page_text.split(war_type)
-                
-                # Per ogni occorrenza (tranne la prima che è testo prima)
-                for section in sections[1:]:
-                    # Guarda i prossimi 300 caratteri
-                    snippet = section[:300].lower()
-                    
-                    # Cerca il risultato (Victory o Defeat)
-                    if 'victory' in snippet or 'won' in snippet or '1 - 0' in snippet:
-                        war_wins += 1
-                    elif 'defeat' in snippet or 'lost' in snippet or '0 - 1' in snippet or '0 - 3' in snippet:
-                        war_losses += 1
+        # Cerca pattern come "River Race 1v1: X" o "River Race Duel: X"
+        patterns = [
+            r'River Race 1v1.*?:\s*(\d+)',
+            r'River Race Duel.*?:\s*(\d+)',
+            r'River Race.*?:\s*(\d+)'
+        ]
         
-        total_wars = war_wins + war_losses
+        for pattern in patterns:
+            matches = re.findall(pattern, page_text, re.IGNORECASE)
+            if matches:
+                # Prendi il primo match
+                total = int(matches[0])
+                
+                # Conta vittorie e sconfitte nel testo della pagina
+                snippet = page_text.lower()
+                
+                # Conta "Victory" e "Defeat" nelle righe di battaglia
+                victories = snippet.count('victory')
+                defeats = snippet.count('defeat')
+                
+                war_wins = max(0, victories)
+                war_losses = max(0, defeats)
+                
+                break
+        
+        # Se non ha trovato niente, prova un approccio diverso
+        if war_wins + war_losses == 0:
+            # Conta solo le occorrenze nel testo
+            war_wins = page_text.count('Victory')
+            war_losses = page_text.count('Defeat')
+        
+        total = war_wins + war_losses
         
         print(f"W:{war_wins} L:{war_losses}", end=" ", flush=True)
         
-        # Logica risultato
-        if total_wars == 0:
+        if total == 0:
             print(f"❌")
             return 'No'
-        elif war_losses >= total_wars or war_wins == 0:
+        elif war_losses >= total or war_wins == 0:
             print(f"✅ Sì")
             return 'Sì'
         else:
@@ -123,7 +164,7 @@ def get_war_battles(player_tag):
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR - RIVER RACE BATTLES")
+    print("🤖 BOT CLASH ROYALE WAR - RIVER RACE DETECTION")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
@@ -136,18 +177,18 @@ def main():
         print("✅")
         print()
         
-        print("2️⃣ Lettura giocatori...")
+        print("2️⃣ Giocatori...")
         all_rows = sheet.get_all_values()
         
         if len(all_rows) < 2:
-            print("❌ Foglio vuoto")
+            print("❌ Vuoto")
             return False
         
         players = all_rows[1:]
-        print(f"✅ {len(players)} giocatori")
+        print(f"✅ {len(players)}")
         print()
         
-        print("3️⃣ Analisi River Race battles...")
+        print("3️⃣ River Race Analysis...")
         print()
         
         updated = 0
@@ -178,7 +219,7 @@ def main():
         print()
         print(f"✅ Aggiornati: {updated}")
         print("=" * 70)
-        print("✅ DONE!")
+        print("✅ COMPLETATO!")
         print("=" * 70)
         return True
     
