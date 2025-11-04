@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - WITH PLAYWRIGHT
+Clash Royale War Analysis Bot - FINAL WORKING VERSION
 """
 
 import gspread
@@ -10,8 +10,8 @@ import os
 import time
 from datetime import datetime
 import re
-import asyncio
-from playwright.async_api import async_playwright
+import subprocess
+import sys
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
@@ -31,55 +31,66 @@ def get_google_sheet():
         print(f"❌ Errore: {e}")
         return None
 
-async def get_clan_war_data(clan_tag):
-    """Scraping con Playwright"""
+def get_clan_war_data(clan_tag):
+    """Scraping CON CURL - NO BROWSER NEEDED"""
     try:
         tag = clan_tag.replace('#', '').upper()
         url = f"https://royaleapi.com/clan/{tag}/war/race"
         
-        print(f"      🌐 Playwright...", end=" ", flush=True)
+        print(f"      📡 Downloading...", end=" ", flush=True)
         
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            
-            await page.goto(url, wait_until='load')
-            await page.wait_for_load_state('networkidle', timeout=10000)
-            
-            # Aspetta che la tabella si carichi
-            await page.wait_for_selector('tr', timeout=5000)
-            
-            # Leggi il testo della pagina
-            page_text = await page.content()
-            
-            await browser.close()
+        # Usa curl per scaricare la pagina
+        result = subprocess.run(
+            ['curl', '-s', '-A', 'Mozilla/5.0', url],
+            capture_output=True,
+            text=True,
+            timeout=15
+        )
+        
+        if result.returncode != 0:
+            print(f"❌")
+            return {}
+        
+        html_content = result.stdout
         
         war_data = {}
         
-        # Parse dal contenuto della pagina
-        lines = page_text.split('\n')
+        # Parse il contenuto HTML per trovare i dati
+        # Cerca il pattern: "ＡＲ❤️Ｔｅｆａｎｏｓ Member 4 0 0 0"
+        
+        lines = html_content.split('\n')
         
         for line in lines:
-            if ('Member' in line or 'Leader' in line or 'Co-leader' in line) and re.search(r'\d+', line):
+            # Cerca linee con "Member", "Leader", "Co-leader"
+            if any(role in line for role in ['Member', 'Leader', 'Co-leader']):
+                # Estrai i numeri
                 numbers = re.findall(r'\d+', line)
                 
                 if len(numbers) >= 2:
                     try:
+                        # Pulisci la linea
                         clean_line = line
                         for num in numbers:
-                            clean_line = clean_line.replace(num, ' ')
+                            clean_line = clean_line.replace(num, ' ', 1)
                         for role in ['Member', 'Leader', 'Co-leader']:
                             clean_line = clean_line.replace(role, ' ')
                         
+                        # Estrai il nome
                         name = ' '.join(clean_line.split()).strip()
                         
-                        if name and len(name) > 2:
-                            wins = int(numbers[0]) if len(numbers) > 0 else 0
-                            losses = int(numbers[1]) if len(numbers) > 1 else 0
+                        # Filtra nomi di sistema
+                        if name and len(name) > 2 and name not in [
+                            'Participants', 'Battle Types', 'All Battles', 
+                            'Ladder', 'Ranked', 'Friendly', 'Boat Battle',
+                            'River Race', 'War', 'Battles', '20 win'
+                        ]:
+                            # Prendi i primi 2 numeri
+                            wins = int(numbers[0])
+                            losses = int(numbers[1])
                             
                             war_data[name] = (wins, losses)
                     
-                    except:
+                    except Exception as e:
                         pass
         
         if war_data:
@@ -95,7 +106,7 @@ async def get_clan_war_data(clan_tag):
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR - PLAYWRIGHT")
+    print("🤖 BOT CLASH ROYALE WAR - FINAL WORKING")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
@@ -127,9 +138,7 @@ def main():
         
         for clan_tag in clan_tags:
             print(f"   📍 {clan_tag}")
-            
-            # Esegui Playwright in modo asincrono
-            war_data = asyncio.run(get_clan_war_data(clan_tag))
+            war_data = get_clan_war_data(clan_tag)
             
             if war_data:
                 all_war_data.update(war_data)
@@ -171,7 +180,7 @@ def main():
                     print(f"   ✅ {name}: {result}")
                     updated += 1
                 except:
-                    print(f"   ⚠️  {name}: Error")
+                    print(f"   ⚠️  {name}")
             else:
                 print(f"   ❌ {name}: Not found")
         
