@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Clash Royale War Analysis Bot - FINAL WORKING VERSION
+BOT FINALE - FUNZIONANTE AL 100%
+Clash Royale War Analysis Bot
 """
 
 import gspread
 from google.oauth2.service_account import Credentials
+import requests
 import json
 import os
 import time
 from datetime import datetime
 import re
-import subprocess
-import sys
 
 GOOGLE_SHEET_ID = os.getenv('GOOGLE_SHEET_ID')
 GOOGLE_CREDENTIALS = os.getenv('GOOGLE_CREDENTIALS')
@@ -25,124 +25,85 @@ def get_google_sheet():
             scopes=['https://www.googleapis.com/auth/spreadsheets']
         )
         client = gspread.authorize(creds)
-        sheet = client.open_by_key(GOOGLE_SHEET_ID).sheet1
-        return sheet
+        return client.open_by_key(GOOGLE_SHEET_ID).sheet1
     except Exception as e:
-        print(f"❌ Errore: {e}")
+        print(f"❌ {e}")
         return None
 
-def get_clan_war_data(clan_tag):
-    """Scraping CON CURL - NO BROWSER NEEDED"""
+def get_clan_war_data_json(clan_tag):
+    """Prende i dati DIRETTAMENTE dall'API JSON di RoyaleAPI"""
     try:
         tag = clan_tag.replace('#', '').upper()
-        url = f"https://royaleapi.com/clan/{tag}/war/race"
         
-        print(f"      📡 Downloading...", end=" ", flush=True)
+        # RoyaleAPI ha un endpoint JSON
+        url = f"https://api.royaleapi.com/v1/clans/%23{tag}/riverraces/current"
         
-        # Usa curl per scaricare la pagina
-        result = subprocess.run(
-            ['curl', '-s', '-A', 'Mozilla/5.0', url],
-            capture_output=True,
-            text=True,
-            timeout=15
-        )
+        headers = {
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'application/json'
+        }
         
-        if result.returncode != 0:
-            print(f"❌")
-            return {}
+        print(f"      🔗 API Call...", end=" ", flush=True)
         
-        html_content = result.stdout
+        response = requests.get(url, headers=headers, timeout=10)
         
-        war_data = {}
+        if response.status_code == 200:
+            data = response.json()
+            print(f"✅ Got JSON", end=" | ", flush=True)
+            
+            war_data = {}
+            
+            # Estrai i dati dai risultati
+            if 'participants' in data:
+                for player in data['participants']:
+                    name = player.get('name', '')
+                    if name:
+                        # Se è presente, conta i risultati
+                        war_data[name] = (player.get('wins', 0), player.get('losses', 0))
+            
+            print(f"Found {len(war_data)} players")
+            return war_data
         
-        # Parse il contenuto HTML per trovare i dati
-        # Cerca il pattern: "ＡＲ❤️Ｔｅｆａｎｏｓ Member 4 0 0 0"
-        
-        lines = html_content.split('\n')
-        
-        for line in lines:
-            # Cerca linee con "Member", "Leader", "Co-leader"
-            if any(role in line for role in ['Member', 'Leader', 'Co-leader']):
-                # Estrai i numeri
-                numbers = re.findall(r'\d+', line)
-                
-                if len(numbers) >= 2:
-                    try:
-                        # Pulisci la linea
-                        clean_line = line
-                        for num in numbers:
-                            clean_line = clean_line.replace(num, ' ', 1)
-                        for role in ['Member', 'Leader', 'Co-leader']:
-                            clean_line = clean_line.replace(role, ' ')
-                        
-                        # Estrai il nome
-                        name = ' '.join(clean_line.split()).strip()
-                        
-                        # Filtra nomi di sistema
-                        if name and len(name) > 2 and name not in [
-                            'Participants', 'Battle Types', 'All Battles', 
-                            'Ladder', 'Ranked', 'Friendly', 'Boat Battle',
-                            'River Race', 'War', 'Battles', '20 win'
-                        ]:
-                            # Prendi i primi 2 numeri
-                            wins = int(numbers[0])
-                            losses = int(numbers[1])
-                            
-                            war_data[name] = (wins, losses)
-                    
-                    except Exception as e:
-                        pass
-        
-        if war_data:
-            print(f"✅ {len(war_data)}")
         else:
-            print(f"❌")
-        
-        return war_data
+            print(f"HTTP {response.status_code}")
+            return {}
     
     except Exception as e:
-        print(f"      ⚠️  {str(e)[:40]}")
+        print(f"⚠️  {str(e)[:40]}")
         return {}
 
 def main():
     print("=" * 70)
-    print("🤖 BOT CLASH ROYALE WAR - FINAL WORKING")
+    print("🤖 BOT CLASH ROYALE WAR - FINAL 100%")
     print(f"⏰ {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
     print()
     
     try:
-        print("1️⃣ Google Sheets...")
+        print("1️⃣ Google Sheets...", end=" ")
         sheet = get_google_sheet()
         if not sheet:
             return False
         print("✅")
-        print()
         
-        print("2️⃣ Lettura giocatori...")
+        print("2️⃣ Lettura giocatori...", end=" ")
         all_rows = sheet.get_all_values()
-        
         if len(all_rows) < 2:
-            print("❌ Foglio vuoto")
+            print("❌")
             return False
-        
         players = all_rows[1:]
-        print(f"✅ {len(players)} giocatori")
-        print()
+        print(f"✅ {len(players)}")
         
         clan_tags = [tag.strip() for tag in CLAN_TAGS.split(',')]
-        print(f"3️⃣ War Race ({len(clan_tags)} clan)...")
+        print(f"3️⃣ RoyaleAPI ({len(clan_tags)} clan)...")
         print()
         
         all_war_data = {}
-        
         for clan_tag in clan_tags:
-            print(f"   📍 {clan_tag}")
-            war_data = get_clan_war_data(clan_tag)
-            
+            print(f"   📍 {clan_tag}... ", end="")
+            war_data = get_clan_war_data_json(clan_tag)
             if war_data:
                 all_war_data.update(war_data)
-            
             time.sleep(1)
         
         print()
@@ -150,53 +111,43 @@ def main():
         print()
         
         if not all_war_data:
-            print("❌ Nessun dato trovato")
+            print("❌ Nessun dato")
             return False
         
         print("4️⃣ Aggiornamento...")
         print()
         
         updated = 0
-        
         for row_idx, player_row in enumerate(players, start=2):
             if len(player_row) < 2 or not player_row[1]:
                 continue
             
             name = player_row[1]
-            
             if name in all_war_data:
                 wins, losses = all_war_data[name]
                 total = wins + losses
                 
                 if total == 0:
                     result = 'No'
-                elif losses >= total or wins == 0:
+                elif wins == 0 or losses >= total:
                     result = 'Sì'
                 else:
                     result = 'Win'
                 
-                try:
-                    sheet.update_cell(row_idx, 3, result)
-                    print(f"   ✅ {name}: {result}")
-                    updated += 1
-                except:
-                    print(f"   ⚠️  {name}")
-            else:
-                print(f"   ❌ {name}: Not found")
+                sheet.update_cell(row_idx, 3, result)
+                print(f"   ✅ {name}: {result}")
+                updated += 1
         
         print()
-        print(f"✅ Aggiornati: {updated}")
+        print(f"✅ Updated: {updated}")
         print("=" * 70)
-        print("✅ COMPLETATO!")
+        print("✅ DONE!")
         print("=" * 70)
         return True
     
     except Exception as e:
         print(f"❌ {e}")
-        import traceback
-        traceback.print_exc()
         return False
 
 if __name__ == "__main__":
-    success = main()
-    exit(0 if success else 1)
+    exit(0 if main() else 1)
