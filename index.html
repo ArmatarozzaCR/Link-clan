@@ -148,39 +148,63 @@ async function caricaLink() {
 async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
-  tag = tag.replace("@", "").toLowerCase();
+  
+  // Rimuovi @ e converti in lowercase
+  tag = tag.replace(/^@+/, "").toLowerCase();
   localStorage.setItem("ultimoTag", tag);
 
   try {
     const res = await fetch("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.xlsx");
-    if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error("Errore download file");
+    
     const arrayBuffer = await res.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     
-    // Leggi i dati senza sovrascrivere le intestazioni
-    const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+    // Converti in array di array
+    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+    
+    if (rawData.length < 2) {
+      document.getElementById("verificaRisultato").innerHTML = "File Excel vuoto";
+      return;
+    }
+    
     let risultati = [];
-
-    for (const row of data) {
-      // Accedi alle proprietà usando i nomi effettivi delle colonne dell'Excel
-      let tagCell = String(row["TagTelegram"] || row["Tag Telegram"] || "").replace("@","").toLowerCase().trim();
-      let nome = String(row["Nome"] || "").trim();
-      let clan = String(row["Clan"] || "").trim();
-      let attivo = String(row["Attivo"] || "").trim().toLowerCase();
+    
+    // Scorri tutte le righe (dalla riga 1, saltando intestazioni)
+    for (let i = 1; i < rawData.length; i++) {
+      const row = rawData[i];
       
-      if (tagCell && tagCell === tag && attivo === "si") {
-        risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
+      // COLONNA A (indice 0) = Tag Telegram
+      // COLONNA B (indice 1) = Nome
+      // COLONNA C (indice 2) = Clan  
+      // COLONNA D (indice 3) = Attivo
+      
+      let tagCell = String(row[0] || "").replace(/^@+/, "").toLowerCase().trim();
+      let nome = String(row[1] || "").trim();
+      let clan = String(row[2] || "").trim();
+      let attivo = String(row[3] || "").toLowerCase().trim();
+      
+      // Verifica match
+      if (tagCell && tagCell === tag) {
+        if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
+          risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
+        } else {
+          risultati.push(`Tag trovato ma non attivo`);
+        }
       }
     }
-
-    const output = risultati.length ? risultati.join("<br>") : "Tag non trovato o non attivo";
+    
+    const output = risultati.length 
+      ? risultati.join("<br>") 
+      : `Tag "${tag}" non trovato nel database`;
+    
     document.getElementById("verificaRisultato").innerHTML = output;
 
   } catch (e) {
     console.error("Errore:", e);
-    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento convocazioni";
+    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento dati";
   }
 }
 
@@ -199,6 +223,7 @@ window.onload = function () {
   input.id = "verificaInput";
   input.placeholder = "Inserisci il tuo tag Telegram";
   verificaDiv.appendChild(input);
+  
   setTimeout(() => {
     const ultimoTag = localStorage.getItem("ultimoTag");
     if (ultimoTag) {
