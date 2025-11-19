@@ -97,7 +97,6 @@ h1 {
 }
 </style>
 <script>
-// BLOCCO DESKTOP CONTINUO E RIDIMENSIONAMENTO
 function bloccoDesktop() {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile || window.innerWidth > 800) {
@@ -107,10 +106,9 @@ function bloccoDesktop() {
   }
   return true;
 }
-setInterval(bloccoDesktop, 800);
+setInterval(bloccoDesktop, 500);
 window.addEventListener("resize", bloccoDesktop);
 
-// BLOCCO TUTTE LE AZIONI DI COPIA, SELEZIONE, DRAG, DESTRA E DEVTOOLS
 function bloccoCopia() {
   document.body.style.userSelect = "none";
   document.body.style.webkitUserSelect = "none";
@@ -125,7 +123,6 @@ document.addEventListener('selectstart', e => e.preventDefault());
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-// BLOCCO DEVTOOLS
 function rilevaAperturaDevTools() {
   let devtools = false;
   const threshold = 170;
@@ -140,22 +137,12 @@ function rilevaAperturaDevTools() {
     } else {
       devtools = false;
     }
-  }, 800);
+  }, 500);
 }
 rilevaAperturaDevTools();
 
-// BLOCCO TASTI
-const keyCombos = [
-  [17, 16, 73], // Ctrl+Shift+I
-  [17, 16, 74], // Ctrl+Shift+J
-  [17, 85],     // Ctrl+U
-  [17, 83],     // Ctrl+S
-  [123],        // F12
-];
-
 document.addEventListener('keydown', e => {
   const code = e.keyCode;
-  // combina fino a tre tasti
   if ((e.ctrlKey && e.shiftKey && (code === 73 || code === 74)) ||
       (e.ctrlKey && code === 85) ||
       (e.ctrlKey && code === 83) ||
@@ -181,6 +168,7 @@ async function caricaLink() {
       const div = document.createElement("div");
       div.className = "button";
       div.onclick = async () => {
+        if(!bloccoDesktop()) return;
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
@@ -193,7 +181,7 @@ async function caricaLink() {
           }
           const urlData = await urlRes.json();
           if(urlData.url) {
-            window.location.href = urlData.url;
+            window.location.replace(urlData.url);
           } else {
             alert("Link non disponibile");
           }
@@ -231,7 +219,6 @@ async function verificaConvocazione() {
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    
     const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
     
     if (rawData.length < 2) {
@@ -262,6 +249,7 @@ async function verificaConvocazione() {
     document.getElementById("verificaRisultato").innerHTML = "Errore caricamento dati";
   }
 }
+
 window.onload = function () {
   if (!bloccoDesktop()) return;
   const mobileContent = document.getElementById("mobileContent");
