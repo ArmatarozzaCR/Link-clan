@@ -149,8 +149,8 @@ async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   
-  // Rimuovi @ e converti in lowercase
-  tag = tag.replace(/^@+/, "").toLowerCase();
+  // Rimuovi @ e converti in uppercase per il confronto (i tag Telegram sono case-insensitive)
+  tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
   try {
@@ -176,20 +176,21 @@ async function verificaConvocazione() {
     for (let i = 1; i < rawData.length; i++) {
       const row = rawData[i];
       
-      // COLONNA A (indice 0) = Tag Telegram
-      // COLONNA B (indice 1) = Nome
+      // STRUTTURA CORRETTA:
+      // COLONNA A (indice 0) = Nome account (quello da mostrare)
+      // COLONNA B (indice 1) = Tag Telegram (quello da cercare)
       // COLONNA C (indice 2) = Clan  
       // COLONNA D (indice 3) = Attivo
       
-      let tagCell = String(row[0] || "").replace(/^@+/, "").toLowerCase().trim();
-      let nome = String(row[1] || "").trim();
+      let nome = String(row[0] || "").trim();
+      let tagCell = String(row[1] || "").replace(/^@+/, "").toUpperCase().trim();
       let clan = String(row[2] || "").trim();
       let attivo = String(row[3] || "").toLowerCase().trim();
       
-      // Verifica match
+      // Verifica match sul tag Telegram (colonna B)
       if (tagCell && tagCell === tag) {
         if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
-          risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
+          risultati.push(`Sei convocato in ${clan} con l'account @${nome}`);
         } else {
           risultati.push(`Tag trovato ma non attivo`);
         }
