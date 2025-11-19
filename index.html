@@ -106,6 +106,8 @@ window.addEventListener('DOMContentLoaded', () => {
 ['copy','cut','paste','selectstart','dragstart','contextmenu'].forEach(ev => document.addEventListener(ev, e=>e.preventDefault()));
 function rilevaAperturaDevTools() {
   let dev = false, th = 170;
+  const ua = navigator.userAgent || "";
+  if (!/Windows|Macintosh|X11|Linux/i.test(ua)) return;
   setInterval(() => {
     dev = window.outerWidth-window.innerWidth>th || window.outerHeight-window.innerHeight>th;
     if(dev){
