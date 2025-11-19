@@ -149,7 +149,7 @@ async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   tag = tag.replace("@", "").toLowerCase();
-localStorage.setItem("ultimoTag", tag);
+  localStorage.setItem("ultimoTag", tag);
 
   try {
     const res = await fetch("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.xlsx");
@@ -158,15 +158,19 @@ localStorage.setItem("ultimoTag", tag);
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet, { header: ["TagTelegram","Nome","Clan","Attivo"], defval:"" });
+    
+    // Leggi i dati senza sovrascrivere le intestazioni
+    const data = XLSX.utils.sheet_to_json(sheet, { defval: "" });
     let risultati = [];
 
     for (const row of data) {
-      let tagCell = row.TagTelegram?.replace("@","").toLowerCase().trim();
-      let nome = row.Nome?.trim();
-      let clan = row.Clan?.trim();
-      let attivo = row.Attivo?.trim().toLowerCase();
-      if(tagCell && tagCell === tag && attivo === "si") {
+      // Accedi alle proprietà usando i nomi effettivi delle colonne dell'Excel
+      let tagCell = String(row["TagTelegram"] || row["Tag Telegram"] || "").replace("@","").toLowerCase().trim();
+      let nome = String(row["Nome"] || "").trim();
+      let clan = String(row["Clan"] || "").trim();
+      let attivo = String(row["Attivo"] || "").trim().toLowerCase();
+      
+      if (tagCell && tagCell === tag && attivo === "si") {
         risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
       }
     }
@@ -174,7 +178,8 @@ localStorage.setItem("ultimoTag", tag);
     const output = risultati.length ? risultati.join("<br>") : "Tag non trovato o non attivo";
     document.getElementById("verificaRisultato").innerHTML = output;
 
-  } catch {
+  } catch (e) {
+    console.error("Errore:", e);
     document.getElementById("verificaRisultato").innerHTML = "Errore caricamento convocazioni";
   }
 }
@@ -191,15 +196,16 @@ window.onload = function () {
   verificaDiv.id = "verificaContainer";
 
   const input = document.createElement("input");
-input.id = "verificaInput";
-input.placeholder = "Inserisci il tuo tag Telegram";
-verificaDiv.appendChild(input);
-setTimeout(() => {
-  const ultimoTag = localStorage.getItem("ultimoTag");
-  if (ultimoTag) {
-    input.value = ultimoTag;
-  }
-}, 0);
+  input.id = "verificaInput";
+  input.placeholder = "Inserisci il tuo tag Telegram";
+  verificaDiv.appendChild(input);
+  setTimeout(() => {
+    const ultimoTag = localStorage.getItem("ultimoTag");
+    if (ultimoTag) {
+      input.value = ultimoTag;
+    }
+  }, 0);
+  
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
