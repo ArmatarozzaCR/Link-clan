@@ -139,11 +139,25 @@ async function caricaLink() {
       div.className = "button";
       div.onclick = async () => {
         try {
-          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
+          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, {
+            headers: {
+              referer: location.origin,
+              'x-touch-capable': ('ontouchstart' in window) ? '1' : '0',
+              'x-max-touch-points': String(navigator.maxTouchPoints || 0),
+              'x-screen-width': String(window.screen.width || 0)
+            }
+          });
           if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
-          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
+          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, {
+            headers: {
+              referer: location.origin,
+              'x-touch-capable': ('ontouchstart' in window) ? '1' : '0',
+              'x-max-touch-points': String(navigator.maxTouchPoints || 0),
+              'x-screen-width': String(window.screen.width || 0)
+            }
+          });
           if(!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
