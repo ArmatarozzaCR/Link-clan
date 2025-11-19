@@ -97,18 +97,17 @@ h1 {
 }
 </style>
 <script>
-function bloccoDesktop() {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (!isMobile || window.innerWidth > 800) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; color: white; background: black;">\u26a0\ufe0f Questo sito pu\u00f2 essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
-    document.body.style.background = "#000";
+function bloccoMobile() {
+  const ua = navigator.userAgent || "";
+  const isDesktop = /(windows nt|macintosh|x11|linux x86_64|linux armv|cros|ubuntu|fedora|intel mac)/i.test(ua);
+  if (isDesktop || window.innerWidth > 1400) {
+    document.body.innerHTML = `<div style='font-size: 22px; padding: 20px; color: white; background: black;'>⚠️ Solo per dispositivi mobili.<br>Accedi da smartphone o tablet reale.</div>`;
     return false;
   }
   return true;
 }
-setInterval(bloccoDesktop, 500);
-window.addEventListener("resize", bloccoDesktop);
-
+setInterval(bloccoMobile, 1000);
+window.addEventListener("resize", bloccoMobile);
 function bloccoCopia() {
   document.body.style.userSelect = "none";
   document.body.style.webkitUserSelect = "none";
@@ -122,7 +121,6 @@ document.addEventListener('paste', e => e.preventDefault());
 document.addEventListener('selectstart', e => e.preventDefault());
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('contextmenu', e => e.preventDefault());
-
 function rilevaAperturaDevTools() {
   let devtools = false;
   const threshold = 170;
@@ -137,10 +135,9 @@ function rilevaAperturaDevTools() {
     } else {
       devtools = false;
     }
-  }, 500);
+  }, 800);
 }
 rilevaAperturaDevTools();
-
 document.addEventListener('keydown', e => {
   const code = e.keyCode;
   if ((e.ctrlKey && e.shiftKey && (code === 73 || code === 74)) ||
@@ -151,7 +148,6 @@ document.addEventListener('keydown', e => {
     return false;
   }
 });
-
 async function caricaLink() {
   try {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
@@ -168,7 +164,7 @@ async function caricaLink() {
       const div = document.createElement("div");
       div.className = "button";
       div.onclick = async () => {
-        if(!bloccoDesktop()) return;
+        if(!bloccoMobile()) return;
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
@@ -204,23 +200,19 @@ async function caricaLink() {
     document.body.innerHTML = "<div style='padding:20px;font-size:20px;'>Errore nel caricamento dei link.</div>";
   }
 }
-
 async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
-
   try {
     const res = await fetch("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.xlsx");
     if (!res.ok) throw new Error("Errore download file");
-    
     const arrayBuffer = await res.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-    
     if (rawData.length < 2) {
       document.getElementById("verificaRisultato").innerHTML = "File Excel vuoto";
       return;
@@ -249,9 +241,8 @@ async function verificaConvocazione() {
     document.getElementById("verificaRisultato").innerHTML = "Errore caricamento dati";
   }
 }
-
 window.onload = function () {
-  if (!bloccoDesktop()) return;
+  if (!bloccoMobile()) return;
   const mobileContent = document.getElementById("mobileContent");
   const verificaDiv = document.createElement("div");
   verificaDiv.id = "verificaContainer";
