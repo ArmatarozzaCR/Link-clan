@@ -98,7 +98,7 @@ async function caricaLink() {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
     if(!res.ok) {
       if (res.status === 403) {
-        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+        document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
         return;
       }
       throw new Error();
@@ -149,7 +149,7 @@ async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   
-  // Rimuovi @ e converti in uppercase per il confronto (i tag Telegram sono case-insensitive)
+  // Rimuovi @ e converti in uppercase per il confronto
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
@@ -176,10 +176,9 @@ async function verificaConvocazione() {
     for (let i = 1; i < rawData.length; i++) {
       const row = rawData[i];
       
-      // STRUTTURA CORRETTA:
-      // COLONNA A (indice 0) = Nome account (quello da mostrare)
-      // COLONNA B (indice 1) = Tag Telegram (quello da cercare)
-      // COLONNA C (indice 2) = Clan  
+      // COLONNA A (indice 0) = Nome account
+      // COLONNA B (indice 1) = Tag Telegram
+      // COLONNA C (indice 2) = Clan
       // COLONNA D (indice 3) = Attivo
       
       let nome = String(row[0] || "").trim();
@@ -190,7 +189,7 @@ async function verificaConvocazione() {
       // Verifica match sul tag Telegram (colonna B)
       if (tagCell && tagCell === tag) {
         if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
-          risultati.push(`Sei convocato in ${clan} con l'account @${nome}`);
+          risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
         } else {
           risultati.push(`Tag trovato ma non attivo`);
         }
@@ -199,7 +198,7 @@ async function verificaConvocazione() {
     
     const output = risultati.length 
       ? risultati.join("<br>") 
-      : `Tag "${tag}" non trovato nel database`;
+      : `Tag \"${tag}\" non trovato nel database`;
     
     document.getElementById("verificaRisultato").innerHTML = output;
 
@@ -212,7 +211,7 @@ async function verificaConvocazione() {
 window.onload = function () {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
+    document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
 
