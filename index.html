@@ -24,10 +24,6 @@ body {
   text-align: center;
   padding: 40px 20px;
   box-sizing: border-box;
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -moz-user-select: none;
 }
 h1 {
   font-size: 24px;
@@ -97,31 +93,6 @@ h1 {
 }
 </style>
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-    document.body.style.userSelect = "none";
-    document.body.style.webkitUserSelect = "none";
-    document.body.style.msUserSelect = "none";
-    document.body.style.mozUserSelect = "none";
-});
-['copy','cut','paste','selectstart','dragstart','contextmenu'].forEach(ev => document.addEventListener(ev, e=>e.preventDefault()));
-function rilevaAperturaDevTools() {
-  let dev = false, th = 170;
-  const ua = navigator.userAgent || "";
-  if (!/Windows|Macintosh|X11|Linux/i.test(ua)) return;
-  setInterval(() => {
-    dev = window.outerWidth-window.innerWidth>th || window.outerHeight-window.innerHeight>th;
-    if(dev){
-      document.body.innerHTML = "<div style='padding:25px;color:white;background:#111;font-size:24px;'>Accesso non consentito!</div>";
-    }
-  }, 800);
-}
-rilevaAperturaDevTools();
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey&&e.shiftKey&&(e.keyCode===73||e.keyCode===74)) || (e.ctrlKey&&(e.keyCode===85||e.keyCode===83)) || (e.keyCode===123)) {
-    e.preventDefault();
-    return false;
-  }
-});
 async function caricaLink() {
   try {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
@@ -139,32 +110,18 @@ async function caricaLink() {
       div.className = "button";
       div.onclick = async () => {
         try {
-          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, {
-            headers: {
-              referer: location.origin,
-              'x-touch-capable': ('ontouchstart' in window) ? '1' : '0',
-              'x-max-touch-points': String(navigator.maxTouchPoints || 0),
-              'x-screen-width': String(window.screen.width || 0)
-            }
-          });
+          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
-          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, {
-            headers: {
-              referer: location.origin,
-              'x-touch-capable': ('ontouchstart' in window) ? '1' : '0',
-              'x-max-touch-points': String(navigator.maxTouchPoints || 0),
-              'x-screen-width': String(window.screen.width || 0)
-            }
-          });
+          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
           if(!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
           }
           const urlData = await urlRes.json();
           if(urlData.url) {
-            window.location.replace(urlData.url);
+            window.location.href = urlData.url;
           } else {
             alert("Link non disponibile");
           }
@@ -187,30 +144,49 @@ async function caricaLink() {
     document.body.innerHTML = "<div style='padding:20px;font-size:20px;'>Errore nel caricamento dei link.</div>";
   }
 }
+
 async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
+  
+  // Rimuovi @ e converti in uppercase per il confronto
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
+
   try {
     const res = await fetch("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.xlsx");
     if (!res.ok) throw new Error("Errore download file");
+    
     const arrayBuffer = await res.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
+    
+    // Converti in array di array
     const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+    
     if (rawData.length < 2) {
       document.getElementById("verificaRisultato").innerHTML = "File Excel vuoto";
       return;
     }
+    
     let risultati = [];
+    
+    // Scorri tutte le righe (dalla riga 1, saltando intestazioni)
     for (let i = 1; i < rawData.length; i++) {
       const row = rawData[i];
+      
+      // COLONNA A (indice 0) = Nome account
+      // COLONNA B (indice 1) = Tag Telegram
+      // COLONNA C (indice 2) = Clan
+      // COLONNA D (indice 3) = Attivo
+      
       let nome = String(row[0] || "").trim();
       let tagCell = String(row[1] || "").replace(/^@+/, "").toUpperCase().trim();
       let clan = String(row[2] || "").trim();
       let attivo = String(row[3] || "").toLowerCase().trim();
+      
+      // Verifica match sul tag Telegram (colonna B)
       if (tagCell && tagCell === tag) {
         if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
           risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
@@ -219,41 +195,70 @@ async function verificaConvocazione() {
         }
       }
     }
-    const output = risultati.length
-      ? risultati.join("<br>")
+    
+    const output = risultati.length 
+      ? risultati.join("<br>") 
       : `Tag \"${tag}\" non trovato nel database`;
+    
     document.getElementById("verificaRisultato").innerHTML = output;
+
   } catch (e) {
     console.error("Errore:", e);
     document.getElementById("verificaRisultato").innerHTML = "Errore caricamento dati";
   }
 }
+
 window.onload = function () {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (!isMobile) {
+    document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
+    return;
+  }
+
   const mobileContent = document.getElementById("mobileContent");
   const verificaDiv = document.createElement("div");
   verificaDiv.id = "verificaContainer";
+
   const input = document.createElement("input");
   input.id = "verificaInput";
   input.placeholder = "Inserisci il tuo tag Telegram";
   verificaDiv.appendChild(input);
+  
   setTimeout(() => {
     const ultimoTag = localStorage.getItem("ultimoTag");
     if (ultimoTag) {
       input.value = ultimoTag;
     }
   }, 0);
+  
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
   btn.textContent = "Verifica convocazione";
   btn.onclick = verificaConvocazione;
   verificaDiv.appendChild(btn);
+
   const output = document.createElement("div");
   output.id = "verificaRisultato";
   verificaDiv.appendChild(output);
+
   mobileContent.insertBefore(verificaDiv, document.getElementById("linkContainer"));
+
   caricaLink();
 };
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (
+    e.keyCode === 123 ||
+    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+    (e.ctrlKey && e.keyCode === 85) ||
+    (e.ctrlKey && e.keyCode === 83)
+  ) {
+    e.preventDefault();
+    return false;
+  }
+});
 </script>
 </head>
 <body>
