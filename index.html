@@ -176,17 +176,17 @@ async function verificaConvocazione() {
     for (let i = 1; i < rawData.length; i++) {
       const row = rawData[i];
       
-      // COLONNA A (indice 0) = Nome account
-      // COLONNA B (indice 1) = Tag Telegram
+      // COLONNA A (indice 0) = Tag Telegram
+      // COLONNA B (indice 1) = Nome account
       // COLONNA C (indice 2) = Clan
       // COLONNA D (indice 3) = Attivo
       
-      let nome = String(row[0] || "").trim();
-      let tagCell = String(row[1] || "").replace(/^@+/, "").toUpperCase().trim();
+      let tagCell = String(row[0] || "").replace(/^@+/, "").toUpperCase().trim();
+      let nome = String(row[1] || "").trim();
       let clan = String(row[2] || "").trim();
       let attivo = String(row[3] || "").toLowerCase().trim();
       
-      // Verifica match sul tag Telegram (colonna B)
+      // Verifica match sul tag Telegram (colonna A)
       if (tagCell && tagCell === tag) {
         if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
           risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
