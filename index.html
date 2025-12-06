@@ -98,7 +98,7 @@ async function caricaLink() {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
     if(!res.ok) {
       if (res.status === 403) {
-        document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+        document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
         return;
       }
       throw new Error();
@@ -149,6 +149,7 @@ async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   
+  // Rimuovi @ e converti in uppercase per il confronto
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
@@ -161,6 +162,7 @@ async function verificaConvocazione() {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     
+    // Converti in array di array
     const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
     
     if (rawData.length < 2) {
@@ -170,14 +172,21 @@ async function verificaConvocazione() {
     
     let risultati = [];
     
+    // Scorri tutte le righe (dalla riga 1, saltando intestazioni)
     for (let i = 1; i < rawData.length; i++) {
       const row = rawData[i];
+      
+      // COLONNA A (indice 0) = Tag Telegram
+      // COLONNA B (indice 1) = Nome account
+      // COLONNA C (indice 2) = Clan
+      // COLONNA D (indice 3) = Attivo
       
       let tagCell = String(row[0] || "").replace(/^@+/, "").toUpperCase().trim();
       let nome = String(row[1] || "").trim();
       let clan = String(row[2] || "").trim();
       let attivo = String(row[3] || "").toLowerCase().trim();
       
+      // Verifica match sul tag Telegram (colonna A)
       if (tagCell && tagCell === tag) {
         if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
           risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
@@ -189,7 +198,7 @@ async function verificaConvocazione() {
     
     const output = risultati.length 
       ? risultati.join("<br>") 
-      : `Tag "${tag}" non trovato nel database`;
+      : `Tag \"${tag}\" non trovato nel database`;
     
     document.getElementById("verificaRisultato").innerHTML = output;
 
@@ -202,7 +211,7 @@ async function verificaConvocazione() {
 window.onload = function () {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
-    document.body.innerHTML = `<div style="font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
+    document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
 
