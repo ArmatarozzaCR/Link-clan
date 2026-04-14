@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Link - Armata Rozza</title>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
 html, body {
   margin: 0;
@@ -93,6 +92,9 @@ h1 {
 }
 </style>
 <script>
+const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
+const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing"];
+
 async function caricaLink() {
   try {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
@@ -145,60 +147,52 @@ async function caricaLink() {
   }
 }
 
+async function leggiFoglio(sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
+
+  const text = await res.text();
+  const jsonText = text
+    .replace(/^\/\*O_o\*\/\s*/, "")
+    .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+    .replace(/\);$/, "");
+
+  const data = JSON.parse(jsonText);
+  return data.table.rows || [];
+}
+
 async function verificaConvocazione() {
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   
-  // Rimuovi @ e converti in uppercase per il confronto
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
   try {
-    const res = await fetch("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/data/data.xlsx");
-    if (!res.ok) throw new Error("Errore download file");
-    
-    const arrayBuffer = await res.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    
-    // Converti in array di array
-    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-    
-    if (rawData.length < 2) {
-      document.getElementById("verificaRisultato").innerHTML = "File Excel vuoto";
-      return;
-    }
-    
+    document.getElementById("verificaRisultato").innerHTML = "Controllo in corso...";
+
     let risultati = [];
-    
-    // Scorri tutte le righe (dalla riga 1, saltando intestazioni)
-    for (let i = 1; i < rawData.length; i++) {
-      const row = rawData[i];
-      
-      // COLONNA A (indice 0) = Tag Telegram
-      // COLONNA B (indice 1) = Nome account
-      // COLONNA C (indice 2) = Clan
-      // COLONNA D (indice 3) = Attivo
-      
-      let tagCell = String(row[0] || "").replace(/^@+/, "").toUpperCase().trim();
-      let nome = String(row[1] || "").trim();
-      let clan = String(row[2] || "").trim();
-      let attivo = String(row[3] || "").toLowerCase().trim();
-      
-      // Verifica match sul tag Telegram (colonna A)
-      if (tagCell && tagCell === tag) {
-        if (attivo === "si" || attivo === "sì" || attivo === "yes" || attivo === "1") {
-          risultati.push(`Sei convocato in ${clan} con l'account ${nome}`);
-        } else {
-          risultati.push(`Tag trovato ma non attivo`);
+
+    for (const sheetName of CLAN_SHEETS) {
+      const rows = await leggiFoglio(sheetName);
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.c || [];
+
+        let nome = String((cells[0] && cells[0].v) || "").trim();
+        let tagCell = String((cells[1] && cells[1].v) || "").replace(/^@+/, "").toUpperCase().trim();
+
+        if (tagCell && tagCell === tag) {
+          risultati.push(`Sei convocato in ${sheetName} con l'account ${nome}`);
         }
       }
     }
     
     const output = risultati.length 
       ? risultati.join("<br>") 
-      : `Tag \"${tag}\" non trovato nel database`;
+      : `Tag \"${tag}\" non trovato nelle convocazioni`;
     
     document.getElementById("verificaRisultato").innerHTML = output;
 
