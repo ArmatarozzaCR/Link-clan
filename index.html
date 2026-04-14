@@ -162,7 +162,30 @@ async function leggiFoglio(sheetName) {
   return data.table.rows || [];
 }
 
+async function convocazioniAttive() {
+  try {
+    const rows = await leggiFoglio("setting");
+    if (!rows.length) return true;
+
+    const primaRiga = rows[0].c || [];
+    const chiave = String((primaRiga[0] && primaRiga[0].v) || "").trim().toLowerCase();
+    const valore = String((primaRiga[1] && primaRiga[1].v) || "").trim().toLowerCase();
+
+    if (chiave !== "convocazioni") return true;
+    return valore === "on";
+  } catch {
+    return true;
+  }
+}
+
 async function verificaConvocazione() {
+  const attive = await convocazioniAttive();
+
+  if (!attive) {
+    document.getElementById("verificaRisultato").innerHTML = "Convocazioni attualmente disattivate";
+    return;
+  }
+
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
   
