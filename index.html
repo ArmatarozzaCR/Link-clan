@@ -199,7 +199,7 @@ body::before {
   z-index: 1;
 }
 
-.button img {
+.clan-logo {
   width: 75px;
   height: 75px;
   object-fit: contain;
@@ -211,8 +211,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  min-width: 84px;
+  gap: 5px;
+  min-width: 62px;
   margin-left: auto;
   position: relative;
   z-index: 1;
@@ -220,9 +220,12 @@ body::before {
 }
 
 .trophy-icon {
-  width: 9px !important;
-  height: 9px !important;
+  width: 11px !important;
+  height: 11px !important;
+  object-fit: contain;
   opacity: 0.9;
+  flex-shrink: 0;
+  filter: none !important;
 }
 
 .trophy-value {
@@ -310,19 +313,19 @@ body::before {
     font-size: 18px;
   }
 
-  .button img {
+  .clan-logo {
     width: 68px !important;
     height: 68px !important;
   }
 
   .trophy-box {
-    min-width: 72px;
-    gap: 5px;
+    min-width: 58px;
+    gap: 4px;
   }
 
   .trophy-icon {
-    width: 9px !important;
-    height: 9px !important;
+    width: 11px !important;
+    height: 11px !important;
   }
 
   .trophy-value {
@@ -343,6 +346,14 @@ body::before {
 const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
 const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing"];
 const TROPHY_ICON = "./cw-trophy.png";
+
+function normalizeName(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
 
 async function leggiFoglio(sheetName) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
@@ -404,7 +415,7 @@ async function caricaLink() {
       leggiSettingCompleto()
     ]);
 
-    if(!res.ok) {
+    if (!res.ok) {
       if (res.status === 403) {
         document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
         return;
@@ -421,19 +432,19 @@ async function caricaLink() {
       div.onclick = async () => {
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
-          if(!tokenRes.ok) throw new Error();
+          if (!tokenRes.ok) throw new Error();
 
           const tokenData = await tokenRes.json();
-          if(!tokenData.token) return alert("Token non ricevuto");
+          if (!tokenData.token) return alert("Token non ricevuto");
 
           const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
-          if(!urlRes.ok) {
+          if (!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
           }
 
           const urlData = await urlRes.json();
-          if(urlData.url) {
+          if (urlData.url) {
             window.location.href = urlData.url;
           } else {
             alert("Link non disponibile");
@@ -444,9 +455,9 @@ async function caricaLink() {
       };
 
       const img = document.createElement("img");
+      img.className = "clan-logo";
       img.src = item.img;
       img.alt = item.nome;
-      img.style = "width:75px;height:75px;object-fit:contain;flex-shrink:0;";
 
       const span = document.createElement("span");
       span.className = "button-label";
@@ -462,18 +473,18 @@ async function caricaLink() {
 
       const trophyValue = document.createElement("span");
       trophyValue.className = "trophy-value";
-      const nomePulito = item.nome.trim().toLowerCase();
 
-let valore = "-";
+      const nomePulito = normalizeName(item.nome);
+      let valore = "-";
 
-for (const key in setting.trophyMap) {
-  if (key.trim().toLowerCase() === nomePulito) {
-    valore = setting.trophyMap[key];
-    break;
-  }
-}
+      for (const key in setting.trophyMap) {
+        if (normalizeName(key) === nomePulito) {
+          valore = setting.trophyMap[key];
+          break;
+        }
+      }
 
-trophyValue.textContent = valore;
+      trophyValue.textContent = valore;
 
       trophyBox.appendChild(trophyIcon);
       trophyBox.appendChild(trophyValue);
