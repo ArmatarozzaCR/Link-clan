@@ -30,9 +30,9 @@ body {
     linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.55)),
     url("./background.jpg");
   background-repeat: no-repeat;
-background-position: center top;
-background-size: cover;
-background-color: #120000;
+  background-position: center top;
+  background-size: cover;
+  background-color: #120000;
   color: var(--text);
   text-align: center;
   overflow-x: hidden;
@@ -105,7 +105,7 @@ body::before {
     0 0 12px rgba(255,0,0,0.25),
     0 6px 18px rgba(0,0,0,0.22);
   transition: .25s ease;
-text-align: center;
+  text-align: center;
 }
 
 #verificaInput::placeholder {
@@ -187,6 +187,41 @@ text-align: center;
   transform: scale(0.985);
 }
 
+/* Bottone clan convocato: bordo verde pulsante */
+.button.convocato {
+  border-color: #00e676;
+  animation: greenPulse 1.8s infinite alternate ease-in-out;
+}
+
+.button.convocato:hover {
+  border-color: #69ff9a;
+  animation-play-state: paused;
+}
+
+@keyframes greenPulse {
+  0% {
+    box-shadow:
+      0 0 8px rgba(0, 230, 118, 0.55),
+      0 0 18px rgba(0, 200, 90, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(0, 230, 118, 0.90),
+      0 0 40px rgba(0, 255, 120, 0.28),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
+  100% {
+    box-shadow:
+      0 0 8px rgba(0, 230, 118, 0.55),
+      0 0 18px rgba(0, 200, 90, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
+}
+
 .button-label {
   font-size: 20px;
   flex-grow: 1;
@@ -248,17 +283,31 @@ text-align: center;
 }
 
 #verificaRisultato {
+  display: none;
   margin-top: 14px;
   font-size: 17px;
-  color: var(--gold);
+  color: #ffffff;
   text-align: center;
-  line-height: 1.5;
-  text-shadow:
-    0 1px 2px rgba(0,0,0,0.72),
-    0 0 8px rgba(255,170,0,0.14);
-  padding: 2px 8px 0;
-  font-weight: 600;
+  line-height: 1.8;
+  font-weight: 500;
   word-break: break-word;
+  overflow-wrap: anywhere;
+  padding: 14px 18px;
+  background: rgba(0, 0, 0, 0.50);
+  border: 1px solid rgba(255, 60, 0, 0.40);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.30);
+}
+
+#verificaRisultato.trovato {
+  border-color: rgba(0, 200, 90, 0.50);
+}
+
+#verificaRisultato.non-trovato {
+  border-color: rgba(255, 40, 40, 0.45);
+  color: #ff8a8a;
 }
 
 #linkContainer {
@@ -443,6 +492,7 @@ async function caricaLink() {
     for (const item of data) {
       const div = document.createElement("div");
       div.className = "button";
+      div.dataset.nomeClan = normalizeName(item.nome);
       div.onclick = async () => {
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
@@ -505,10 +555,14 @@ async function caricaLink() {
 }
 
 async function verificaConvocazione() {
+  const outputEl = document.getElementById("verificaRisultato");
+
   const attive = await convocazioniAttive();
 
   if (!attive) {
-    document.getElementById("verificaRisultato").innerHTML = "Le convocazioni non sono ancora disponibili";
+    outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
+    outputEl.className = "non-trovato";
+    outputEl.style.display = "block";
     return;
   }
 
@@ -518,10 +572,18 @@ async function verificaConvocazione() {
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
+  // Reset bordi verdi precedenti
+  document.querySelectorAll("#linkContainer .button.convocato").forEach(btn => {
+    btn.classList.remove("convocato");
+  });
+
   try {
-    document.getElementById("verificaRisultato").innerHTML = "Controllo in corso...";
+    outputEl.innerHTML = "Controllo in corso...";
+    outputEl.className = "";
+    outputEl.style.display = "block";
 
     let risultati = [];
+    const clanConvocati = new Set();
 
     for (const sheetName of CLAN_SHEETS) {
       const rows = await leggiFoglio(sheetName);
@@ -534,19 +596,34 @@ async function verificaConvocazione() {
         let tagCell = String((cells[1] && cells[1].v) || "").replace(/^@+/, "").toUpperCase().trim();
 
         if (tagCell && tagCell === tag) {
-          risultati.push(`Sei convocato in ${sheetName} con l'account ${nome}`);
+          risultati.push(`✅ Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
+          clanConvocati.add(normalizeName(sheetName));
         }
       }
     }
 
-    const output = risultati.length
-      ? risultati.join("<br>")
-      : `Tag "${tag}" non trovato nelle convocazioni`;
+    // Evidenzia i bottoni clan in cui si è convocati
+    document.querySelectorAll("#linkContainer .button").forEach(btn => {
+      if (clanConvocati.has(btn.dataset.nomeClan)) {
+        btn.classList.add("convocato");
+      }
+    });
 
-    document.getElementById("verificaRisultato").innerHTML = output;
+    if (risultati.length) {
+      outputEl.innerHTML = risultati.join("<br>");
+      outputEl.className = "trovato";
+    } else {
+      outputEl.innerHTML = `❌ Tag "${tag}" non trovato nelle convocazioni`;
+      outputEl.className = "non-trovato";
+    }
+
+    outputEl.style.display = "block";
+
   } catch (e) {
     console.error("Errore:", e);
-    document.getElementById("verificaRisultato").innerHTML = "Errore caricamento dati";
+    outputEl.innerHTML = "Errore caricamento dati";
+    outputEl.className = "non-trovato";
+    outputEl.style.display = "block";
   }
 }
 
