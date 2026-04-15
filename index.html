@@ -220,10 +220,9 @@ body::before {
 }
 
 .trophy-icon {
-  width: 18px !important;
-  height: 18px !important;
-  object-fit: contain;
-  filter: none !important;
+  width: 9px !important;
+  height: 9px !important;
+  opacity: 0.9;
 }
 
 .trophy-value {
@@ -322,8 +321,8 @@ body::before {
   }
 
   .trophy-icon {
-    width: 16px !important;
-    height: 16px !important;
+    width: 9px !important;
+    height: 9px !important;
   }
 
   .trophy-value {
@@ -463,7 +462,18 @@ async function caricaLink() {
 
       const trophyValue = document.createElement("span");
       trophyValue.className = "trophy-value";
-      trophyValue.textContent = setting.trophyMap[item.nome] || "-";
+      const nomePulito = item.nome.trim().toLowerCase();
+
+let valore = "-";
+
+for (const key in setting.trophyMap) {
+  if (key.trim().toLowerCase() === nomePulito) {
+    valore = setting.trophyMap[key];
+    break;
+  }
+}
+
+trophyValue.textContent = valore;
 
       trophyBox.appendChild(trophyIcon);
       trophyBox.appendChild(trophyValue);
