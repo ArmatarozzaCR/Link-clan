@@ -15,8 +15,6 @@ html, body {
   --red-2: #ff3b1f;
   --gold: #ffd54a;
   --text: #ffffff;
-  --panel-dark: rgba(28, 8, 8, 0.74);
-  --panel-dark-2: rgba(70, 10, 10, 0.48);
 }
 
 * {
@@ -99,8 +97,7 @@ body::before {
   font-size: 19px;
   font-weight: 700;
   margin-bottom: 14px;
-  background:
-    linear-gradient(180deg, rgba(45, 0, 0, 0.88), rgba(20, 0, 0, 0.84));
+  background: linear-gradient(180deg, rgba(45, 0, 0, 0.88), rgba(20, 0, 0, 0.84));
   color: #fff;
   outline: none;
   box-shadow:
@@ -129,13 +126,12 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 20px;
+  gap: 18px;
   width: 100%;
   max-width: 400px;
   margin: 16px auto;
   padding: 17px 18px;
-  background:
-    linear-gradient(135deg, rgba(25,25,25,0.93), rgba(65,8,8,0.88) 58%, rgba(95,15,15,0.78));
+  background: linear-gradient(135deg, rgba(25,25,25,0.93), rgba(65,8,8,0.88) 58%, rgba(95,15,15,0.78));
   border: 2px solid var(--red-1);
   border-radius: 20px;
   cursor: pointer;
@@ -148,8 +144,6 @@ body::before {
     inset 0 1px 0 rgba(255,255,255,0.08),
     inset 0 -1px 0 rgba(0,0,0,0.25);
   animation: glowPulse 3.2s infinite alternate ease-in-out;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
   overflow: hidden;
 }
 
@@ -157,8 +151,7 @@ body::before {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.09) 18%, transparent 36%);
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.09) 18%, transparent 36%);
   transform: translateX(-130%);
   transition: transform .65s ease;
   pointer-events: none;
@@ -178,8 +171,7 @@ body::before {
 }
 
 .button:hover {
-  background:
-    linear-gradient(135deg, rgba(42,10,10,0.98), rgba(90,8,8,0.92) 58%, rgba(120,15,15,0.84));
+  background: linear-gradient(135deg, rgba(42,10,10,0.98), rgba(90,8,8,0.92) 58%, rgba(120,15,15,0.84));
   transform: translateY(-2px) scale(1.008);
   box-shadow:
     0 0 18px rgba(255, 30, 0, 0.62),
@@ -194,7 +186,7 @@ body::before {
   transform: scale(0.985);
 }
 
-.button span {
+.button-label {
   font-size: 20px;
   flex-grow: 1;
   text-align: left;
@@ -215,13 +207,40 @@ body::before {
   filter: drop-shadow(0 0 6px rgba(255,0,0,0.4));
 }
 
+.trophy-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 84px;
+  margin-left: auto;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.trophy-icon {
+  width: 18px !important;
+  height: 18px !important;
+  object-fit: contain;
+  filter: none !important;
+}
+
+.trophy-value {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  white-space: nowrap;
+}
+
 #verificaBtn {
   justify-content: center;
   text-align: center;
   min-height: 58px;
 }
 
-#verificaBtn span {
+#verificaBtn .button-label {
   text-align: center;
 }
 
@@ -279,7 +298,7 @@ body::before {
   }
 
   .button {
-    gap: 16px;
+    gap: 14px;
     padding: 15px 16px;
     border-radius: 18px;
   }
@@ -288,13 +307,27 @@ body::before {
     border-radius: 16px;
   }
 
-  .button span {
+  .button-label {
     font-size: 18px;
   }
 
   .button img {
     width: 68px !important;
     height: 68px !important;
+  }
+
+  .trophy-box {
+    min-width: 72px;
+    gap: 5px;
+  }
+
+  .trophy-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .trophy-value {
+    font-size: 14px;
   }
 
   #verificaInput {
@@ -310,10 +343,68 @@ body::before {
 <script>
 const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
 const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing"];
+const TROPHY_ICON = "./cw-trophy.png";
+
+async function leggiFoglio(sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
+
+  const text = await res.text();
+  const jsonText = text
+    .replace(/^\/\*O_o\*\/\s*/, "")
+    .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+    .replace(/\);$/, "");
+
+  const data = JSON.parse(jsonText);
+  return data.table.rows || [];
+}
+
+async function leggiSettingCompleto() {
+  try {
+    const rows = await leggiFoglio("setting");
+    let convocazioniOn = true;
+    const trophyMap = {};
+
+    if (rows.length) {
+      const primaRiga = rows[0].c || [];
+      const chiave = String((primaRiga[0] && primaRiga[0].v) || "").trim().toLowerCase();
+      const valore = String((primaRiga[1] && primaRiga[1].v) || "").trim().toLowerCase();
+
+      if (chiave === "convocazioni") {
+        convocazioniOn = valore === "on";
+      }
+    }
+
+    for (let i = 2; i < rows.length; i++) {
+      const cells = rows[i].c || [];
+      const clanName = String((cells[0] && cells[0].v) || "").trim();
+      const trophiesRaw = (cells[1] && cells[1].v) ?? "";
+
+      if (!clanName) continue;
+
+      const trophies = String(trophiesRaw).trim();
+      trophyMap[clanName] = trophies;
+    }
+
+    return { convocazioniOn, trophyMap };
+  } catch {
+    return { convocazioniOn: true, trophyMap: {} };
+  }
+}
+
+async function convocazioniAttive() {
+  const setting = await leggiSettingCompleto();
+  return setting.convocazioniOn;
+}
 
 async function caricaLink() {
   try {
-    const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
+    const [res, setting] = await Promise.all([
+      fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } }),
+      leggiSettingCompleto()
+    ]);
+
     if(!res.ok) {
       if (res.status === 403) {
         document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
@@ -359,45 +450,31 @@ async function caricaLink() {
       img.style = "width:75px;height:75px;object-fit:contain;flex-shrink:0;";
 
       const span = document.createElement("span");
+      span.className = "button-label";
       span.textContent = item.nome;
+
+      const trophyBox = document.createElement("div");
+      trophyBox.className = "trophy-box";
+
+      const trophyIcon = document.createElement("img");
+      trophyIcon.className = "trophy-icon";
+      trophyIcon.src = TROPHY_ICON;
+      trophyIcon.alt = "Coppe";
+
+      const trophyValue = document.createElement("span");
+      trophyValue.className = "trophy-value";
+      trophyValue.textContent = setting.trophyMap[item.nome] || "-";
+
+      trophyBox.appendChild(trophyIcon);
+      trophyBox.appendChild(trophyValue);
 
       div.appendChild(img);
       div.appendChild(span);
+      div.appendChild(trophyBox);
       container.appendChild(div);
     }
   } catch {
     document.body.innerHTML = "<div style='padding:20px;font-size:20px;color:white;'>Errore nel caricamento dei link.</div>";
-  }
-}
-
-async function leggiFoglio(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
-
-  const text = await res.text();
-  const jsonText = text
-    .replace(/^\/\*O_o\*\/\s*/, "")
-    .replace(/^google\.visualization\.Query\.setResponse\(/, "")
-    .replace(/\);$/, "");
-
-  const data = JSON.parse(jsonText);
-  return data.table.rows || [];
-}
-
-async function convocazioniAttive() {
-  try {
-    const rows = await leggiFoglio("setting");
-    if (!rows.length) return true;
-
-    const primaRiga = rows[0].c || [];
-    const chiave = String((primaRiga[0] && primaRiga[0].v) || "").trim().toLowerCase();
-    const valore = String((primaRiga[1] && primaRiga[1].v) || "").trim().toLowerCase();
-
-    if (chiave !== "convocazioni") return true;
-    return valore === "on";
-  } catch {
-    return true;
   }
 }
 
@@ -473,8 +550,13 @@ window.onload = function () {
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
-  btn.textContent = "Verifica convocazione";
   btn.onclick = verificaConvocazione;
+
+  const btnLabel = document.createElement("span");
+  btnLabel.className = "button-label";
+  btnLabel.textContent = "Verifica convocazione";
+  btn.appendChild(btnLabel);
+
   verificaDiv.appendChild(btn);
 
   const output = document.createElement("div");
