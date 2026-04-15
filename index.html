@@ -358,7 +358,7 @@ function normalizeName(value) {
 }
 
 async function leggiFoglio(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json&headers=0`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
 
