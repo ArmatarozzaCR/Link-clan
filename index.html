@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Link - Armata Rozza</title>
 <style>
 html, body {
@@ -10,27 +10,81 @@ html, body {
   padding: 0;
 }
 
+:root {
+  --red-1: #ff1a1a;
+  --red-2: #ff3b1f;
+  --gold: #ffd54a;
+  --text: #ffffff;
+  --panel-dark: rgba(28, 8, 8, 0.74);
+  --panel-dark-2: rgba(70, 10, 10, 0.48);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-image:
-    linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.45)),
+    radial-gradient(circle at top center, rgba(255,120,0,0.10), transparent 28%),
+    linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.55)),
     url("./background.jpg");
   background-repeat: no-repeat;
   background-position: center top;
   background-size: cover;
   background-color: #120000;
-  color: #ffffff;
+  color: var(--text);
   text-align: center;
-  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(255,130,0,0.12), transparent 12%),
+    radial-gradient(circle at 85% 30%, rgba(255,60,0,0.10), transparent 10%),
+    radial-gradient(circle at 12% 76%, rgba(255,120,0,0.08), transparent 9%),
+    radial-gradient(circle at 88% 82%, rgba(255,90,0,0.08), transparent 10%);
+  mix-blend-mode: screen;
+  opacity: .9;
 }
 
 #mobileContent {
+  position: relative;
   width: 100%;
   max-width: 430px;
   margin: 0 auto;
-  padding: 210px 14px 30px;
-  box-sizing: border-box;
+  padding: 220px 14px 34px;
+}
+
+#mobileContent::before {
+  content: "";
+  position: absolute;
+  top: 183px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 22px);
+  max-width: 406px;
+  height: calc(100% - 200px);
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.18));
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  z-index: 0;
+}
+
+#dynamicTop,
+#linkContainer {
+  position: relative;
+  z-index: 1;
 }
 
 #verificaContainer {
@@ -41,66 +95,139 @@ body {
 
 #verificaInput {
   width: 100%;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 2px solid #ff1a1a;
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  box-sizing: border-box;
-  background: rgba(255,255,255,0.95);
-  color: #111;
+  padding: 15px 18px;
+  border-radius: 18px;
+  border: 2px solid rgba(255, 55, 35, 0.95);
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  background:
+    linear-gradient(180deg, rgba(45, 0, 0, 0.88), rgba(20, 0, 0, 0.84));
+  color: #fff;
   outline: none;
-  box-shadow: 0 0 12px rgba(0,0,0,0.25);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 0 12px rgba(255,0,0,0.25),
+    0 6px 18px rgba(0,0,0,0.22);
+  transition: .25s ease;
+}
+
+#verificaInput::placeholder {
+  color: rgba(255,255,255,0.72);
+  font-weight: 600;
 }
 
 #verificaInput:focus {
-  box-shadow: 0 0 14px rgba(255,0,0,0.35);
+  border-color: #ff6a4f;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    0 0 22px rgba(255,40,0,0.42),
+    0 8px 20px rgba(0,0,0,0.24);
+  transform: translateY(-1px);
 }
 
 .button {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 22px;
+  gap: 20px;
   width: 100%;
   max-width: 400px;
   margin: 16px auto;
-  padding: 16px 18px;
-  background: linear-gradient(135deg, rgba(28,28,28,0.94), rgba(55,10,10,0.9));
-  border: 2px solid #ff1a1a;
-  border-radius: 16px;
+  padding: 17px 18px;
+  background:
+    linear-gradient(135deg, rgba(25,25,25,0.93), rgba(65,8,8,0.88) 58%, rgba(95,15,15,0.78));
+  border: 2px solid var(--red-1);
+  border-radius: 20px;
   cursor: pointer;
   font-size: 18px;
-  font-weight: 700;
-  transition: all 0.28s ease;
-  box-shadow: 0 0 12px rgba(255,0,0,0.42);
-  box-sizing: border-box;
-  animation: glowPulse 3s infinite alternate ease-in-out;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  font-weight: 800;
+  transition: transform .22s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease;
+  box-shadow:
+    0 0 10px rgba(255, 20, 0, 0.40),
+    0 0 24px rgba(255, 60, 0, 0.12),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(0,0,0,0.25);
+  animation: glowPulse 3.2s infinite alternate ease-in-out;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  overflow: hidden;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.09) 18%, transparent 36%);
+  transform: translateX(-130%);
+  transition: transform .65s ease;
+  pointer-events: none;
+}
+
+.button::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 18px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 24%, transparent 76%, rgba(0,0,0,0.10));
+}
+
+.button:hover::before {
+  transform: translateX(130%);
 }
 
 .button:hover {
-  background: linear-gradient(135deg, rgba(50,10,10,0.98), rgba(80,0,0,0.92));
-  transform: translateY(-2px);
-  box-shadow: 0 0 18px rgba(255,0,0,0.62);
+  background:
+    linear-gradient(135deg, rgba(42,10,10,0.98), rgba(90,8,8,0.92) 58%, rgba(120,15,15,0.84));
+  transform: translateY(-2px) scale(1.008);
+  box-shadow:
+    0 0 18px rgba(255, 30, 0, 0.62),
+    0 0 34px rgba(255, 80, 0, 0.18),
+    inset 0 1px 0 rgba(255,255,255,0.10),
+    inset 0 -1px 0 rgba(0,0,0,0.25);
+  border-color: #ff5a3a;
   animation-play-state: paused;
 }
 
+.button:active {
+  transform: scale(0.985);
+}
+
 .button span {
-  font-size: 21px;
+  font-size: 20px;
   flex-grow: 1;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.2px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  position: relative;
+  z-index: 1;
+}
+
+.button img {
+  width: 75px !important;
+  height: 75px !important;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--red-1);
+  box-shadow:
+    0 0 10px rgba(255,0,0,0.40),
+    0 0 18px rgba(255,80,0,0.18);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  background: rgba(0,0,0,0.2);
 }
 
 #verificaBtn {
-  width: 100%;
   justify-content: center;
   text-align: center;
+  min-height: 58px;
 }
 
 #verificaBtn span {
@@ -108,12 +235,17 @@ body {
 }
 
 #verificaRisultato {
-  margin-top: 12px;
+  margin-top: 14px;
   font-size: 17px;
-  color: #ffd54a;
+  color: var(--gold);
   text-align: center;
-  line-height: 1.45;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+  line-height: 1.5;
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.72),
+    0 0 8px rgba(255,170,0,0.14);
+  padding: 2px 8px 0;
+  font-weight: 600;
+  word-break: break-word;
 }
 
 #linkContainer {
@@ -123,27 +255,64 @@ body {
 }
 
 @keyframes glowPulse {
-  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.55); }
-  50% { box-shadow: 0 0 18px rgba(255, 80, 0, 0.95); }
-  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.55); }
+  0% {
+    box-shadow:
+      0 0 8px rgba(255, 0, 0, 0.45),
+      0 0 18px rgba(255, 70, 0, 0.10),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(255, 60, 0, 0.80),
+      0 0 38px rgba(255, 110, 0, 0.20),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
+  100% {
+    box-shadow:
+      0 0 8px rgba(255, 0, 0, 0.45),
+      0 0 18px rgba(255, 70, 0, 0.10),
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -1px 0 rgba(0,0,0,0.25);
+  }
 }
 
 @media (max-width: 420px) {
   #mobileContent {
-    padding: 145px 12px 28px;
+    padding: 220px 12px 28px;
+  }
+
+  #mobileContent::before {
+    width: calc(100% - 18px);
   }
 
   .button {
     gap: 16px;
     padding: 15px 16px;
+    border-radius: 18px;
+  }
+
+  .button::after {
+    border-radius: 16px;
   }
 
   .button span {
-    font-size: 19px;
+    font-size: 18px;
+  }
+
+  .button img {
+    width: 68px !important;
+    height: 68px !important;
   }
 
   #verificaInput {
     font-size: 17px;
+    padding: 14px 16px;
+  }
+
+  #verificaRisultato {
+    font-size: 16px;
   }
 }
 </style>
