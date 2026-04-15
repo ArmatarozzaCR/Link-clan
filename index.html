@@ -59,7 +59,7 @@ body::before {
   width: 100%;
   max-width: 430px;
   margin: 0 auto;
-  padding: 220px 14px 34px;
+  padding: 240px 14px 34px;
 }
 
 #mobileContent::before {
@@ -210,18 +210,11 @@ body::before {
 }
 
 .button img {
-  width: 75px !important;
-  height: 75px !important;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid var(--red-1);
-  box-shadow:
-    0 0 10px rgba(255,0,0,0.40),
-    0 0 18px rgba(255,80,0,0.18);
+  width: 75px;
+  height: 75px;
+  object-fit: contain;
   flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-  background: rgba(0,0,0,0.2);
+  filter: drop-shadow(0 0 6px rgba(255,0,0,0.4));
 }
 
 #verificaBtn {
@@ -365,7 +358,7 @@ async function caricaLink() {
       const img = document.createElement("img");
       img.src = item.img;
       img.alt = item.nome;
-      img.style = "width:75px;height:75px;object-fit:cover;border-radius:50%;border:2px solid #ff1a1a;box-shadow:0 0 8px rgba(255,0,0,0.45);flex-shrink:0;";
+      img.style = "width:75px;height:75px;object-fit:contain;flex-shrink:0;";
 
       const span = document.createElement("span");
       span.textContent = item.nome;
