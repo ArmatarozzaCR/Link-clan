@@ -9,23 +9,55 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
 body {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background:
-    linear-gradient(to bottom, rgba(0,0,0,0.18), rgba(0,0,0,0.72)),
-    url("background.jpg") no-repeat center top;
+  background-image:
+    linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.45)),
+    url("./background.jpg");
+  background-repeat: no-repeat;
+  background-position: center top;
   background-size: cover;
-  background-attachment: scroll;
+  background-color: #120000;
   color: #ffffff;
   text-align: center;
-  padding: 28px 16px 40px;
   box-sizing: border-box;
 }
+
+#mobileContent {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 155px 14px 30px;
+  box-sizing: border-box;
+}
+
+#verificaContainer {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 22px auto;
+}
+
+#verificaInput {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #ff1a1a;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.95);
+  color: #111;
+  outline: none;
+  box-shadow: 0 0 12px rgba(0,0,0,0.25);
+}
+
+#verificaInput:focus {
+  box-shadow: 0 0 14px rgba(255,0,0,0.35);
+}
+
 .button {
   display: flex;
   align-items: center;
@@ -34,133 +66,82 @@ body {
   width: 100%;
   max-width: 400px;
   margin: 16px auto;
-  padding: 18px 20px;
-  background: linear-gradient(135deg, rgba(26,26,26,0.92), rgba(45,10,10,0.88));
+  padding: 16px 18px;
+  background: linear-gradient(135deg, rgba(28,28,28,0.94), rgba(55,10,10,0.9));
   border: 2px solid #ff1a1a;
-  border-radius: 18px;
+  border-radius: 16px;
   cursor: pointer;
   font-size: 18px;
   font-weight: 700;
   transition: all 0.28s ease;
-  box-shadow: 0 0 14px rgba(255,0,0,0.45), inset 0 0 10px rgba(255,255,255,0.03);
+  box-shadow: 0 0 12px rgba(255,0,0,0.42);
   box-sizing: border-box;
   animation: glowPulse 3s infinite alternate ease-in-out;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
+
 .button:hover {
-  background: linear-gradient(135deg, rgba(55,10,10,0.95), rgba(80,0,0,0.92));
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 0 22px rgba(255,0,0,0.72), inset 0 0 12px rgba(255,255,255,0.05);
+  background: linear-gradient(135deg, rgba(50,10,10,0.98), rgba(80,0,0,0.92));
+  transform: translateY(-2px);
+  box-shadow: 0 0 18px rgba(255,0,0,0.62);
   animation-play-state: paused;
 }
+
 .button span {
-  font-size: 22px;
+  font-size: 21px;
   flex-grow: 1;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
-.button img {
-  width: 74px !important;
-  height: 74px !important;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 40, 40, 0.95);
-  box-shadow: 0 0 10px rgba(255,0,0,0.45);
-  flex-shrink: 0;
-}
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.45), inset 0 0 8px rgba(255,255,255,0.02); }
-  50% { box-shadow: 0 0 20px rgba(255, 70, 0, 0.95), inset 0 0 10px rgba(255,255,255,0.04); }
-  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.45), inset 0 0 8px rgba(255,255,255,0.02); }
-}
-#mobileContent {
-  width: 100%;
-  max-width: 430px;
-}
-.main-panel {
-  width: 100%;
-  margin: 132px auto 0;
-  padding: 18px 14px 22px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.58));
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  box-sizing: border-box;
-}
-#verificaContainer {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto 24px auto;
-}
-#verificaInput {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 2px solid #ff1a1a;
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  box-sizing: border-box;
-  background: rgba(255,255,255,0.92);
-  color: #111;
-  outline: none;
-  box-shadow: 0 0 14px rgba(255,0,0,0.18);
-}
-#verificaInput::placeholder {
-  color: #666;
-  font-weight: 600;
-}
-#verificaInput:focus {
-  border-color: #ff4d4d;
-  box-shadow: 0 0 18px rgba(255,0,0,0.35);
-}
+
 #verificaBtn {
   width: 100%;
   justify-content: center;
-  gap: 0;
+  text-align: center;
 }
+
 #verificaBtn span {
   text-align: center;
 }
+
 #verificaRisultato {
-  margin-top: 14px;
+  margin-top: 12px;
   font-size: 17px;
-  line-height: 1.45;
   color: #ffd54a;
   text-align: center;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.75);
-  padding: 0 6px;
+  line-height: 1.45;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.7);
 }
+
 #linkContainer {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
 }
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.55); }
+  50% { box-shadow: 0 0 18px rgba(255, 80, 0, 0.95); }
+  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.55); }
+}
+
 @media (max-width: 420px) {
-  body {
-    padding: 22px 12px 32px;
+  #mobileContent {
+    padding: 145px 12px 28px;
   }
-  .main-panel {
-    margin-top: 118px;
-    padding: 16px 10px 18px;
-  }
+
   .button {
-    gap: 18px;
-    padding: 16px;
-    border-radius: 16px;
+    gap: 16px;
+    padding: 15px 16px;
   }
+
   .button span {
     font-size: 19px;
   }
-  .button img {
-    width: 66px !important;
-    height: 66px !important;
-  }
+
   #verificaInput {
     font-size: 17px;
   }
@@ -175,13 +156,15 @@ async function caricaLink() {
     const res = await fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } });
     if(!res.ok) {
       if (res.status === 403) {
-        document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
+        document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
         return;
       }
       throw new Error();
     }
+
     const data = await res.json();
     const container = document.getElementById("linkContainer");
+
     for (const item of data) {
       const div = document.createElement("div");
       div.className = "button";
@@ -189,13 +172,16 @@ async function caricaLink() {
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if(!tokenRes.ok) throw new Error();
+
           const tokenData = await tokenRes.json();
           if(!tokenData.token) return alert("Token non ricevuto");
+
           const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
           if(!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
           }
+
           const urlData = await urlRes.json();
           if(urlData.url) {
             window.location.href = urlData.url;
@@ -206,19 +192,21 @@ async function caricaLink() {
           alert("Errore apertura link");
         }
       };
+
       const img = document.createElement("img");
       img.src = item.img;
       img.alt = item.nome;
-      img.style = "width: 75px; height: 75px; object-fit: cover;";
+      img.style = "width:75px;height:75px;object-fit:cover;border-radius:50%;border:2px solid #ff1a1a;box-shadow:0 0 8px rgba(255,0,0,0.45);flex-shrink:0;";
+
       const span = document.createElement("span");
       span.textContent = item.nome;
+
       div.appendChild(img);
       div.appendChild(span);
       container.appendChild(div);
     }
-    document.getElementById("mobileContent").style.display = 'block';
   } catch {
-    document.body.innerHTML = "<div style='padding:20px;font-size:20px;'>Errore nel caricamento dei link.</div>";
+    document.body.innerHTML = "<div style='padding:20px;font-size:20px;color:white;'>Errore nel caricamento dei link.</div>";
   }
 }
 
@@ -263,7 +251,7 @@ async function verificaConvocazione() {
 
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
-  
+
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
@@ -287,13 +275,12 @@ async function verificaConvocazione() {
         }
       }
     }
-    
-    const output = risultati.length 
-      ? risultati.join("<br>") 
-      : `Tag \"${tag}\" non trovato nelle convocazioni`;
-    
-    document.getElementById("verificaRisultato").innerHTML = output;
 
+    const output = risultati.length
+      ? risultati.join("<br>")
+      : `Tag "${tag}" non trovato nelle convocazioni`;
+
+    document.getElementById("verificaRisultato").innerHTML = output;
   } catch (e) {
     console.error("Errore:", e);
     document.getElementById("verificaRisultato").innerHTML = "Errore caricamento dati";
@@ -303,11 +290,11 @@ async function verificaConvocazione() {
 window.onload = function () {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
-    document.body.innerHTML = `<div style=\"font-size: 22px; line-height: 1.5; padding: 20px; box-sizing: border-box; color: white; background: black;\">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
+    document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
 
-  const mobileContent = document.getElementById("mobileContent");
+  const container = document.getElementById("dynamicTop");
   const verificaDiv = document.createElement("div");
   verificaDiv.id = "verificaContainer";
 
@@ -315,14 +302,14 @@ window.onload = function () {
   input.id = "verificaInput";
   input.placeholder = "Inserisci il tuo tag Telegram";
   verificaDiv.appendChild(input);
-  
+
   setTimeout(() => {
     const ultimoTag = localStorage.getItem("ultimoTag");
     if (ultimoTag) {
       input.value = ultimoTag;
     }
   }, 0);
-  
+
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
@@ -334,7 +321,7 @@ window.onload = function () {
   output.id = "verificaRisultato";
   verificaDiv.appendChild(output);
 
-  mobileContent.insertBefore(verificaDiv, document.getElementById("linkContainer"));
+  container.appendChild(verificaDiv);
 
   caricaLink();
 };
@@ -354,10 +341,9 @@ document.addEventListener('keydown', e => {
 </script>
 </head>
 <body>
-<div id="mobileContent" style="display:none;">
-  <div class="main-panel">
+  <div id="mobileContent">
+    <div id="dynamicTop"></div>
     <div id="linkContainer"></div>
   </div>
-</div>
 </body>
 </html>
