@@ -220,10 +220,10 @@ body::before {
 }
 
 .trophy-icon {
-  width: 11px !important;
-  height: 11px !important;
+  width: 14px !important;
+  height: 14px !important;
   object-fit: contain;
-  opacity: 0.9;
+  opacity: 0.95;
   flex-shrink: 0;
   filter: none !important;
 }
@@ -324,8 +324,8 @@ body::before {
   }
 
   .trophy-icon {
-    width: 11px !important;
-    height: 11px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .trophy-value {
@@ -350,6 +350,8 @@ const TROPHY_ICON = "./cw-trophy.png";
 function normalizeName(value) {
   return String(value || "")
     .normalize("NFKC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/\u00A0/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .toLowerCase();
@@ -375,31 +377,28 @@ async function leggiSettingCompleto() {
     const rows = await leggiFoglio("setting");
     let convocazioniOn = true;
     const trophyMap = {};
+    const trophyMapNormalized = {};
 
-    if (rows.length) {
-      const primaRiga = rows[0].c || [];
-      const chiave = String((primaRiga[0] && primaRiga[0].v) || "").trim().toLowerCase();
-      const valore = String((primaRiga[1] && primaRiga[1].v) || "").trim().toLowerCase();
-
-      if (chiave === "convocazioni") {
-        convocazioniOn = valore === "on";
-      }
-    }
-
-    for (let i = 2; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       const cells = rows[i].c || [];
-      const clanName = String((cells[0] && cells[0].v) || "").trim();
-      const trophiesRaw = (cells[1] && cells[1].v) ?? "";
+      const colA = String((cells[0] && cells[0].v) || "").trim();
+      const colB = (cells[1] && cells[1].v) ?? "";
 
-      if (!clanName) continue;
+      if (!colA) continue;
 
-      const trophies = String(trophiesRaw).trim();
-      trophyMap[clanName] = trophies;
+      if (normalizeName(colA) === "convocazioni") {
+        convocazioniOn = String(colB).trim().toLowerCase() === "on";
+        continue;
+      }
+
+      const trophies = String(colB).trim();
+      trophyMap[colA] = trophies;
+      trophyMapNormalized[normalizeName(colA)] = trophies;
     }
 
-    return { convocazioniOn, trophyMap };
+    return { convocazioniOn, trophyMap, trophyMapNormalized };
   } catch {
-    return { convocazioniOn: true, trophyMap: {} };
+    return { convocazioniOn: true, trophyMap: {}, trophyMapNormalized: {} };
   }
 }
 
@@ -475,16 +474,7 @@ async function caricaLink() {
       trophyValue.className = "trophy-value";
 
       const nomePulito = normalizeName(item.nome);
-      let valore = "-";
-
-      for (const key in setting.trophyMap) {
-        if (normalizeName(key) === nomePulito) {
-          valore = setting.trophyMap[key];
-          break;
-        }
-      }
-
-      trophyValue.textContent = valore;
+      trophyValue.textContent = setting.trophyMapNormalized[nomePulito] || "-";
 
       trophyBox.appendChild(trophyIcon);
       trophyBox.appendChild(trophyValue);
