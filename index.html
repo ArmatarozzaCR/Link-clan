@@ -220,8 +220,8 @@ body::before {
 }
 
 .trophy-icon {
-  width: 14px !important;
-  height: 14px !important;
+  width: 20px !important;
+  height: 20px !important;
   object-fit: contain;
   opacity: 0.95;
   flex-shrink: 0;
@@ -324,8 +324,8 @@ body::before {
   }
 
   .trophy-icon {
-    width: 14px !important;
-    height: 14px !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 
   .trophy-value {
@@ -379,21 +379,25 @@ async function leggiSettingCompleto() {
     const trophyMap = {};
     const trophyMapNormalized = {};
 
-    for (let i = 0; i < rows.length; i++) {
+    if (rows.length > 0) {
+      const firstRow = rows[0].c || [];
+      const key = String((firstRow[0] && firstRow[0].v) || "").trim();
+      const value = String((firstRow[1] && firstRow[1].v) || "").trim();
+
+      if (normalizeName(key) === "convocazioni") {
+        convocazioniOn = normalizeName(value) === "on";
+      }
+    }
+
+    for (let i = 1; i < rows.length; i++) {
       const cells = rows[i].c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
-      const colB = (cells[1] && cells[1].v) ?? "";
+      const colB = String((cells[1] && cells[1].v) || "").trim();
 
-      if (!colA) continue;
+      if (!colA || !colB) continue;
 
-      if (normalizeName(colA) === "convocazioni") {
-        convocazioniOn = String(colB).trim().toLowerCase() === "on";
-        continue;
-      }
-
-      const trophies = String(colB).trim();
-      trophyMap[colA] = trophies;
-      trophyMapNormalized[normalizeName(colA)] = trophies;
+      trophyMap[colA] = colB;
+      trophyMapNormalized[normalizeName(colA)] = colB;
     }
 
     return { convocazioniOn, trophyMap, trophyMapNormalized };
