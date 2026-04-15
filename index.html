@@ -358,7 +358,7 @@ function normalizeName(value) {
 }
 
 async function leggiFoglio(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json&headers=0`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
 
@@ -378,13 +378,12 @@ async function leggiSettingCompleto() {
     const trophyMap = {};
     const trophyMapNormalized = {};
 
-    for (let i = 0; i < rows.length; i++) {
+    for (let i = 2; i < rows.length; i++) {
       const cells = rows[i].c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
 
       if (!colA || !colB) continue;
-      if (normalizeName(colA) === "convocazioni") continue;
 
       trophyMap[colA] = colB;
       trophyMapNormalized[normalizeName(colA)] = colB;
@@ -401,17 +400,12 @@ async function convocazioniAttive() {
     const rows = await leggiFoglio("setting");
     if (!rows.length) return true;
 
-    for (let i = 0; i < rows.length; i++) {
-      const cells = rows[i].c || [];
-      const chiave = String((cells[0] && cells[0].v) || "").trim();
-      const valore = String((cells[1] && cells[1].v) || "").trim();
+    const primaRiga = rows[0].c || [];
+    const chiave = String((primaRiga[0] && primaRiga[0].v) || "").trim().toLowerCase();
+    const valore = String((primaRiga[1] && primaRiga[1].v) || "").trim().toLowerCase();
 
-      if (normalizeName(chiave) === "convocazioni") {
-        return normalizeName(valore) === "on";
-      }
-    }
-
-    return true;
+    if (chiave !== "convocazioni") return true;
+    return valore === "on";
   } catch {
     return true;
   }
