@@ -596,7 +596,7 @@ async function verificaConvocazione() {
         let tagCell = String((cells[1] && cells[1].v) || "").replace(/^@+/, "").toUpperCase().trim();
 
         if (tagCell && tagCell === tag) {
-          risultati.push(`Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
+          risultati.push(`• Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
           clanConvocati.add(normalizeName(sheetName));
         }
       }
