@@ -378,12 +378,13 @@ async function leggiSettingCompleto() {
     const trophyMap = {};
     const trophyMapNormalized = {};
 
-    for (let i = 2; i < rows.length; i++) {
+    for (let i = 0; i < rows.length; i++) {
       const cells = rows[i].c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
 
       if (!colA || !colB) continue;
+      if (normalizeName(colA) === "convocazioni") continue;
 
       trophyMap[colA] = colB;
       trophyMapNormalized[normalizeName(colA)] = colB;
@@ -400,12 +401,17 @@ async function convocazioniAttive() {
     const rows = await leggiFoglio("setting");
     if (!rows.length) return true;
 
-    const primaRiga = rows[0].c || [];
-    const chiave = String((primaRiga[0] && primaRiga[0].v) || "").trim().toLowerCase();
-    const valore = String((primaRiga[1] && primaRiga[1].v) || "").trim().toLowerCase();
+    for (let i = 0; i < rows.length; i++) {
+      const cells = rows[i].c || [];
+      const chiave = String((cells[0] && cells[0].v) || "").trim();
+      const valore = String((cells[1] && cells[1].v) || "").trim();
 
-    if (chiave !== "convocazioni") return true;
-    return valore === "on";
+      if (normalizeName(chiave) === "convocazioni") {
+        return normalizeName(valore) === "on";
+      }
+    }
+
+    return true;
   } catch {
     return true;
   }
