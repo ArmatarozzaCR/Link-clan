@@ -212,7 +212,7 @@ body::before {
   align-items: center;
   justify-content: flex-end;
   gap: 5px;
-  min-width: 62px;
+  min-width: 70px;
   margin-left: auto;
   position: relative;
   z-index: 1;
@@ -220,8 +220,8 @@ body::before {
 }
 
 .trophy-icon {
-  width: 20px !important;
-  height: 20px !important;
+  width: 18px !important;
+  height: 18px !important;
   object-fit: contain;
   opacity: 0.95;
   flex-shrink: 0;
@@ -319,13 +319,13 @@ body::before {
   }
 
   .trophy-box {
-    min-width: 58px;
+    min-width: 64px;
     gap: 4px;
   }
 
   .trophy-icon {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
 
   .trophy-value {
@@ -383,23 +383,6 @@ async function leggiSettingCompleto() {
     convocazioniOn = normalizeName(b1) === "on";
 
     for (let i = 2; i < rows.length; i++) {
-      const cells = rows[i].c || [];
-      const colA = String((cells[0] && cells[0].v) || "").trim();
-      const colB = String((cells[1] && cells[1].v) || "").trim();
-
-      if (!colA || !colB) continue;
-
-      trophyMap[colA] = colB;
-      trophyMapNormalized[normalizeName(colA)] = colB;
-    }
-
-    return { convocazioniOn, trophyMap, trophyMapNormalized };
-  } catch {
-    return { convocazioniOn: true, trophyMap: {}, trophyMapNormalized: {} };
-  }
-}
-
-    for (let i = 1; i < rows.length; i++) {
       const cells = rows[i].c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
