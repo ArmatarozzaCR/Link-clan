@@ -13,82 +13,157 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom right, #000000, #4d0000);
-  background-repeat: no-repeat;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.18), rgba(0,0,0,0.72)),
+    url("background.jpg") no-repeat center top;
   background-size: cover;
+  background-attachment: scroll;
   color: #ffffff;
   text-align: center;
-  padding: 40px 20px;
+  padding: 28px 16px 40px;
   box-sizing: border-box;
-}
-h1 {
-  font-size: 24px;
-  margin-bottom: 30px;
-  color: #ffffff;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
 }
 .button {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 24px;
+  gap: 22px;
   width: 100%;
   max-width: 400px;
-  margin: 20px auto;
-  padding: 18px;
-  background: #222;
-  border: 2px solid #ff0000;
-  border-radius: 12px;
+  margin: 16px auto;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(26,26,26,0.92), rgba(45,10,10,0.88));
+  border: 2px solid #ff1a1a;
+  border-radius: 18px;
   cursor: pointer;
   font-size: 18px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(255,0,0,0.5);
+  font-weight: 700;
+  transition: all 0.28s ease;
+  box-shadow: 0 0 14px rgba(255,0,0,0.45), inset 0 0 10px rgba(255,255,255,0.03);
   box-sizing: border-box;
   animation: glowPulse 3s infinite alternate ease-in-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .button:hover {
-  background: #440000;
-  transform: translateY(-3px);
-  box-shadow: 0 0 16px rgba(255,0,0,0.7);
+  background: linear-gradient(135deg, rgba(55,10,10,0.95), rgba(80,0,0,0.92));
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 0 22px rgba(255,0,0,0.72), inset 0 0 12px rgba(255,255,255,0.05);
   animation-play-state: paused;
 }
 .button span {
-  font-size: 24px;
+  font-size: 22px;
   flex-grow: 1;
   text-align: left;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.button img {
+  width: 74px !important;
+  height: 74px !important;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 40, 40, 0.95);
+  box-shadow: 0 0 10px rgba(255,0,0,0.45);
+  flex-shrink: 0;
 }
 @keyframes glowPulse {
-  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.6); }
-  50% { box-shadow: 0 0 18px rgba(255, 80, 0, 1); }
-  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.6); }
+  0% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.45), inset 0 0 8px rgba(255,255,255,0.02); }
+  50% { box-shadow: 0 0 20px rgba(255, 70, 0, 0.95), inset 0 0 10px rgba(255,255,255,0.04); }
+  100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.45), inset 0 0 8px rgba(255,255,255,0.02); }
+}
+#mobileContent {
+  width: 100%;
+  max-width: 430px;
+}
+.main-panel {
+  width: 100%;
+  margin: 132px auto 0;
+  padding: 18px 14px 22px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.58));
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  box-sizing: border-box;
 }
 #verificaContainer {
   width: 100%;
   max-width: 400px;
-  margin: 0 auto 30px auto;
+  margin: 0 auto 24px auto;
 }
 #verificaInput {
-  width: calc(100% - 40px);
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 2px solid #ff0000;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 2px solid #ff1a1a;
   font-size: 18px;
+  font-weight: 700;
   margin-bottom: 12px;
   box-sizing: border-box;
+  background: rgba(255,255,255,0.92);
+  color: #111;
+  outline: none;
+  box-shadow: 0 0 14px rgba(255,0,0,0.18);
+}
+#verificaInput::placeholder {
+  color: #666;
+  font-weight: 600;
+}
+#verificaInput:focus {
+  border-color: #ff4d4d;
+  box-shadow: 0 0 18px rgba(255,0,0,0.35);
 }
 #verificaBtn {
   width: 100%;
+  justify-content: center;
+  gap: 0;
+}
+#verificaBtn span {
+  text-align: center;
 }
 #verificaRisultato {
-  margin-top: 12px;
-  font-size: 18px;
-  color: #ffcc00;
+  margin-top: 14px;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #ffd54a;
   text-align: center;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.75);
+  padding: 0 6px;
+}
+#linkContainer {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+@media (max-width: 420px) {
+  body {
+    padding: 22px 12px 32px;
+  }
+  .main-panel {
+    margin-top: 118px;
+    padding: 16px 10px 18px;
+  }
+  .button {
+    gap: 18px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+  .button span {
+    font-size: 19px;
+  }
+  .button img {
+    width: 66px !important;
+    height: 66px !important;
+  }
+  #verificaInput {
+    font-size: 17px;
+  }
 }
 </style>
 <script>
@@ -280,8 +355,9 @@ document.addEventListener('keydown', e => {
 </head>
 <body>
 <div id="mobileContent" style="display:none;">
-  <h1>Link - Armata Rozza</h1>
-  <div id="linkContainer" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+  <div class="main-panel">
+    <div id="linkContainer"></div>
+  </div>
 </div>
 </body>
 </html>
