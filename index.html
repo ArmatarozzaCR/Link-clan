@@ -382,7 +382,7 @@ async function leggiSettingCompleto() {
     const b1 = String((rows[0]?.c?.[1]?.v) ?? "").trim();
     convocazioniOn = normalizeName(b1) === "on";
 
-    for (let i = 2; i < rows.length; i++) {
+    for (let i = 1; i < rows.length; i++) {
       const cells = rows[i].c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
