@@ -398,20 +398,24 @@ async function leggiSettingCompleto() {
 
 async function convocazioniAttive() {
   try {
-    const rows = await leggiFoglio("setting");
-    if (!rows.length) return true;
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=B1&tqx=out:json`;
+    const res = await fetch(url);
+    if (!res.ok) return true;
 
-    for (let i = 0; i < rows.length; i++) {
-      const cells = rows[i].c || [];
-      const chiave = String((cells[0] && cells[0].v) || "").trim();
-      const valore = String((cells[1] && cells[1].v) || "").trim();
+    const text = await res.text();
+    const jsonText = text
+      .replace(/^\/\*O_o\*\/\s*/, "")
+      .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+      .replace(/\);$/, "");
 
-      if (normalizeName(chiave) === "convocazioni") {
-        return normalizeName(valore) === "on";
-      }
-    }
+    const data = JSON.parse(jsonText);
 
-    return true;
+    const valore = String(
+      data.table.rows?.[0]?.c?.[0]?.v || ""
+    ).trim().toLowerCase();
+
+    return valore === "on";
+
   } catch {
     return true;
   }
