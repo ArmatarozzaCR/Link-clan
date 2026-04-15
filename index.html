@@ -507,7 +507,7 @@ async function verificaConvocazione() {
   const attive = await convocazioniAttive();
 
   if (!attive) {
-    document.getElementById("verificaRisultato").innerHTML = "Convocazioni attualmente disattivate";
+    document.getElementById("verificaRisultato").innerHTML = "Le convocazioni non sono ancora disponibili";
     return;
   }
 
