@@ -379,15 +379,25 @@ async function leggiSettingCompleto() {
     const trophyMap = {};
     const trophyMapNormalized = {};
 
-    if (rows.length > 0) {
-      const firstRow = rows[0].c || [];
-      const key = String((firstRow[0] && firstRow[0].v) || "").trim();
-      const value = String((firstRow[1] && firstRow[1].v) || "").trim();
+    const b1 = String((rows[0]?.c?.[1]?.v) ?? "").trim();
+    convocazioniOn = normalizeName(b1) === "on";
 
-      if (normalizeName(key) === "convocazioni") {
-        convocazioniOn = normalizeName(value) === "on";
-      }
+    for (let i = 2; i < rows.length; i++) {
+      const cells = rows[i].c || [];
+      const colA = String((cells[0] && cells[0].v) || "").trim();
+      const colB = String((cells[1] && cells[1].v) || "").trim();
+
+      if (!colA || !colB) continue;
+
+      trophyMap[colA] = colB;
+      trophyMapNormalized[normalizeName(colA)] = colB;
     }
+
+    return { convocazioniOn, trophyMap, trophyMapNormalized };
+  } catch {
+    return { convocazioniOn: true, trophyMap: {}, trophyMapNormalized: {} };
+  }
+}
 
     for (let i = 1; i < rows.length; i++) {
       const cells = rows[i].c || [];
