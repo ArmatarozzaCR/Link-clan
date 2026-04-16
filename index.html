@@ -187,7 +187,6 @@ body::before {
   transform: scale(0.985);
 }
 
-/* Bottone clan convocato: bordo verde pulsante */
 .button.convocato {
   border-color: #00e676;
   animation: greenPulse 1.8s infinite alternate ease-in-out;
@@ -316,6 +315,36 @@ body::before {
   margin: 0 auto;
 }
 
+.offline-box {
+  width: 100%;
+  max-width: 400px;
+  margin: 52px auto 0;
+  padding: 20px 18px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.50);
+  border: 1px solid rgba(255, 60, 0, 0.40);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    0 4px 18px rgba(0,0,0,0.30),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+  color: #ffffff;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.offline-title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+}
+
+.offline-text {
+  font-size: 17px;
+  color: rgba(255,255,255,0.88);
+}
+
 @keyframes glowPulse {
   0% {
     box-shadow:
@@ -388,6 +417,20 @@ body::before {
   }
 
   #verificaRisultato {
+    font-size: 16px;
+  }
+
+  .offline-box {
+    margin: 46px auto 0;
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+
+  .offline-title {
+    font-size: 20px;
+  }
+
+  .offline-text {
     font-size: 16px;
   }
 }
@@ -479,10 +522,6 @@ async function caricaLink() {
     ]);
 
     if (!res.ok) {
-      if (res.status === 403) {
-        document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⛔ Il sito è offline,<br>vi è andata male Russi 🇷🇺</div>`;
-        return;
-      }
       throw new Error();
     }
 
@@ -550,7 +589,13 @@ async function caricaLink() {
       container.appendChild(div);
     }
   } catch {
-    document.body.innerHTML = "<div style='padding:20px;font-size:20px;color:white;'>Errore nel caricamento dei link.</div>";
+    document.getElementById("dynamicTop").innerHTML = `
+      <div class="offline-box">
+        <div class="offline-title">La war è iniziata</div>
+        <div class="offline-text">I link non sono più disponibili.</div>
+      </div>
+    `;
+    document.getElementById("linkContainer").innerHTML = "";
   }
 }
 
@@ -572,7 +617,6 @@ async function verificaConvocazione() {
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
-  // Reset bordi verdi precedenti
   document.querySelectorAll("#linkContainer .button.convocato").forEach(btn => {
     btn.classList.remove("convocato");
   });
@@ -602,7 +646,6 @@ async function verificaConvocazione() {
       }
     }
 
-    // Evidenzia i bottoni clan in cui si è convocati
     document.querySelectorAll("#linkContainer .button").forEach(btn => {
       if (clanConvocati.has(btn.dataset.nomeClan)) {
         btn.classList.add("convocato");
