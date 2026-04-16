@@ -304,7 +304,7 @@
   <div class="wrap">
 
     <h1 class="title">Check convocazioni</h1>
-    <p class="subtitle">Premi il pulsante per avviare l’aggiornamento automatico delle convocazioni.</p>
+    <p class="subtitle">Premi il pulsante per avviare l’aggiornamento automatico delle convocazioni</p>
 
     <button id="startBtn" class="button">Avvia check convocazioni</button>
 
@@ -320,8 +320,6 @@
       >
         Apri il file Google
       </a>
-
-      <button id="backBtn" class="secondaryBtn" type="button">Torna indietro</button>
   </div>
 
   <script>
@@ -332,7 +330,6 @@
     const statusBox = document.getElementById("statusBox");
     const actions = document.getElementById("actions");
     const openSheetBtn = document.getElementById("openSheetBtn");
-    const backBtn = document.getElementById("backBtn");
 
     openSheetBtn.href = SHEET_URL;
 
@@ -382,7 +379,7 @@
         stopWaitingAnimation();
 
         if (normalized.startsWith("OK")) {
-          setStatus("success", "Convocazioni aggiornate.");
+          setStatus("success", "Convocazioni aggiornate");
           actions.classList.add("show");
         } else {
           throw new Error(text || "Risposta non valida");
@@ -398,14 +395,6 @@
     }
 
     startBtn.addEventListener("click", avviaCheck);
-
-    backBtn.addEventListener("click", () => {
-      if (document.referrer) {
-        history.back();
-      } else {
-        window.location.href = "/";
-      }
-    });
   </script>
 </body>
 </html>
