@@ -75,7 +75,7 @@
       font-size: 16px;
       line-height: 1.5;
       color: rgba(255,255,255,0.88);
-      margin: 0 0 22px;
+      margin: 0 0 10px;
       animation: fadeUp .45s ease .12s both;
     }
 
@@ -143,7 +143,7 @@
 
     .statusBox {
       display: none;
-      margin-top: 18px;
+      margin-top: 10px;
       padding: 16px 18px;
       border-radius: 18px;
       background: rgba(0,0,0,0.42);
@@ -231,27 +231,17 @@
     }
 
     .divider {
-      display: none;
       margin: 20px 0 0;
       border: none;
       border-top: 1px solid rgba(255,255,255,0.08);
     }
 
-    .divider.show {
-      display: block;
-    }
-
     .timestamp {
-      display: none;
       margin-top: 14px;
       font-size: 13px;
       color: rgba(255,255,255,0.42);
       letter-spacing: 0.2px;
       animation: fadeUp .4s ease;
-    }
-
-    .timestamp.show {
-      display: block;
     }
 
     .timestamp strong {
@@ -339,6 +329,7 @@
   <script>
     const SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMUXgqS3ULU0UekRqddVL4Z4BnNKZqBLV0AqdV4AA7PtoI7Nd045Tftrx_a4iRzHyQ8c1Vi8FzeTAWqM9S9tXrC0d1ME6PhSSkktyfSZqprvhycwSLidVbWH-qVDQYvR-n67wXrfa92r51ol9iaPdEaH7EZDdtDafujiP6rTEEyF8kOq5V8gl7km4yXrPcL5If0lwDpkwkBFx3RmtbVVDlL24C88VHPsfCL7teulUO6n6lM9-WmI-kJGEE_u1iEssKnLAHglJNQr6BY7qUoB8AIJuNZArw&lib=MDGe9bDQr1x_w4KSRQI3x9o5ljRdC-B99";
     const SHEET_URL  = "https://docs.google.com/spreadsheets/d/1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A/edit?gid=1516163823#gid=1516163823";
+    const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
 
     const startBtn     = document.getElementById("startBtn");
     const statusBox    = document.getElementById("statusBox");
@@ -379,17 +370,35 @@
 
     function showTimestamp(raw) {
       if (!raw || !raw.trim()) return;
-      tsDivider.classList.add("show");
-      timestampBox.classList.add("show");
       timestampBox.innerHTML = "Ultimo aggiornamento: <strong>" + raw.trim() + "</strong>";
+    }
+
+    async function fetchTimestamp() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=F2&tqx=out:json`;
+        const res = await fetch(url, { cache: "no-store" });
+        const text = await res.text();
+
+        const jsonText = text
+          .replace(/^\/\*O_o\*\/\s*/, "")
+          .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+          .replace(/\);$/, "");
+
+        const data = JSON.parse(jsonText);
+        const val = String(data.table.rows?.[0]?.c?.[0]?.v || "").trim();
+
+        if (val) {
+          showTimestamp(val);
+        }
+      } catch (e) {
+        console.warn("Timestamp non disponibile", e);
+      }
     }
 
     async function avviaCheck() {
       startBtn.disabled = true;
       actions.classList.remove("show");
       retryBtn.style.display = "none";
-      tsDivider.classList.remove("show");
-      timestampBox.classList.remove("show");
 
       startWaitingAnimation();
 
@@ -400,6 +409,7 @@
         if (!response.ok) throw new Error(text || "Errore durante l'esecuzione dello script");
 
         const normalized = String(text || "").trim().toUpperCase();
+
         stopWaitingAnimation();
 
         if (normalized.startsWith("OK")) {
@@ -421,27 +431,10 @@
       }
     }
 
-    async function fetchTimestamp() {
-      const SHEET_ID  = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
-      const RANGE     = "setting!F2";
-      const API_KEY   = "";
-      if (!API_KEY) {
-        showTimestamp(new Date().toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }));
-        return;
-      }
-      try {
-        const url = "https://sheets.googleapis.com/v4/spreadsheets/" + SHEET_ID + "/values/" + encodeURIComponent(RANGE) + "?key=" + API_KEY;
-        const res  = await fetch(url, { cache: "no-store" });
-        const json = await res.json();
-        const val  = json.values && json.values[0] && json.values[0][0];
-        if (val) showTimestamp(val);
-      } catch (e) {
-        console.warn("Timestamp non disponibile", e);
-      }
-    }
-
     startBtn.addEventListener("click", avviaCheck);
     retryBtn.addEventListener("click", avviaCheck);
+
+    fetchTimestamp();
   </script>
 </body>
 </html>
