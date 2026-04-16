@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Check Convocazioni - Armata Rozza</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background:
+        radial-gradient(circle at top center, rgba(255,120,0,0.10), transparent 28%),
+        linear-gradient(to bottom, rgba(0,0,0,0.10), rgba(0,0,0,0.65)),
+        url("./background.jpg");
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-size: cover;
+      background-color: #120000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 18%, rgba(255,130,0,0.12), transparent 12%),
+        radial-gradient(circle at 85% 30%, rgba(255,60,0,0.10), transparent 10%),
+        radial-gradient(circle at 12% 76%, rgba(255,120,0,0.08), transparent 9%),
+        radial-gradient(circle at 88% 82%, rgba(255,90,0,0.08), transparent 10%);
+      mix-blend-mode: screen;
+      opacity: .9;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 22px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.30), rgba(0,0,0,0.45));
+      box-shadow:
+        0 12px 30px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0 0 10px;
+      letter-spacing: 0.3px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.45);
+    }
+
+    .subtitle {
+      font-size: 16px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.88);
+      margin: 0 0 22px;
+    }
+
+    .button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 60px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(25,25,25,0.95), rgba(65,8,8,0.90) 58%, rgba(95,15,15,0.82));
+      border: 2px solid #ff1a1a;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 19px;
+      font-weight: 900;
+      color: #fff;
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, opacity .22s ease;
+      box-shadow:
+        0 0 12px rgba(255, 20, 0, 0.40),
+        0 0 24px rgba(255, 60, 0, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
+      overflow: hidden;
+    }
+
+    .button:hover {
+      transform: translateY(-2px) scale(1.01);
+      border-color: #ff5a3a;
+      box-shadow:
+        0 0 18px rgba(255, 30, 0, 0.62),
+        0 0 34px rgba(255, 80, 0, 0.18),
+        inset 0 1px 0 rgba(255,255,255,0.10),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
+    }
+
+    .button:disabled {
+      opacity: 0.68;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .statusBox {
+      display: none;
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: rgba(0,0,0,0.42);
+      border: 1px solid rgba(255,255,255,0.10);
+      line-height: 1.6;
+      font-size: 17px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .statusBox.show {
+      display: block;
+    }
+
+    .statusBox.waiting {
+      color: #ffd54a;
+      border-color: rgba(255, 190, 40, 0.35);
+    }
+
+    .statusBox.success {
+      color: #8dffb3;
+      border-color: rgba(0, 230, 118, 0.40);
+    }
+
+    .statusBox.error {
+      color: #ff9b9b;
+      border-color: rgba(255, 50, 50, 0.38);
+    }
+
+    .actions {
+      display: none;
+      margin-top: 18px;
+      gap: 12px;
+      flex-direction: column;
+    }
+
+    .actions.show {
+      display: flex;
+    }
+
+    .secondaryBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      transition: transform .2s ease, background .2s ease;
+      box-sizing: border-box;
+    }
+
+    .secondaryBtn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .tiny {
+      margin-top: 18px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.62);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Check convocazioni</h1>
+    <p class="subtitle">Premi il pulsante per avviare l’aggiornamento automatico delle convocazioni.</p>
+
+    <button id="startBtn" class="button">Avvia check convocazioni</button>
+
+    <div id="statusBox" class="statusBox"></div>
+
+    <div id="actions" class="actions">
+      <a
+        id="openSheetBtn"
+        class="secondaryBtn"
+        href="https://docs.google.com/spreadsheets/d/1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A/edit?gid=1516163823#gid=1516163823"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Apri il file Google
+      </a>
+
+      <button id="backBtn" class="secondaryBtn" type="button">Torna indietro</button>
+    </div>
+
+    <div class="tiny">La procedura può richiedere qualche secondo.</div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMUXgqS3ULU0UekRqddVL4Z4BnNKZqBLV0AqdV4AA7PtoI7Nd045Tftrx_a4iRzHyQ8c1Vi8FzeTAWqM9S9tXrC0d1ME6PhSSkktyfSZqprvhycwSLidVbWH-qVDQYvR-n67wXrfa92r51ol9iaPdEaH7EZDdtDafujiP6rTEEyF8kOq5V8gl7km4yXrPcL5If0lwDpkwkBFx3RmtbVVDlL24C88VHPsfCL7teulUO6n6lM9-WmI-kJGEE_u1iEssKnLAHglJNQr6BY7qUoB8AIJuNZArw&lib=MDGe9bDQr1x_w4KSRQI3x9o5ljRdC-B99";
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A/edit?gid=1516163823#gid=1516163823";
+
+    const startBtn = document.getElementById("startBtn");
+    const statusBox = document.getElementById("statusBox");
+    const actions = document.getElementById("actions");
+    const openSheetBtn = document.getElementById("openSheetBtn");
+    const backBtn = document.getElementById("backBtn");
+
+    openSheetBtn.href = SHEET_URL;
+
+    function setStatus(type, text) {
+      statusBox.className = "statusBox show " + type;
+      statusBox.textContent = text;
+    }
+
+    async function avviaCheck() {
+      startBtn.disabled = true;
+      actions.classList.remove("show");
+      setStatus("waiting", "Attendi... aggiornamento convocazioni in corso.");
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        const text = await response.text();
+
+        if (!response.ok) {
+          throw new Error(text || "Errore durante l'esecuzione dello script");
+        }
+
+        const normalized = String(text || "").trim().toUpperCase();
+
+        if (normalized.startsWith("OK")) {
+          setStatus("success", "Convocazioni aggiornate.");
+          actions.classList.add("show");
+        } else {
+          throw new Error(text || "Risposta non valida");
+        }
+      } catch (error) {
+        setStatus("error", "Errore durante l'aggiornamento delle convocazioni.");
+        actions.classList.add("show");
+        console.error(error);
+      } finally {
+        startBtn.disabled = false;
+      }
+    }
+
+    startBtn.addEventListener("click", avviaCheck);
+
+    backBtn.addEventListener("click", () => {
+      if (document.referrer) {
+        history.back();
+      } else {
+        window.location.href = "/";
+      }
+    });
+  </script>
+</body>
+</html>
