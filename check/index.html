@@ -77,6 +77,11 @@
       color: rgba(255,255,255,0.88);
       margin: 0 0 10px;
       animation: fadeUp .45s ease .12s both;
+      transition: opacity .25s ease, transform .25s ease, margin .25s ease;
+    }
+
+    .subtitle.hidden {
+      display: none;
     }
 
     .button {
@@ -102,6 +107,10 @@
         inset 0 -1px 0 rgba(0,0,0,0.25);
       overflow: hidden;
       animation: glowPulse 3s infinite alternate ease-in-out, fadeUp .45s ease .2s both;
+    }
+
+    .button.hidden {
+      display: none;
     }
 
     .button::before {
@@ -294,7 +303,7 @@
   <div class="wrap">
 
     <h1 class="title">Check convocazioni</h1>
-    <p class="subtitle">Premi il pulsante per avviare l'aggiornamento automatico delle convocazioni</p>
+    <p id="subtitle" class="subtitle">Premi il pulsante per avviare l'aggiornamento automatico delle convocazioni</p>
 
     <button id="startBtn" class="button">Avvia check convocazioni</button>
 
@@ -332,6 +341,7 @@
     const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
 
     const startBtn     = document.getElementById("startBtn");
+    const subtitle     = document.getElementById("subtitle");
     const statusBox    = document.getElementById("statusBox");
     const actions      = document.getElementById("actions");
     const openSheetBtn = document.getElementById("openSheetBtn");
@@ -413,6 +423,8 @@
         stopWaitingAnimation();
 
         if (normalized.startsWith("OK")) {
+          subtitle.classList.add("hidden");
+          startBtn.classList.add("hidden");
           setStatus("success", "Convocazioni aggiornate");
           retryBtn.style.display = "none";
           actions.classList.add("show");
