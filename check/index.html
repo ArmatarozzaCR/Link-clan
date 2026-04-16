@@ -241,6 +241,37 @@
       text-align: left;
     }
 
+    .pulse-red {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pulse-red::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      box-shadow: 0 0 0 0 rgba(255, 30, 0, 0.7);
+      animation: pulseEffect 1.8s infinite;
+      pointer-events: none;
+    }
+
+    .button:disabled.pulse-red::after {
+      display: none;
+    }
+
+    @keyframes pulseEffect {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 30, 0, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 18px rgba(255, 30, 0, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 30, 0, 0);
+      }
+    }
+
     @keyframes panelFadeIn {
       from {
         opacity: 0;
@@ -306,20 +337,21 @@
     <h1 class="title">Check convocazioni</h1>
     <p class="subtitle">Premi il pulsante per avviare l’aggiornamento automatico delle convocazioni</p>
 
-    <button id="startBtn" class="button">Avvia check convocazioni</button>
+    <button id="startBtn" class="button pulse-red">Avvia check convocazioni</button>
 
     <div id="statusBox" class="statusBox"></div>
 
     <div id="actions" class="actions">
       <a
         id="openSheetBtn"
-        class="secondaryBtn"
+        class="secondaryBtn pulse-red"
         href="https://docs.google.com/spreadsheets/d/1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A/edit?gid=1516163823#gid=1516163823"
         target="_blank"
         rel="noopener noreferrer"
       >
         Apri il file Google
       </a>
+    </div>
   </div>
 
   <script>
