@@ -52,8 +52,7 @@ body::before {
   opacity: .9;
 }
 
-.screen {
-  display: none;
+#mobileContent {
   position: relative;
   width: 100%;
   max-width: 480px;
@@ -61,11 +60,7 @@ body::before {
   padding: 130px 6px 20px;
 }
 
-.screen.active {
-  display: block;
-}
-
-.screen::before {
+#mobileContent::before {
   content: "";
   position: absolute;
   top: 143px;
@@ -82,37 +77,49 @@ body::before {
   z-index: 0;
 }
 
-.screen-inner {
+#dynamicTop,
+#linkContainer {
   position: relative;
   z-index: 1;
 }
 
-.back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 22px;
-  padding: 9px 18px;
-  background: rgba(0,0,0,0.38);
-  border: 1px solid rgba(255,60,0,0.45);
-  border-radius: 30px;
-  cursor: pointer;
-  font-size: 15px;
+#verificaContainer {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 22px auto;
+}
+
+#verificaInput {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 18px;
+  border: 2px solid rgba(255, 55, 35, 0.95);
+  font-size: 19px;
   font-weight: 700;
-  color: rgba(255,255,255,0.88);
-  transition: background .2s, border-color .2s, transform .18s;
-  letter-spacing: 0.2px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  margin-bottom: 2px;
+  background: linear-gradient(180deg, rgba(45, 0, 0, 0.88), rgba(20, 0, 0, 0.84));
+  color: #fff;
+  outline: none;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 0 12px rgba(255,0,0,0.25),
+    0 6px 18px rgba(0,0,0,0.22);
+  transition: .25s ease;
+  text-align: center;
 }
 
-.back-btn:hover {
-  background: rgba(0,0,0,0.55);
-  border-color: rgba(255,90,40,0.7);
+#verificaInput::placeholder {
+  color: rgba(255,255,255,0.72);
+  font-weight: 600;
+}
+
+#verificaInput:focus {
+  border-color: #ff6a4f;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    0 0 22px rgba(255,40,0,0.42),
+    0 8px 20px rgba(0,0,0,0.24);
   transform: translateY(-1px);
-}
-
-.back-btn:active {
-  transform: scale(0.97);
 }
 
 .button {
@@ -227,10 +234,6 @@ body::before {
   z-index: 1;
 }
 
-.landing-btn .button-label {
-  font-size: 22px;
-}
-
 .clan-logo {
   width: 75px;
   height: 75px;
@@ -268,56 +271,17 @@ body::before {
   white-space: nowrap;
 }
 
-.verifica-box {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto 22px auto;
-}
-
-.verifica-input {
-  width: 100%;
-  padding: 15px 18px;
-  border-radius: 18px;
-  border: 2px solid rgba(255, 55, 35, 0.95);
-  font-size: 19px;
-  font-weight: 700;
-  margin-bottom: 2px;
-  background: linear-gradient(180deg, rgba(45, 0, 0, 0.88), rgba(20, 0, 0, 0.84));
-  color: #fff;
-  outline: none;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.05) inset,
-    0 0 12px rgba(255,0,0,0.25),
-    0 6px 18px rgba(0,0,0,0.22);
-  transition: .25s ease;
-  text-align: center;
-}
-
-.verifica-input::placeholder {
-  color: rgba(255,255,255,0.72);
-  font-weight: 600;
-}
-
-.verifica-input:focus {
-  border-color: #ff6a4f;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.08) inset,
-    0 0 22px rgba(255,40,0,0.42),
-    0 8px 20px rgba(0,0,0,0.24);
-  transform: translateY(-1px);
-}
-
-.verifica-btn {
+#verificaBtn {
   justify-content: center;
   text-align: center;
   min-height: 58px;
 }
 
-.verifica-btn .button-label {
+#verificaBtn .button-label {
   text-align: center;
 }
 
-.verifica-risultato {
+#verificaRisultato {
   display: none;
   margin-top: 14px;
   font-size: 17px;
@@ -336,22 +300,19 @@ body::before {
   box-shadow: 0 4px 18px rgba(0,0,0,0.30);
 }
 
-.verifica-risultato.trovato {
+#verificaRisultato.trovato {
   border-color: rgba(0, 200, 90, 0.50);
 }
 
-.verifica-risultato.non-trovato {
+#verificaRisultato.non-trovato {
   border-color: rgba(255, 40, 40, 0.45);
   color: #ff8a8a;
 }
 
-#linkContainer,
-#linkContainerWarlosing {
+#linkContainer {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
-  position: relative;
-  z-index: 1;
 }
 
 .offline-box {
@@ -409,11 +370,11 @@ body::before {
 }
 
 @media (max-width: 420px) {
-  .screen {
+  #mobileContent {
     padding: 180px 12px 16px;
   }
 
-  .screen::before {
+  #mobileContent::before {
     width: calc(100% - 18px);
   }
 
@@ -429,10 +390,6 @@ body::before {
 
   .button-label {
     font-size: 18px;
-  }
-
-  .landing-btn .button-label {
-    font-size: 20px;
   }
 
   .clan-logo {
@@ -454,12 +411,12 @@ body::before {
     font-size: 14px;
   }
 
-  .verifica-input {
+  #verificaInput {
     font-size: 17px;
     padding: 14px 16px;
   }
 
-  .verifica-risultato {
+  #verificaRisultato {
     font-size: 16px;
   }
 
@@ -480,10 +437,7 @@ body::before {
 </style>
 <script>
 const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
-const CLAN_SHEETS_WAR = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Baby Rozza"];
-const CLAN_SHEETS_WARLOSING = ["Rozz ⚡ Tower", "Rozzham ☪️ City", "ＰｉｅｄｉＲｏｚｚｉ！"];
-const CLAN_SHEETS_ALL = [...CLAN_SHEETS_WAR, ...CLAN_SHEETS_WARLOSING];
-const WARLOSING_NAMES = CLAN_SHEETS_WARLOSING.map(normalizeName);
+const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing"];
 const TROPHY_ICON = "./cw-trophy.png";
 
 function normalizeName(value) {
@@ -496,38 +450,17 @@ function normalizeName(value) {
     .toLowerCase();
 }
 
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  if (id === "screen-clanwar" || id === "screen-warlosing") {
-    mostraRisultatoInSezione(id);
-  }
-}
-
-function mostraRisultatoInSezione(screenId) {
-  const tag = localStorage.getItem("ultimoTag");
-  const html = localStorage.getItem("ultimoRisultatoHTML");
-  const classe = localStorage.getItem("ultimoRisultatoClasse");
-
-  const suffix = screenId === "screen-clanwar" ? "War" : "Warlosing";
-  const outputEl = document.getElementById("verifica-risultato" + suffix);
-
-  if (tag && html && outputEl) {
-    outputEl.innerHTML = html;
-    outputEl.className = "verifica-risultato " + (classe || "");
-    outputEl.style.display = "block";
-  }
-}
-
 async function leggiFoglio(sheetName) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
+
   const text = await res.text();
   const jsonText = text
     .replace(/^\/\*O_o\*\/\s*/, "")
     .replace(/^google\.visualization\.Query\.setResponse\(/, "")
     .replace(/\);$/, "");
+
   const data = JSON.parse(jsonText);
   return data.table.rows || [];
 }
@@ -535,18 +468,24 @@ async function leggiFoglio(sheetName) {
 async function leggiSettingCompleto() {
   try {
     const rows = await leggiFoglio("setting");
+    const trophyMap = {};
     const trophyMapNormalized = {};
+
     for (let i = 0; i < rows.length; i++) {
       const cells = rows[i].c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
+
       if (!colA || !colB) continue;
       if (normalizeName(colA) === "convocazioni") continue;
+
+      trophyMap[colA] = colB;
       trophyMapNormalized[normalizeName(colA)] = colB;
     }
-    return trophyMapNormalized;
+
+    return { trophyMap, trophyMapNormalized };
   } catch {
-    return {};
+    return { trophyMap: {}, trophyMapNormalized: {} };
   }
 }
 
@@ -555,139 +494,151 @@ async function convocazioniAttive() {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=B1&tqx=out:json`;
     const res = await fetch(url);
     if (!res.ok) return true;
+
     const text = await res.text();
     const jsonText = text
       .replace(/^\/\*O_o\*\/\s*/, "")
       .replace(/^google\.visualization\.Query\.setResponse\(/, "")
       .replace(/\);$/, "");
+
     const data = JSON.parse(jsonText);
-    const valore = String(data.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase();
+
+    const valore = String(
+      data.table.rows?.[0]?.c?.[0]?.v || ""
+    ).trim().toLowerCase();
+
     return valore === "on";
+
   } catch {
     return true;
   }
 }
 
-async function apriLink(item) {
-  try {
-    const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
-    if (!tokenRes.ok) throw new Error();
-    const tokenData = await tokenRes.json();
-    if (!tokenData.token) return alert("Token non ricevuto");
-    const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
-    if (!urlRes.ok) {
-      const t = await urlRes.text();
-      return alert("Errore apertura link: " + t);
-    }
-    const urlData = await urlRes.json();
-    if (urlData.url) {
-      window.location.href = urlData.url;
-    } else {
-      alert("Link non disponibile");
-    }
-  } catch {
-    alert("Errore apertura link");
-  }
-}
-
-function buildBtn(item, trophyMapNormalized) {
-  const div = document.createElement("div");
-  div.className = "button";
-  div.dataset.nomeClan = normalizeName(item.nome);
-  div.onclick = () => apriLink(item);
-
-  const img = document.createElement("img");
-  img.className = "clan-logo";
-  img.src = item.img;
-  img.alt = item.nome;
-
-  const span = document.createElement("span");
-  span.className = "button-label";
-  span.textContent = item.nome;
-
-  const trophyBox = document.createElement("div");
-  trophyBox.className = "trophy-box";
-
-  const trophyIcon = document.createElement("img");
-  trophyIcon.className = "trophy-icon";
-  trophyIcon.src = TROPHY_ICON;
-  trophyIcon.alt = "Coppe";
-
-  const trophyValue = document.createElement("span");
-  trophyValue.className = "trophy-value";
-  trophyValue.textContent = trophyMapNormalized[normalizeName(item.nome)] || "-";
-
-  trophyBox.appendChild(trophyIcon);
-  trophyBox.appendChild(trophyValue);
-  div.appendChild(img);
-  div.appendChild(span);
-  div.appendChild(trophyBox);
-  return div;
-}
-
 async function caricaLink() {
   try {
-    const [res, trophyMapNormalized] = await Promise.all([
+    const [res, setting] = await Promise.all([
       fetch("https://nameless-brook-094f.cr-armatarozza.workers.dev/", { headers: { referer: location.origin } }),
       leggiSettingCompleto()
     ]);
 
-    if (!res.ok) throw new Error();
+    if (!res.ok) {
+      throw new Error();
+    }
 
     const data = await res.json();
     const container = document.getElementById("linkContainer");
-    const containerW = document.getElementById("linkContainerWarlosing");
 
     for (const item of data) {
-      const n = normalizeName(item.nome);
-      if (WARLOSING_NAMES.includes(n)) {
-        containerW.appendChild(buildBtn(item, trophyMapNormalized));
-      } else {
-        container.appendChild(buildBtn(item, trophyMapNormalized));
-      }
+      const div = document.createElement("div");
+      div.className = "button";
+      div.dataset.nomeClan = normalizeName(item.nome);
+      div.onclick = async () => {
+        try {
+          const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
+          if (!tokenRes.ok) throw new Error();
+
+          const tokenData = await tokenRes.json();
+          if (!tokenData.token) return alert("Token non ricevuto");
+
+          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
+          if (!urlRes.ok) {
+            const text = await urlRes.text();
+            return alert("Errore apertura link: " + text);
+          }
+
+          const urlData = await urlRes.json();
+          if (urlData.url) {
+            window.location.href = urlData.url;
+          } else {
+            alert("Link non disponibile");
+          }
+        } catch {
+          alert("Errore apertura link");
+        }
+      };
+
+      const img = document.createElement("img");
+      img.className = "clan-logo";
+      img.src = item.img;
+      img.alt = item.nome;
+
+      const span = document.createElement("span");
+      span.className = "button-label";
+      span.textContent = item.nome;
+
+      const trophyBox = document.createElement("div");
+      trophyBox.className = "trophy-box";
+
+      const trophyIcon = document.createElement("img");
+      trophyIcon.className = "trophy-icon";
+      trophyIcon.src = TROPHY_ICON;
+      trophyIcon.alt = "Coppe";
+
+      const trophyValue = document.createElement("span");
+      trophyValue.className = "trophy-value";
+
+      const nomePulito = normalizeName(item.nome);
+      trophyValue.textContent = setting.trophyMapNormalized[nomePulito] || "-";
+
+      trophyBox.appendChild(trophyIcon);
+      trophyBox.appendChild(trophyValue);
+
+      div.appendChild(img);
+      div.appendChild(span);
+      div.appendChild(trophyBox);
+      container.appendChild(div);
     }
   } catch {
-    document.getElementById("warOfflineBox").style.display = "block";
+    document.getElementById("dynamicTop").innerHTML = `
+      <div class="offline-box">
+        <div class="offline-title">La war è iniziata</div>
+        <div class="offline-text">I link non sono più disponibili</div>
+      </div>
+    `;
     document.getElementById("linkContainer").innerHTML = "";
-    document.getElementById("linkContainerWarlosing").innerHTML = "";
   }
 }
 
-async function verificaConvocazione(inputId, risultatoId, clanSheets, containerSelector) {
-  const outputEl = document.getElementById(risultatoId);
+async function verificaConvocazione() {
+  const outputEl = document.getElementById("verificaRisultato");
+
   const attive = await convocazioniAttive();
 
   if (!attive) {
     outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
-    outputEl.className = "verifica-risultato non-trovato";
+    outputEl.className = "non-trovato";
     outputEl.style.display = "block";
     return;
   }
 
-  let tag = document.getElementById(inputId).value.trim();
+  let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
 
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
-  document.querySelectorAll(containerSelector + " .button.convocato").forEach(btn => {
+  document.querySelectorAll("#linkContainer .button.convocato").forEach(btn => {
     btn.classList.remove("convocato");
   });
 
   try {
     outputEl.innerHTML = "Controllo in corso...";
-    outputEl.className = "verifica-risultato";
+    outputEl.className = "";
     outputEl.style.display = "block";
 
-    const risultati = [];
+    let risultati = [];
     const clanConvocati = new Set();
 
-    for (const sheetName of clanSheets) {
+    for (const sheetName of CLAN_SHEETS) {
       const rows = await leggiFoglio(sheetName);
+
       for (let i = 1; i < rows.length; i++) {
-        const cells = rows[i].c || [];
-        const nome = String((cells[0] && cells[0].v) || "").trim();
-        const tagCell = String((cells[1] && cells[1].v) || "").replace(/^@+/, "").toUpperCase().trim();
+        const row = rows[i];
+        const cells = row.c || [];
+
+        let nome = String((cells[0] && cells[0].v) || "").trim();
+        let tagCell = String((cells[1] && cells[1].v) || "").replace(/^@+/, "").toUpperCase().trim();
+
         if (tagCell && tagCell === tag) {
           risultati.push(`• Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
           clanConvocati.add(normalizeName(sheetName));
@@ -695,60 +646,28 @@ async function verificaConvocazione(inputId, risultatoId, clanSheets, containerS
       }
     }
 
-    document.querySelectorAll(containerSelector + " .button").forEach(btn => {
+    document.querySelectorAll("#linkContainer .button").forEach(btn => {
       if (clanConvocati.has(btn.dataset.nomeClan)) {
         btn.classList.add("convocato");
       }
     });
 
-    let html, classe;
     if (risultati.length) {
-      html = risultati.join("<br>");
-      classe = "trovato";
+      outputEl.innerHTML = risultati.join("<br>");
+      outputEl.className = "trovato";
     } else {
-      html = `❌ Tag "${tag}" non trovato nelle convocazioni`;
-      classe = "non-trovato";
+      outputEl.innerHTML = `❌ Tag "${tag}" non trovato nelle convocazioni`;
+      outputEl.className = "non-trovato";
     }
 
-    outputEl.innerHTML = html;
-    outputEl.className = "verifica-risultato " + classe;
     outputEl.style.display = "block";
 
-    localStorage.setItem("ultimoRisultatoHTML", html);
-    localStorage.setItem("ultimoRisultatoClasse", classe);
-
-  } catch {
+  } catch (e) {
+    console.error("Errore:", e);
     outputEl.innerHTML = "Errore caricamento dati";
-    outputEl.className = "verifica-risultato non-trovato";
+    outputEl.className = "non-trovato";
     outputEl.style.display = "block";
   }
-}
-
-function creaVerificaBox(inputId, btnOnclick, risultatoId) {
-  const box = document.createElement("div");
-  box.className = "verifica-box";
-
-  const input = document.createElement("input");
-  input.id = inputId;
-  input.className = "verifica-input";
-  input.placeholder = "Inserisci il tuo tag Telegram";
-  box.appendChild(input);
-
-  const btn = document.createElement("div");
-  btn.className = "button verifica-btn";
-  btn.onclick = btnOnclick;
-  const btnLabel = document.createElement("span");
-  btnLabel.className = "button-label";
-  btnLabel.textContent = "Verifica convocazione";
-  btn.appendChild(btnLabel);
-  box.appendChild(btn);
-
-  const output = document.createElement("div");
-  output.id = risultatoId;
-  output.className = "verifica-risultato";
-  box.appendChild(output);
-
-  return box;
 }
 
 window.onload = function () {
@@ -758,33 +677,40 @@ window.onload = function () {
     return;
   }
 
-  const ultimoTag = localStorage.getItem("ultimoTag") || "";
+  const container = document.getElementById("dynamicTop");
+  const verificaDiv = document.createElement("div");
+  verificaDiv.id = "verificaContainer";
 
-  const landingVerifica = creaVerificaBox(
-    "verifica-input-landing",
-    () => verificaConvocazione("verifica-input-landing", "verifica-risultato-landing", CLAN_SHEETS_ALL, "#screen-landing"),
-    "verifica-risultato-landing"
-  );
-  document.getElementById("landingVerificaSlot").appendChild(landingVerifica);
-  if (ultimoTag) document.getElementById("verifica-input-landing").value = ultimoTag;
+  const input = document.createElement("input");
+  input.id = "verificaInput";
+  input.placeholder = "Inserisci il tuo tag Telegram";
+  verificaDiv.appendChild(input);
 
-  const warVerifica = creaVerificaBox(
-    "verifica-input-war",
-    () => verificaConvocazione("verifica-input-war", "verifica-risultatoWar", CLAN_SHEETS_WAR, "#linkContainer"),
-    "verifica-risultatoWar"
-  );
-  document.getElementById("warVerificaSlot").appendChild(warVerifica);
-  if (ultimoTag) document.getElementById("verifica-input-war").value = ultimoTag;
+  setTimeout(() => {
+    const ultimoTag = localStorage.getItem("ultimoTag");
+    if (ultimoTag) {
+      input.value = ultimoTag;
+    }
+  }, 0);
 
-  const warlVerifica = creaVerificaBox(
-    "verifica-input-warlosing",
-    () => verificaConvocazione("verifica-input-warlosing", "verifica-risultatoWarlosing", CLAN_SHEETS_WARLOSING, "#linkContainerWarlosing"),
-    "verifica-risultatoWarlosing"
-  );
-  document.getElementById("warlVerificaSlot").appendChild(warlVerifica);
-  if (ultimoTag) document.getElementById("verifica-input-warlosing").value = ultimoTag;
+  const btn = document.createElement("div");
+  btn.className = "button";
+  btn.id = "verificaBtn";
+  btn.onclick = verificaConvocazione;
 
-  showScreen("screen-landing");
+  const btnLabel = document.createElement("span");
+  btnLabel.className = "button-label";
+  btnLabel.textContent = "Verifica convocazione";
+  btn.appendChild(btnLabel);
+
+  verificaDiv.appendChild(btn);
+
+  const output = document.createElement("div");
+  output.id = "verificaRisultato";
+  verificaDiv.appendChild(output);
+
+  container.appendChild(verificaDiv);
+
   caricaLink();
 };
 
@@ -803,38 +729,9 @@ document.addEventListener('keydown', e => {
 </script>
 </head>
 <body>
-
-  <div id="screen-landing" class="screen active">
-    <div class="screen-inner">
-      <div id="landingVerificaSlot"></div>
-      <div class="button landing-btn" onclick="showScreen('screen-clanwar')">
-        <span class="button-label">⚔️ Clan War</span>
-      </div>
-      <div class="button landing-btn" onclick="showScreen('screen-warlosing')">
-        <span class="button-label">💀 Clan Warlosing</span>
-      </div>
-    </div>
+  <div id="mobileContent">
+    <div id="dynamicTop"></div>
+    <div id="linkContainer"></div>
   </div>
-
-  <div id="screen-clanwar" class="screen">
-    <div class="screen-inner">
-      <div class="back-btn" onclick="showScreen('screen-landing')">← Indietro</div>
-      <div id="warVerificaSlot"></div>
-      <div id="warOfflineBox" class="offline-box" style="display:none;">
-        <div class="offline-title">La war è iniziata</div>
-        <div class="offline-text">I link non sono più disponibili</div>
-      </div>
-      <div id="linkContainer"></div>
-    </div>
-  </div>
-
-  <div id="screen-warlosing" class="screen">
-    <div class="screen-inner">
-      <div class="back-btn" onclick="showScreen('screen-landing')">← Indietro</div>
-      <div id="warlVerificaSlot"></div>
-      <div id="linkContainerWarlosing"></div>
-    </div>
-  </div>
-
 </body>
 </html>
