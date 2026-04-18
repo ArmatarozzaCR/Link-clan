@@ -481,7 +481,11 @@ body::before {
 <script>
 const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
 const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Baby Rozza", "Rozz ⚡ Tower", "Rozzham ☪️ City", "ＰｉｅｄｉＲｏｚｚｉ！"];
-const WARLOSING_NAMES = ["rozz ⚡ tower", "rozzham ☪️ city", "ｐｉｅｄｉｒｏｚｚｉ！"];
+const WARLOSING_NAMES = [
+  "Rozz ⚡ Tower",
+  "Rozzham ☪️ City",
+  "ＰｉｅｄｉＲｏｚｚｉ！"
+].map(normalizeName);
 const TROPHY_ICON = "./cw-trophy.png";
 
 function normalizeName(value) {
