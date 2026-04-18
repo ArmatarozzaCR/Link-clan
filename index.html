@@ -268,13 +268,13 @@ body::before {
   white-space: nowrap;
 }
 
-#verificaContainer {
+.verifica-box {
   width: 100%;
   max-width: 400px;
   margin: 0 auto 22px auto;
 }
 
-#verificaInput {
+.verifica-input {
   width: 100%;
   padding: 15px 18px;
   border-radius: 18px;
@@ -293,12 +293,12 @@ body::before {
   text-align: center;
 }
 
-#verificaInput::placeholder {
+.verifica-input::placeholder {
   color: rgba(255,255,255,0.72);
   font-weight: 600;
 }
 
-#verificaInput:focus {
+.verifica-input:focus {
   border-color: #ff6a4f;
   box-shadow:
     0 0 0 1px rgba(255,255,255,0.08) inset,
@@ -307,17 +307,17 @@ body::before {
   transform: translateY(-1px);
 }
 
-#verificaBtn {
+.verifica-btn {
   justify-content: center;
   text-align: center;
   min-height: 58px;
 }
 
-#verificaBtn .button-label {
+.verifica-btn .button-label {
   text-align: center;
 }
 
-#verificaRisultato {
+.verifica-risultato {
   display: none;
   margin-top: 14px;
   font-size: 17px;
@@ -336,11 +336,11 @@ body::before {
   box-shadow: 0 4px 18px rgba(0,0,0,0.30);
 }
 
-#verificaRisultato.trovato {
+.verifica-risultato.trovato {
   border-color: rgba(0, 200, 90, 0.50);
 }
 
-#verificaRisultato.non-trovato {
+.verifica-risultato.non-trovato {
   border-color: rgba(255, 40, 40, 0.45);
   color: #ff8a8a;
 }
@@ -454,12 +454,12 @@ body::before {
     font-size: 14px;
   }
 
-  #verificaInput {
+  .verifica-input {
     font-size: 17px;
     padding: 14px 16px;
   }
 
-  #verificaRisultato {
+  .verifica-risultato {
     font-size: 16px;
   }
 
@@ -480,12 +480,10 @@ body::before {
 </style>
 <script>
 const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
-const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Baby Rozza", "Rozz ⚡ Tower", "Rozzham ☪️ City", "ＰｉｅｄｉＲｏｚｚｉ！"];
-const WARLOSING_NAMES = [
-  "Rozz ⚡ Tower",
-  "Rozzham ☪️ City",
-  "ＰｉｅｄｉＲｏｚｚｉ！"
-].map(normalizeName);
+const CLAN_SHEETS_WAR = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Baby Rozza"];
+const CLAN_SHEETS_WARLOSING = ["Rozz ⚡ Tower", "Rozzham ☪️ City", "ＰｉｅｄｉＲｏｚｚｉ！"];
+const CLAN_SHEETS_ALL = [...CLAN_SHEETS_WAR, ...CLAN_SHEETS_WARLOSING];
+const WARLOSING_NAMES = CLAN_SHEETS_WARLOSING.map(normalizeName);
 const TROPHY_ICON = "./cw-trophy.png";
 
 function normalizeName(value) {
@@ -501,6 +499,24 @@ function normalizeName(value) {
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
+  if (id === "screen-clanwar" || id === "screen-warlosing") {
+    mostraRisultatoInSezione(id);
+  }
+}
+
+function mostraRisultatoInSezione(screenId) {
+  const tag = localStorage.getItem("ultimoTag");
+  const html = localStorage.getItem("ultimoRisultatoHTML");
+  const classe = localStorage.getItem("ultimoRisultatoClasse");
+
+  const suffix = screenId === "screen-clanwar" ? "War" : "Warlosing";
+  const outputEl = document.getElementById("verifica-risultato" + suffix);
+
+  if (tag && html && outputEl) {
+    outputEl.innerHTML = html;
+    outputEl.className = "verifica-risultato " + (classe || "");
+    outputEl.style.display = "block";
+  }
 }
 
 async function leggiFoglio(sheetName) {
@@ -631,47 +647,42 @@ async function caricaLink() {
       }
     }
   } catch {
-    document.getElementById("dynamicTop").innerHTML = `
-      <div class="offline-box">
-        <div class="offline-title">La war è iniziata</div>
-        <div class="offline-text">I link non sono più disponibili</div>
-      </div>
-    `;
+    document.getElementById("warOfflineBox").style.display = "block";
     document.getElementById("linkContainer").innerHTML = "";
     document.getElementById("linkContainerWarlosing").innerHTML = "";
   }
 }
 
-async function verificaConvocazione() {
-  const outputEl = document.getElementById("verificaRisultato");
+async function verificaConvocazione(inputId, risultatoId, clanSheets, containerSelector) {
+  const outputEl = document.getElementById(risultatoId);
   const attive = await convocazioniAttive();
 
   if (!attive) {
     outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
-    outputEl.className = "non-trovato";
+    outputEl.className = "verifica-risultato non-trovato";
     outputEl.style.display = "block";
     return;
   }
 
-  let tag = document.getElementById("verificaInput").value.trim();
+  let tag = document.getElementById(inputId).value.trim();
   if (!tag) return;
 
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
 
-  document.querySelectorAll("#linkContainer .button.convocato").forEach(btn => {
+  document.querySelectorAll(containerSelector + " .button.convocato").forEach(btn => {
     btn.classList.remove("convocato");
   });
 
   try {
     outputEl.innerHTML = "Controllo in corso...";
-    outputEl.className = "";
+    outputEl.className = "verifica-risultato";
     outputEl.style.display = "block";
 
     const risultati = [];
     const clanConvocati = new Set();
 
-    for (const sheetName of CLAN_SHEETS) {
+    for (const sheetName of clanSheets) {
       const rows = await leggiFoglio(sheetName);
       for (let i = 1; i < rows.length; i++) {
         const cells = rows[i].c || [];
@@ -684,27 +695,60 @@ async function verificaConvocazione() {
       }
     }
 
-    document.querySelectorAll("#linkContainer .button").forEach(btn => {
+    document.querySelectorAll(containerSelector + " .button").forEach(btn => {
       if (clanConvocati.has(btn.dataset.nomeClan)) {
         btn.classList.add("convocato");
       }
     });
 
+    let html, classe;
     if (risultati.length) {
-      outputEl.innerHTML = risultati.join("<br>");
-      outputEl.className = "trovato";
+      html = risultati.join("<br>");
+      classe = "trovato";
     } else {
-      outputEl.innerHTML = `❌ Tag "${tag}" non trovato nelle convocazioni`;
-      outputEl.className = "non-trovato";
+      html = `❌ Tag "${tag}" non trovato nelle convocazioni`;
+      classe = "non-trovato";
     }
 
+    outputEl.innerHTML = html;
+    outputEl.className = "verifica-risultato " + classe;
     outputEl.style.display = "block";
+
+    localStorage.setItem("ultimoRisultatoHTML", html);
+    localStorage.setItem("ultimoRisultatoClasse", classe);
 
   } catch {
     outputEl.innerHTML = "Errore caricamento dati";
-    outputEl.className = "non-trovato";
+    outputEl.className = "verifica-risultato non-trovato";
     outputEl.style.display = "block";
   }
+}
+
+function creaVerificaBox(inputId, btnOnclick, risultatoId) {
+  const box = document.createElement("div");
+  box.className = "verifica-box";
+
+  const input = document.createElement("input");
+  input.id = inputId;
+  input.className = "verifica-input";
+  input.placeholder = "Inserisci il tuo tag Telegram";
+  box.appendChild(input);
+
+  const btn = document.createElement("div");
+  btn.className = "button verifica-btn";
+  btn.onclick = btnOnclick;
+  const btnLabel = document.createElement("span");
+  btnLabel.className = "button-label";
+  btnLabel.textContent = "Verifica convocazione";
+  btn.appendChild(btnLabel);
+  box.appendChild(btn);
+
+  const output = document.createElement("div");
+  output.id = risultatoId;
+  output.className = "verifica-risultato";
+  box.appendChild(output);
+
+  return box;
 }
 
 window.onload = function () {
@@ -714,37 +758,33 @@ window.onload = function () {
     return;
   }
 
+  const ultimoTag = localStorage.getItem("ultimoTag") || "";
+
+  const landingVerifica = creaVerificaBox(
+    "verifica-input-landing",
+    () => verificaConvocazione("verifica-input-landing", "verifica-risultato-landing", CLAN_SHEETS_ALL, "#screen-landing"),
+    "verifica-risultato-landing"
+  );
+  document.getElementById("landingVerificaSlot").appendChild(landingVerifica);
+  if (ultimoTag) document.getElementById("verifica-input-landing").value = ultimoTag;
+
+  const warVerifica = creaVerificaBox(
+    "verifica-input-war",
+    () => verificaConvocazione("verifica-input-war", "verifica-risultatoWar", CLAN_SHEETS_WAR, "#linkContainer"),
+    "verifica-risultatoWar"
+  );
+  document.getElementById("warVerificaSlot").appendChild(warVerifica);
+  if (ultimoTag) document.getElementById("verifica-input-war").value = ultimoTag;
+
+  const warlVerifica = creaVerificaBox(
+    "verifica-input-warlosing",
+    () => verificaConvocazione("verifica-input-warlosing", "verifica-risultatoWarlosing", CLAN_SHEETS_WARLOSING, "#linkContainerWarlosing"),
+    "verifica-risultatoWarlosing"
+  );
+  document.getElementById("warlVerificaSlot").appendChild(warlVerifica);
+  if (ultimoTag) document.getElementById("verifica-input-warlosing").value = ultimoTag;
+
   showScreen("screen-landing");
-
-  const verificaDiv = document.createElement("div");
-  verificaDiv.id = "verificaContainer";
-
-  const input = document.createElement("input");
-  input.id = "verificaInput";
-  input.placeholder = "Inserisci il tuo tag Telegram";
-  verificaDiv.appendChild(input);
-
-  setTimeout(() => {
-    const ultimoTag = localStorage.getItem("ultimoTag");
-    if (ultimoTag) input.value = ultimoTag;
-  }, 0);
-
-  const btn = document.createElement("div");
-  btn.className = "button";
-  btn.id = "verificaBtn";
-  btn.onclick = verificaConvocazione;
-  const btnLabel = document.createElement("span");
-  btnLabel.className = "button-label";
-  btnLabel.textContent = "Verifica convocazione";
-  btn.appendChild(btnLabel);
-  verificaDiv.appendChild(btn);
-
-  const output = document.createElement("div");
-  output.id = "verificaRisultato";
-  verificaDiv.appendChild(output);
-
-  document.getElementById("dynamicTop").appendChild(verificaDiv);
-
   caricaLink();
 };
 
@@ -764,8 +804,9 @@ document.addEventListener('keydown', e => {
 </head>
 <body>
 
-  <div id="screen-landing" class="screen">
+  <div id="screen-landing" class="screen active">
     <div class="screen-inner">
+      <div id="landingVerificaSlot"></div>
       <div class="button landing-btn" onclick="showScreen('screen-clanwar')">
         <span class="button-label">⚔️ Clan War</span>
       </div>
@@ -778,7 +819,11 @@ document.addEventListener('keydown', e => {
   <div id="screen-clanwar" class="screen">
     <div class="screen-inner">
       <div class="back-btn" onclick="showScreen('screen-landing')">← Indietro</div>
-      <div id="dynamicTop"></div>
+      <div id="warVerificaSlot"></div>
+      <div id="warOfflineBox" class="offline-box" style="display:none;">
+        <div class="offline-title">La war è iniziata</div>
+        <div class="offline-text">I link non sono più disponibili</div>
+      </div>
       <div id="linkContainer"></div>
     </div>
   </div>
@@ -786,6 +831,7 @@ document.addEventListener('keydown', e => {
   <div id="screen-warlosing" class="screen">
     <div class="screen-inner">
       <div class="back-btn" onclick="showScreen('screen-landing')">← Indietro</div>
+      <div id="warlVerificaSlot"></div>
       <div id="linkContainerWarlosing"></div>
     </div>
   </div>
