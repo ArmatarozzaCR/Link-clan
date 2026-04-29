@@ -1,19 +1,11 @@
-
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Family Rozza</title>
+<link rel="icon" type="image/png" href="./Icona.png" />
 <style>
-h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-pre{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;font-family:var(--font-mono);font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre;color:var(--color-text-primary);margin:0}
-button{margin-top:1rem;cursor:pointer}
-#copied{display:none;font-size:13px;color:var(--color-text-success);margin-left:10px}
-</style>
-<h2 class="sr-only">Script HTML completo aggiornato per Family Rozza</h2>
-<pre id="code">&lt;!DOCTYPE html&gt;
-&lt;html lang="it"&gt;
-&lt;head&gt;
-&lt;meta charset="UTF-8" /&gt;
-&lt;meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /&gt;
-&lt;title&gt;Family Rozza&lt;/title&gt;
-&lt;link rel="icon" type="image/png" href="./Icona.png" /&gt;
-&lt;style&gt;
 html, body {
   margin: 0;
   padding: 0;
@@ -443,8 +435,8 @@ body::before {
     font-size: 16px;
   }
 }
-&lt;/style&gt;
-&lt;script&gt;
+</style>
+<script>
 const SHEET_ID = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
 const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing", "Baby Rozza"];
 const TROPHY_ICON = "./cw-trophy.png";
@@ -611,10 +603,10 @@ async function caricaLink() {
     }
   } catch {
     document.getElementById("dynamicTop").innerHTML = `
-      &lt;div class="offline-box"&gt;
-        &lt;div class="offline-title"&gt;La war è iniziata&lt;/div&gt;
-        &lt;div class="offline-text"&gt;I link non sono più disponibili&lt;/div&gt;
-      &lt;/div&gt;
+      <div class="offline-box">
+        <div class="offline-title">La war è iniziata</div>
+        <div class="offline-text">I link non sono più disponibili</div>
+      </div>
     `;
     document.getElementById("linkContainer").innerHTML = "";
   }
@@ -653,7 +645,7 @@ async function verificaConvocazione() {
     for (const sheetName of CLAN_SHEETS) {
       const rows = await leggiFoglio(sheetName);
 
-      for (let i = 1; i &lt; rows.length; i++) {
+      for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         const cells = row.c || [];
 
@@ -664,7 +656,7 @@ async function verificaConvocazione() {
         let tagCell = String(rawTag).replace(/^@+/, "").toUpperCase().trim();
 
         if (tagCell && tagCell === tag) {
-          risultati.push(`• Sei convocato in &lt;strong&gt;${sheetName}&lt;/strong&gt; con l'account ${nome}`);
+          risultati.push(`• Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
           clanConvocati.add(normalizeName(sheetName));
         }
       }
@@ -677,7 +669,7 @@ async function verificaConvocazione() {
     });
 
     if (risultati.length) {
-      outputEl.innerHTML = risultati.join("&lt;br&gt;");
+      outputEl.innerHTML = risultati.join("<br>");
       outputEl.className = "trovato";
     } else {
       outputEl.innerHTML = `❌ Tag "${tag}" non trovato nelle convocazioni`;
@@ -697,7 +689,7 @@ async function verificaConvocazione() {
 window.onload = function () {
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if (!isMobile) {
-    document.body.innerHTML = `&lt;div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;"&gt;⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.&lt;br&gt;Per favore aprilo sul tuo smartphone o tablet.&lt;/div&gt;`;
+    document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
 
@@ -738,8 +730,8 @@ window.onload = function () {
   caricaLink();
 };
 
-document.addEventListener('contextmenu', e =&gt; e.preventDefault());
-document.addEventListener('keydown', e =&gt; {
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
   if (
     e.keyCode === 123 ||
     (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
@@ -750,21 +742,12 @@ document.addEventListener('keydown', e =&gt; {
     return false;
   }
 });
-&lt;/script&gt;
-&lt;/head&gt;
-&lt;body&gt;
-  &lt;div id="mobileContent"&gt;
-    &lt;div id="dynamicTop"&gt;&lt;/div&gt;
-    &lt;div id="linkContainer"&gt;&lt;/div&gt;
-  &lt;/div&gt;
-&lt;/body&gt;
-&lt;/html&gt;</pre>
-<button onclick="
-  const raw = document.getElementById('code').textContent
-    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
-  navigator.clipboard.writeText(raw).then(()=>{
-    document.getElementById('copied').style.display='inline';
-    setTimeout(()=>document.getElementById('copied').style.display='none',2000);
-  });
-">Copia tutto</button>
-<span id="copied">Copiato!</span>
+</script>
+</head>
+<body>
+  <div id="mobileContent">
+    <div id="dynamicTop"></div>
+    <div id="linkContainer"></div>
+  </div>
+</body>
+</html>
