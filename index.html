@@ -548,7 +548,6 @@ async function leggiFoglio(sheetName) {
 async function leggiSettingCompleto() {
   try {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=A3:B6&tqx=out:json`;
-
     const res = await fetch(url);
     if (!res.ok) throw new Error("Errore lettura setting");
 
@@ -568,9 +567,7 @@ async function leggiSettingCompleto() {
       const cells = row.c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
-
       if (!colA || !colB) continue;
-
       trophyMap[colA] = colB;
       trophyMapNormalized[normalizeName(colA)] = colB;
     }
@@ -594,13 +591,8 @@ async function convocazioniAttive() {
       .replace(/\);?\s*$/, "");
 
     const data = JSON.parse(jsonText);
-
-    const valore = String(
-      data.table.rows?.[0]?.c?.[0]?.v || ""
-    ).trim().toLowerCase();
-
+    const valore = String(data.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase();
     return valore === "on";
-
   } catch {
     return true;
   }
@@ -613,9 +605,7 @@ async function caricaLink() {
       leggiSettingCompleto()
     ]);
 
-    if (!res.ok) {
-      throw new Error();
-    }
+    if (!res.ok) throw new Error();
 
     const data = await res.json();
     const container = document.getElementById("linkContainer");
@@ -632,27 +622,12 @@ async function caricaLink() {
           const tokenData = await tokenRes.json();
           if (!tokenData.token) return alert("Token non ricevuto");
 
-          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, {
-            headers: { referer: location.origin },
-            redirect: "manual"
-          });
-
-          if (urlRes.type === "opaqueredirect") {
-            window.location.href = `https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`;
+          if (tokenData.empty) {
+            document.getElementById('noLinkOverlay').classList.add('visible');
             return;
           }
 
-          if (!urlRes.ok) {
-            const text = await urlRes.text();
-            return alert("Errore apertura link: " + text);
-          }
-
-          const urlData = await urlRes.json();
-          if (urlData.url === "00") {
-            document.getElementById('noLinkOverlay').classList.add('visible');
-          } else {
-            window.location.href = urlData.url;
-          }
+          window.location.href = `https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`;
         } catch {
           alert("Errore apertura link");
         }
