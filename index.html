@@ -632,17 +632,26 @@ async function caricaLink() {
           const tokenData = await tokenRes.json();
           if (!tokenData.token) return alert("Token non ricevuto");
 
-          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
+          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, {
+            headers: { referer: location.origin },
+            redirect: "manual"
+          });
+
+          if (urlRes.type === "opaqueredirect") {
+            window.location.href = `https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`;
+            return;
+          }
+
           if (!urlRes.ok) {
             const text = await urlRes.text();
             return alert("Errore apertura link: " + text);
           }
 
           const urlData = await urlRes.json();
-          if (urlData.url && urlData.url !== "00") {
-            window.location.href = urlData.url;
-          } else {
+          if (urlData.url === "00") {
             document.getElementById('noLinkOverlay').classList.add('visible');
+          } else {
+            window.location.href = urlData.url;
           }
         } catch {
           alert("Errore apertura link");
