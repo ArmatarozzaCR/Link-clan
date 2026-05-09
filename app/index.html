@@ -11,38 +11,40 @@
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png" />
 <style>
-  html {
+  html, body {
     height: 100%;
-  }
-
-  body {
     margin: 0;
     padding: 0;
-    min-height: 100%;
-    min-height: -webkit-fill-available;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 
-    /* Sfondo: texture + gradiente scuro sopra + colore pieno sotto */
-    background-color: #1a0000; /* colore solido che matcha la texture in basso */
+  /* Sfondo fisso che copre SEMPRE tutta la viewport, anche oltre il contenuto */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-color: #1a0000;
     background-image:
       radial-gradient(circle at top center, rgba(255,120,0,0.10), transparent 28%),
       linear-gradient(to bottom,
         rgba(0,0,0,0.05) 0%,
-        rgba(0,0,0,0.30) 60%,
-        rgba(0,0,0,0.72) 100%
+        rgba(0,0,0,0.40) 70%,
+        rgba(0,0,0,0.65) 100%
       ),
       url("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/background.jpg");
     background-repeat: no-repeat;
     background-position: center top;
     background-size: cover;
-    /* NON fixed su iOS — causa il nero */
-    background-attachment: scroll;
+  }
 
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #fff;
     text-align: center;
     overflow-x: hidden;
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: transparent;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -55,7 +57,7 @@
   #viewInstall {
     max-width: 440px;
     margin: 0 auto;
-    padding: 52px 20px 60px;
+    padding: 140px 20px 60px; /* scende sotto la scritta Family Rozza dello sfondo */
   }
 
   .app-icon {
@@ -110,9 +112,10 @@
 
   .step {
     display: flex;
-    align-items: flex-start;
+    align-items: center; /* centrato verticalmente */
     gap: 13px;
     margin-bottom: 17px;
+    text-align: left;
   }
   .step:last-child { margin-bottom: 0; }
 
@@ -130,7 +133,6 @@
     font-size: 15px;
     line-height: 1.65;
     color: rgba(255,255,255,0.87);
-    padding-top: 4px;
   }
 
   .step-body strong { color: #fff; }
@@ -155,25 +157,35 @@
     margin: 0 2px -3px;
   }
 
-  /* Freccia verso il basso */
-  .arrow-down {
-    display: block;
-    margin: 0 auto 20px;
-    animation: bounceArrow 1.4s ease-in-out infinite;
-    width: 36px;
-  }
-
-  @keyframes bounceArrow {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(9px); }
-  }
-
   .install-hint {
-    font-size: 13px;
-    color: rgba(255,255,255,0.45);
+    font-size: 14px;
+    color: rgba(255,255,255,0.50);
     line-height: 1.5;
-    margin-top: 10px;
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.08);
   }
+
+  /* ─── FEATURE GRID ───────────────────────────────────────── */
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 11px;
+    margin-bottom: 24px;
+  }
+
+  .feature {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,60,0,0.28);
+    border-radius: 16px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .feature-emoji { font-size: 24px; margin-bottom: 6px; display: block; }
+  .feature-label { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.4; }
 
   /* ─── VIEW: APP ───────────────────────────────────────────── */
   #viewApp {
@@ -295,7 +307,7 @@
 
   .offline-box {
     width: 100%; max-width: 400px;
-    margin: 52px auto 0; padding: 20px 18px;
+    margin: 0 auto 0; padding: 20px 18px;
     border-radius: 20px;
     background: rgba(0,0,0,0.50);
     border: 1px solid rgba(255,60,0,0.40);
@@ -388,6 +400,13 @@
   <div class="app-name">Armata Rozza</div>
   <div class="app-tagline">L'app ufficiale della Family Rozza<br>per unirti ai clan su Clash Royale</div>
 
+  <div class="features">
+    <div class="feature"><span class="feature-emoji">⚔️</span><div class="feature-label">Link clan sempre aggiornati</div></div>
+    <div class="feature"><span class="feature-emoji">🏆</span><div class="feature-label">Verifica la tua convocazione</div></div>
+    <div class="feature"><span class="feature-emoji">📲</span><div class="feature-label">Si installa come vera app</div></div>
+    <div class="feature"><span class="feature-emoji">🔒</span><div class="feature-label">Sicura, nessun App Store</div></div>
+  </div>
+
   <div class="install-card">
     <div class="install-card-title">📲 Salvala sulla schermata Home</div>
 
@@ -420,14 +439,14 @@
     </div>
   </div>
 
-  <!-- Freccia verso il basso che indica il tasto Share di Safari -->
-  <svg class="arrow-down" viewBox="0 0 36 36" fill="none">
-    <path d="M18 4 L18 28 M7 18 L18 30 L29 18"
-          stroke="#ff4400" stroke-width="3.2"
-          stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-
-  <div class="install-hint">⚠️ Funziona solo da <strong>Safari</strong> su iPhone</div>
+  <div class="install-hint">⚠️ Funziona solo da <strong>Safari</strong> su iPhone — il tasto
+    <svg style="display:inline-block;width:17px;height:17px;vertical-align:middle;margin:0 2px -2px" viewBox="0 0 24 24" fill="none" stroke="#ffd54a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/>
+      <polyline points="16 6 12 2 8 6"/>
+      <line x1="12" y1="2" x2="12" y2="15"/>
+    </svg>
+    è in basso nella barra di Safari
+  </div>
 </div>
 
 
