@@ -6,35 +6,22 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Armata Rozza" />
-<meta name="theme-color" content="#0a0000" />
+<meta name="theme-color" content="#1a0000" />
 <title>Family Rozza</title>
 <link rel="manifest" href="./manifest.json" />
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png" />
 <style>
-  html, body {
-    height: 100%;
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
     margin: 0;
     padding: 0;
   }
 
-  /* Sfondo fisso che copre SEMPRE tutta la viewport, anche oltre il contenuto */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-color: #1a0000;
-    background-image:
-      radial-gradient(circle at top center, rgba(255,120,0,0.10), transparent 28%),
-      linear-gradient(to bottom,
-        rgba(0,0,0,0.05) 0%,
-        rgba(0,0,0,0.40) 70%,
-        rgba(0,0,0,0.65) 100%
-      ),
-      url("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/background.jpg");
-    background-repeat: no-repeat;
-    background-position: center top;
-    background-size: cover;
+  html, body {
+    width: 100%;
+    height: 100%;
   }
 
   body {
@@ -42,22 +29,38 @@
     color: #fff;
     text-align: center;
     overflow-x: hidden;
+
+    /*
+      Sfondo STATICO direttamente sul body.
+      background-color è il colore di fallback visibile
+      dove la texture non arriva (pagine lunghe, schemi scuri).
+      background-size: cover + background-attachment: scroll
+      è l'unico combo che funziona senza effetti parallax su iOS Safari.
+    */
+    background-color: #1a0000;
+    background-image:
+      linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.55) 100%),
+      url("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/background.jpg");
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: cover;
+    background-attachment: scroll;
+
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: transparent;
   }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  /* ─── VIEWS ──────────────────────────────────────────────── */
+  /* ─── VIEWS ─────────────────────────────────────────────── */
   .view { display: none; }
   .view.active { display: block; }
 
-  /* ─── VIEW: INSTALLA ─────────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════
+     VIEW A — INSTALLAZIONE
+  ══════════════════════════════════════════════════════════ */
   #viewInstall {
     max-width: 440px;
     margin: 0 auto;
-    padding: 140px 20px 60px; /* scende sotto la scritta Family Rozza dello sfondo */
+    padding: 155px 18px 60px;
   }
 
   .app-icon {
@@ -86,19 +89,37 @@
   .app-tagline {
     font-size: 15px;
     color: rgba(255,255,255,0.65);
-    margin-bottom: 32px;
+    margin-bottom: 28px;
     line-height: 1.5;
   }
 
-  /* Card istruzioni */
+  /* ─── Feature grid ───────────────────────────────────────── */
+  .features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .feature {
+    background: rgba(0,0,0,0.40);
+    border: 1px solid rgba(200,40,0,0.30);
+    border-radius: 14px;
+    padding: 13px 10px;
+    text-align: center;
+  }
+
+  .feature-emoji { font-size: 22px; margin-bottom: 5px; display: block; }
+  .feature-label { font-size: 12px; color: rgba(255,255,255,0.70); line-height: 1.4; }
+
+  /* ─── Card istruzioni ────────────────────────────────────── */
   .install-card {
     background: linear-gradient(160deg, rgba(20,0,0,0.88), rgba(55,8,8,0.85));
     border: 1.5px solid rgba(255,60,0,0.42);
     border-radius: 22px;
     padding: 24px 20px;
-    box-shadow: 0 0 28px rgba(255,30,0,0.14), 0 8px 30px rgba(0,0,0,0.40);
     text-align: left;
-    margin-bottom: 22px;
+    margin-bottom: 16px;
   }
 
   .install-card-title {
@@ -107,15 +128,13 @@
     color: #ffd54a;
     text-align: center;
     margin-bottom: 20px;
-    text-shadow: 0 1px 5px rgba(0,0,0,0.5);
   }
 
   .step {
     display: flex;
-    align-items: center; /* centrato verticalmente */
+    align-items: center;
     gap: 13px;
     margin-bottom: 17px;
-    text-align: left;
   }
   .step:last-child { margin-bottom: 0; }
 
@@ -123,7 +142,6 @@
     width: 32px; height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, #cc1100, #ff4400);
-    box-shadow: 0 0 12px rgba(255,40,0,0.42);
     font-size: 14px; font-weight: 900;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
@@ -139,55 +157,34 @@
 
   .tag-pill {
     display: inline-block;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.20);
-    border-radius: 7px;
-    padding: 1px 9px;
+    background: rgba(255,200,0,0.12);
+    border: 1px solid rgba(255,200,0,0.30);
+    border-radius: 6px;
+    padding: 1px 8px;
     font-size: 13px;
     font-weight: 700;
     color: #ffd54a;
-    margin: 0 1px;
   }
 
-  /* Icona Share SVG inline */
   .share-svg {
     display: inline-block;
-    width: 20px; height: 20px;
+    width: 18px; height: 18px;
     vertical-align: middle;
-    margin: 0 2px -3px;
+    margin: 0 2px -2px;
   }
 
   .install-hint {
-    font-size: 14px;
-    color: rgba(255,255,255,0.50);
+    font-size: 13px;
+    color: rgba(255,255,255,0.42);
     line-height: 1.5;
-    margin-top: 16px;
-    padding: 10px 16px;
-    background: rgba(0,0,0,0.25);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.28);
+    border-radius: 10px;
   }
 
-  /* ─── FEATURE GRID ───────────────────────────────────────── */
-  .features {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 11px;
-    margin-bottom: 24px;
-  }
-
-  .feature {
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,60,0,0.28);
-    border-radius: 16px;
-    padding: 14px 10px;
-    text-align: center;
-  }
-
-  .feature-emoji { font-size: 24px; margin-bottom: 6px; display: block; }
-  .feature-label { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.4; }
-
-  /* ─── VIEW: APP ───────────────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════
+     VIEW B — APP
+  ══════════════════════════════════════════════════════════ */
   #viewApp {
     max-width: 480px;
     margin: 0 auto;
@@ -212,7 +209,7 @@
     background: linear-gradient(180deg, rgba(45,0,0,0.88), rgba(20,0,0,0.84));
     color: #fff;
     outline: none;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset, 0 0 12px rgba(255,0,0,0.25), 0 6px 18px rgba(0,0,0,0.22);
+    box-shadow: 0 0 12px rgba(255,0,0,0.20);
     transition: .25s ease;
     text-align: center;
     -webkit-appearance: none;
@@ -222,7 +219,7 @@
   #verificaInput::placeholder { color: rgba(255,255,255,0.72); font-weight: 600; }
   #verificaInput:focus {
     border-color: #ff6a4f;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 22px rgba(255,40,0,0.42), 0 8px 20px rgba(0,0,0,0.24);
+    box-shadow: 0 0 22px rgba(255,40,0,0.38);
     transform: translateY(-1px);
   }
 
@@ -242,8 +239,9 @@
     cursor: pointer;
     font-size: 18px;
     font-weight: 800;
-    transition: transform .22s ease, box-shadow .22s ease;
-    box-shadow: 0 0 10px rgba(255,20,0,0.40), 0 0 24px rgba(255,60,0,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: transform .22s ease;
+    /* niente inset nei box-shadow → zero bordi bianchi */
+    box-shadow: 0 0 10px rgba(255,20,0,0.40), 0 0 24px rgba(255,60,0,0.10);
     animation: glowPulse 3.2s infinite alternate ease-in-out;
     overflow: hidden;
     -webkit-user-select: none; user-select: none;
@@ -298,8 +296,6 @@
     background: rgba(0,0,0,0.50);
     border: 1px solid rgba(255,60,0,0.40);
     border-radius: 16px;
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.30);
   }
 
   #verificaRisultato.trovato     { border-color: rgba(0,200,90,0.50); }
@@ -307,23 +303,20 @@
 
   .offline-box {
     width: 100%; max-width: 400px;
-    margin: 0 auto 0; padding: 20px 18px;
+    margin: 0 auto; padding: 20px 18px;
     border-radius: 20px;
     background: rgba(0,0,0,0.50);
     border: 1px solid rgba(255,60,0,0.40);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-    box-shadow: 0 4px 18px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04);
     color: #fff; text-align: center; line-height: 1.6;
   }
 
-  .offline-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; text-shadow: 0 2px 5px rgba(0,0,0,0.45); }
+  .offline-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
   .offline-text  { font-size: 17px; color: rgba(255,255,255,0.88); }
 
-  /* ─── OVERLAY NESSUN LINK ─────────────────────────────────── */
+  /* ─── OVERLAY NESSUN LINK ──────────────────────────────── */
   #noLinkOverlay {
     display: none; position: fixed; inset: 0; z-index: 9999;
     background: rgba(0,0,0,0.72);
-    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     align-items: center; justify-content: center;
   }
   #noLinkOverlay.visible { display: flex; }
@@ -333,27 +326,25 @@
     border: 2px solid rgba(255,60,0,0.55); border-radius: 26px;
     padding: 34px 28px 28px; max-width: 320px; width: 90%;
     text-align: center;
-    box-shadow: 0 0 40px rgba(255,30,0,0.25), 0 8px 32px rgba(0,0,0,0.5);
     animation: popIn .3s cubic-bezier(.34,1.56,.64,1) both;
   }
 
   .nolink-emoji { font-size: 58px; line-height: 1; margin-bottom: 12px; display: block; animation: wobble 1.2s ease infinite; }
-  .nolink-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 16px; text-shadow: 0 2px 8px rgba(255,60,0,0.5); }
+  .nolink-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 16px; }
 
   .nolink-close {
     display: inline-block; padding: 12px 32px;
     background: linear-gradient(135deg, #ff1a1a, #ff5500);
     border-radius: 14px; font-size: 16px; font-weight: 800; color: #fff;
-    cursor: pointer; box-shadow: 0 0 16px rgba(255,40,0,0.45);
-    transition: transform .18s;
+    cursor: pointer;
   }
-  .nolink-close:active { transform: scale(0.95); }
+  .nolink-close:active { opacity: 0.85; }
 
-  /* ─── ANIMAZIONI ─────────────────────────────────────────── */
+  /* ─── ANIMAZIONI ────────────────────────────────────────── */
   @keyframes glowPulse {
-    0%   { box-shadow: 0 0 8px rgba(255,0,0,0.45),  0 0 18px rgba(255,70,0,0.10),  inset 0 1px 0 rgba(255,255,255,0.08); }
-    50%  { box-shadow: 0 0 20px rgba(255,60,0,0.80), 0 0 38px rgba(255,110,0,0.20), inset 0 1px 0 rgba(255,255,255,0.10); }
-    100% { box-shadow: 0 0 8px rgba(255,0,0,0.45),  0 0 18px rgba(255,70,0,0.10),  inset 0 1px 0 rgba(255,255,255,0.08); }
+    0%   { box-shadow: 0 0 8px rgba(255,0,0,0.40),  0 0 18px rgba(255,70,0,0.08); }
+    50%  { box-shadow: 0 0 20px rgba(255,60,0,0.78), 0 0 38px rgba(255,110,0,0.18); }
+    100% { box-shadow: 0 0 8px rgba(255,0,0,0.40),  0 0 18px rgba(255,70,0,0.08); }
   }
 
   @keyframes greenPulse {
@@ -372,14 +363,14 @@
     50%     { transform: rotate(6deg); }
   }
 
-  /* ─── RESPONSIVE ──────────────────────────────────────────── */
+  /* ─── RESPONSIVE ────────────────────────────────────────── */
   @media (max-width: 390px) {
-    #viewApp    { padding: 110px 10px 40px; }
-    .button     { gap: 12px; padding: 14px 14px; }
+    #viewApp      { padding: 110px 10px 40px; }
+    .button       { gap: 12px; padding: 14px 14px; }
     .button-label { font-size: 17px; }
-    .clan-logo  { width: 62px; height: 62px; }
-    .trophy-box { min-width: 58px; gap: 3px; }
-    .trophy-icon { width: 17px; height: 17px; }
+    .clan-logo    { width: 62px; height: 62px; }
+    .trophy-box   { min-width: 58px; gap: 3px; }
+    .trophy-icon  { width: 17px; height: 17px; }
     .trophy-value { font-size: 14px; }
     #verificaInput { font-size: 16px; padding: 13px 14px; }
   }
@@ -387,10 +378,7 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════
-     VIEW A: schermata di installazione (prima volta)
-     Visibile finché non è installata come PWA
-═══════════════════════════════════════════════════════ -->
+<!-- ══ VIEW A: INSTALLAZIONE ════════════════════════════════ -->
 <div class="view" id="viewInstall">
 
   <img class="app-icon"
@@ -432,15 +420,13 @@
     </div>
   </div>
 
+</div><!-- fine viewInstall -->
 
-<!-- ══════════════════════════════════════════════════════
-     VIEW B: app vera e propria (dopo installazione)
-═══════════════════════════════════════════════════════ -->
+
+<!-- ══ VIEW B: APP ══════════════════════════════════════════ -->
 <div class="view" id="viewApp">
-
   <div id="dynamicTop"></div>
   <div id="linkContainer"></div>
-
 </div>
 
 
@@ -455,26 +441,18 @@
 
 
 <script>
-  // ─── COSTANTI ────────────────────────────────────────────────
   const WORKER_URL  = "https://nameless-brook-094f.cr-armatarozza.workers.dev/";
   const REFERER     = "https://www.armatarozza.it";
   const SHEET_ID    = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
   const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing", "Baby Rozza"];
   const TROPHY_ICON = "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/cw-trophy.png";
 
-  // ─── DECIDE QUALE VIEW MOSTRARE ──────────────────────────────
-  // Se aperta come PWA standalone → mostra l'app
-  // Se aperta in browser → mostra le istruzioni
   const isStandalone = window.navigator.standalone === true
     || window.matchMedia('(display-mode: standalone)').matches;
 
   document.getElementById(isStandalone ? "viewApp" : "viewInstall").classList.add("active");
+  if (isStandalone) initApp();
 
-  if (isStandalone) {
-    initApp();
-  }
-
-  // ─── UTILS ───────────────────────────────────────────────────
   function normalizeName(v) {
     return String(v || "")
       .normalize("NFKC")
@@ -485,9 +463,8 @@
       .toLowerCase();
   }
 
-  // ─── GOOGLE SHEETS ───────────────────────────────────────────
   async function leggiFoglio(sheetName) {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&range=A1:B500&headers=0&tqx=out:json`;
+    const url  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&range=A1:B500&headers=0&tqx=out:json`;
     const res  = await fetch(url);
     if (!res.ok) throw new Error();
     const text = await res.text();
@@ -530,12 +507,10 @@
             .replace(/^google\.visualization\.Query\.setResponse\(/, "")
             .replace(/\);?\s*$/, "")
       );
-      const v = String(json.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase();
-      return v === "on";
+      return String(json.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase() === "on";
     } catch { return true; }
   }
 
-  // ─── CARICA BOTTONI CLAN ─────────────────────────────────────
   async function caricaLink() {
     try {
       const [res, trophyMap] = await Promise.all([
@@ -543,9 +518,9 @@
         leggiTrophyMap()
       ]);
       if (!res.ok) throw new Error();
-      const data = await res.json();
-
+      const data      = await res.json();
       const container = document.getElementById("linkContainer");
+
       for (const item of data) {
         const div = document.createElement("div");
         div.className = "button";
@@ -553,23 +528,17 @@
         div.addEventListener("click", () => cliccaClan(item.id));
 
         const img = document.createElement("img");
-        img.className = "clan-logo";
-        img.src = item.img;
-        img.alt = item.nome;
+        img.className = "clan-logo"; img.src = item.img; img.alt = item.nome;
 
         const span = document.createElement("span");
-        span.className = "button-label";
-        span.textContent = item.nome;
+        span.className = "button-label"; span.textContent = item.nome;
 
         const trophyBox = document.createElement("div");
         trophyBox.className = "trophy-box";
         const ti = document.createElement("img");
-        ti.className = "trophy-icon";
-        ti.src = TROPHY_ICON;
-        ti.alt = "Coppe";
+        ti.className = "trophy-icon"; ti.src = TROPHY_ICON; ti.alt = "Coppe";
         const tv = document.createElement("span");
-        tv.className = "trophy-value";
-        tv.textContent = trophyMap[normalizeName(item.nome)] || "-";
+        tv.className = "trophy-value"; tv.textContent = trophyMap[normalizeName(item.nome)] || "-";
         trophyBox.append(ti, tv);
 
         div.append(img, span, trophyBox);
@@ -584,53 +553,39 @@
     }
   }
 
-  // ─── CLICK CLAN ──────────────────────────────────────────────
   async function cliccaClan(id) {
     try {
       const tokenRes  = await fetch(`${WORKER_URL}?id=${id}`, { headers: { referer: REFERER } });
       if (!tokenRes.ok) throw new Error();
       const tokenData = await tokenRes.json();
       if (!tokenData.token) { alert("Token non ricevuto"); return; }
-      if (tokenData.empty) {
-        document.getElementById("noLinkOverlay").classList.add("visible");
-        return;
-      }
+      if (tokenData.empty) { document.getElementById("noLinkOverlay").classList.add("visible"); return; }
       window.location.href = `${WORKER_URL}?id=${id}&token=${tokenData.token}`;
-    } catch {
-      alert("Errore apertura link. Riprova.");
-    }
+    } catch { alert("Errore apertura link. Riprova."); }
   }
 
-  // ─── VERIFICA CONVOCAZIONE ───────────────────────────────────
   async function verificaConvocazione() {
     const outputEl = document.getElementById("verificaRisultato");
-    const attive = await convocazioniAttive();
+    const attive   = await convocazioniAttive();
     if (!attive) {
       outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
-      outputEl.className = "";
-      outputEl.style.display = "block";
-      return;
+      outputEl.className = ""; outputEl.style.display = "block"; return;
     }
-
     let tag = document.getElementById("verificaInput").value.trim();
     if (!tag) return;
     tag = tag.replace(/^@+/, "").toUpperCase();
     localStorage.setItem("ultimoTag", tag);
-
     document.querySelectorAll("#linkContainer .button.convocato").forEach(b => b.classList.remove("convocato"));
-
     outputEl.innerHTML = "⏳ Controllo in corso...";
-    outputEl.className = "";
-    outputEl.style.display = "block";
+    outputEl.className = ""; outputEl.style.display = "block";
 
     try {
-      const risultati = [];
+      const risultati     = [];
       const clanConvocati = new Set();
-
       for (const sheetName of CLAN_SHEETS) {
         const rows = await leggiFoglio(sheetName);
         for (let i = 1; i < rows.length; i++) {
-          const c   = (rows[i].c || []);
+          const c   = rows[i].c || [];
           const raw = c[1] != null ? c[1].v : null;
           if (!raw) continue;
           const nome    = String((c[0] && c[0].v) || "").trim();
@@ -641,51 +596,40 @@
           }
         }
       }
-
       document.querySelectorAll("#linkContainer .button").forEach(btn => {
         if (clanConvocati.has(btn.dataset.nomeClan)) btn.classList.add("convocato");
       });
-
       if (risultati.length) {
-        outputEl.innerHTML = risultati.join("<br>");
-        outputEl.className = "trovato";
+        outputEl.innerHTML = risultati.join("<br>"); outputEl.className = "trovato";
       } else {
         outputEl.innerHTML = `❌ Tag "<strong>${tag}</strong>" non trovato nelle convocazioni`;
         outputEl.className = "non-trovato";
       }
     } catch {
-      outputEl.innerHTML = "Errore caricamento dati";
-      outputEl.className = "non-trovato";
+      outputEl.innerHTML = "Errore caricamento dati"; outputEl.className = "non-trovato";
     }
     outputEl.style.display = "block";
   }
 
-  // ─── INIT APP ────────────────────────────────────────────────
   function initApp() {
-    // Costruisce la sezione verifica
-    const top = document.getElementById("dynamicTop");
+    const top  = document.getElementById("dynamicTop");
     const wrap = document.createElement("div");
     wrap.id = "verificaContainer";
 
     const input = document.createElement("input");
-    input.id = "verificaInput";
-    input.type = "text";
+    input.id = "verificaInput"; input.type = "text";
     input.placeholder = "Inserisci il tuo tag Telegram";
-    input.autocomplete = "off";
-    input.autocorrect = "off";
-    input.autocapitalize = "characters";
-    input.spellcheck = false;
+    input.autocomplete = "off"; input.autocorrect = "off";
+    input.autocapitalize = "characters"; input.spellcheck = false;
     const savedTag = localStorage.getItem("ultimoTag");
     if (savedTag) input.value = savedTag;
     input.addEventListener("keydown", e => { if (e.key === "Enter") verificaConvocazione(); });
 
     const btn = document.createElement("div");
-    btn.className = "button";
-    btn.style.justifyContent = "center";
+    btn.className = "button"; btn.style.justifyContent = "center";
     btn.addEventListener("click", verificaConvocazione);
     const bl = document.createElement("span");
-    bl.className = "button-label";
-    bl.textContent = "Verifica convocazione";
+    bl.className = "button-label"; bl.textContent = "Verifica convocazione";
     btn.appendChild(bl);
 
     const out = document.createElement("div");
@@ -693,16 +637,12 @@
 
     wrap.append(input, btn, out);
     top.appendChild(wrap);
-
     caricaLink();
 
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").catch(console.error);
-    }
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(console.error);
   }
 
   document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
-
 </body>
 </html>
