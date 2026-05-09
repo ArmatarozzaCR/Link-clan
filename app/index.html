@@ -5,395 +5,701 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<title>Scarica l'App – Armata Rozza</title>
-<link rel="icon" type="image/png" href="./Icona.png" />
+<meta name="apple-mobile-web-app-title" content="Armata Rozza" />
+<meta name="theme-color" content="#0a0000" />
+<title>Family Rozza</title>
+<link rel="manifest" href="./manifest.json" />
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png" />
 <style>
-  html, body {
-    margin: 0; padding: 0;
-    min-height: 100vh;
+  html {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* Sfondo: texture + gradiente scuro sopra + colore pieno sotto */
+    background-color: #1a0000; /* colore solido che matcha la texture in basso */
     background-image:
       radial-gradient(circle at top center, rgba(255,120,0,0.10), transparent 28%),
-      linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.55)),
-      url("./background.jpg");
+      linear-gradient(to bottom,
+        rgba(0,0,0,0.05) 0%,
+        rgba(0,0,0,0.30) 60%,
+        rgba(0,0,0,0.72) 100%
+      ),
+      url("https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/background.jpg");
     background-repeat: no-repeat;
     background-position: center top;
     background-size: cover;
-    background-color: #120000;
+    /* NON fixed su iOS — causa il nero */
+    background-attachment: scroll;
+
     color: #fff;
     text-align: center;
     overflow-x: hidden;
-  }
-
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 15% 18%, rgba(255,130,0,0.12), transparent 12%),
-      radial-gradient(circle at 85% 30%, rgba(255,60,0,0.10), transparent 10%),
-      radial-gradient(circle at 12% 76%, rgba(255,120,0,0.08), transparent 9%),
-      radial-gradient(circle at 88% 82%, rgba(255,90,0,0.08), transparent 10%);
-    mix-blend-mode: screen;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  .page {
-    position: relative;
-    max-width: 480px;
+  /* ─── VIEWS ──────────────────────────────────────────────── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ─── VIEW: INSTALLA ─────────────────────────────────────── */
+  #viewInstall {
+    max-width: 440px;
     margin: 0 auto;
-    padding: 48px 20px 60px;
-    z-index: 1;
+    padding: 52px 20px 60px;
   }
 
-  /* ── ICONA APP ── */
   .app-icon {
-    width: 110px;
-    height: 110px;
-    border-radius: 26px;
-    box-shadow: 0 0 40px rgba(255,40,0,0.45), 0 8px 32px rgba(0,0,0,0.5);
-    margin: 0 auto 20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    box-shadow: 0 0 36px rgba(255,40,0,0.50), 0 8px 28px rgba(0,0,0,0.55);
     display: block;
-    animation: floatIcon 3s ease-in-out infinite;
+    margin: 0 auto 16px;
+    animation: floatIcon 3.2s ease-in-out infinite;
   }
 
   @keyframes floatIcon {
     0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-8px); }
+    50%      { transform: translateY(-7px); }
   }
 
-  .app-title {
-    font-size: 30px;
+  .app-name {
+    font-size: 28px;
     font-weight: 900;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 12px rgba(255,60,0,0.5);
+    letter-spacing: 0.4px;
+    text-shadow: 0 2px 10px rgba(255,60,0,0.50);
     margin-bottom: 6px;
   }
 
-  .app-sub {
-    font-size: 16px;
-    color: rgba(255,255,255,0.70);
-    margin-bottom: 36px;
+  .app-tagline {
+    font-size: 15px;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 32px;
     line-height: 1.5;
   }
 
-  /* ── CARD CENTRALE ── */
-  .card {
-    background: linear-gradient(160deg, rgba(30,0,0,0.90), rgba(55,8,8,0.88));
-    border: 1.5px solid rgba(255,60,0,0.45);
-    border-radius: 24px;
-    padding: 28px 22px;
-    box-shadow: 0 0 30px rgba(255,30,0,0.15), 0 8px 32px rgba(0,0,0,0.4);
-    margin-bottom: 20px;
+  /* Card istruzioni */
+  .install-card {
+    background: linear-gradient(160deg, rgba(20,0,0,0.88), rgba(55,8,8,0.85));
+    border: 1.5px solid rgba(255,60,0,0.42);
+    border-radius: 22px;
+    padding: 24px 20px;
+    box-shadow: 0 0 28px rgba(255,30,0,0.14), 0 8px 30px rgba(0,0,0,0.40);
     text-align: left;
+    margin-bottom: 22px;
   }
 
-  .card-title {
-    font-size: 18px;
+  .install-card-title {
+    font-size: 17px;
     font-weight: 800;
-    margin-bottom: 18px;
-    text-align: center;
     color: #ffd54a;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.5);
   }
 
-  /* ── STEP ── */
   .step {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 13px;
+    margin-bottom: 17px;
   }
-
   .step:last-child { margin-bottom: 0; }
 
   .step-num {
-    width: 34px;
-    height: 34px;
+    width: 32px; height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff1a1a, #ff5500);
-    box-shadow: 0 0 14px rgba(255,40,0,0.45);
-    font-size: 15px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: linear-gradient(135deg, #cc1100, #ff4400);
+    box-shadow: 0 0 12px rgba(255,40,0,0.42);
+    font-size: 14px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    margin-top: 1px;
   }
 
-  .step-text {
+  .step-body {
     font-size: 15px;
-    line-height: 1.6;
-    color: rgba(255,255,255,0.88);
+    line-height: 1.65;
+    color: rgba(255,255,255,0.87);
+    padding-top: 4px;
   }
 
-  .step-text strong { color: #fff; }
+  .step-body strong { color: #fff; }
 
-  .step-text .tag {
+  .tag-pill {
     display: inline-block;
     background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 8px;
-    padding: 1px 8px;
+    border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 7px;
+    padding: 1px 9px;
     font-size: 13px;
     font-weight: 700;
     color: #ffd54a;
-    margin: 0 2px;
+    margin: 0 1px;
   }
 
-  /* ── ICONA CONDIVIDI ── */
-  .share-icon {
+  /* Icona Share SVG inline */
+  .share-svg {
     display: inline-block;
-    width: 22px;
-    height: 22px;
+    width: 20px; height: 20px;
     vertical-align: middle;
-    margin: 0 3px -3px;
+    margin: 0 2px -3px;
   }
 
-  /* ── CTA BUTTON ── */
-  .cta-btn {
+  /* Freccia verso il basso */
+  .arrow-down {
+    display: block;
+    margin: 0 auto 20px;
+    animation: bounceArrow 1.4s ease-in-out infinite;
+    width: 36px;
+  }
+
+  @keyframes bounceArrow {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(9px); }
+  }
+
+  .install-hint {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+
+  /* ─── VIEW: APP ───────────────────────────────────────────── */
+  #viewApp {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 130px 12px 40px;
+    position: relative;
+  }
+
+  #verificaContainer {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 22px;
+  }
+
+  #verificaInput {
+    width: 100%;
+    padding: 15px 18px;
+    border-radius: 18px;
+    border: 2px solid rgba(255,55,35,0.95);
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    background: linear-gradient(180deg, rgba(45,0,0,0.88), rgba(20,0,0,0.84));
+    color: #fff;
+    outline: none;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05) inset, 0 0 12px rgba(255,0,0,0.25), 0 6px 18px rgba(0,0,0,0.22);
+    transition: .25s ease;
+    text-align: center;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  #verificaInput::placeholder { color: rgba(255,255,255,0.72); font-weight: 600; }
+  #verificaInput:focus {
+    border-color: #ff6a4f;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 0 22px rgba(255,40,0,0.42), 0 8px 20px rgba(0,0,0,0.24);
+    transform: translateY(-1px);
+  }
+
+  .button {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    justify-content: flex-start;
+    gap: 18px;
     width: 100%;
-    padding: 18px;
-    background: linear-gradient(135deg, rgba(25,25,25,0.95), rgba(65,8,8,0.90) 58%, rgba(95,15,15,0.80));
+    max-width: 400px;
+    margin: 16px auto;
+    padding: 17px 18px;
+    background: linear-gradient(135deg, rgba(25,25,25,0.93), rgba(65,8,8,0.88) 58%, rgba(95,15,15,0.78));
     border: 2px solid #ff1a1a;
     border-radius: 20px;
+    cursor: pointer;
     font-size: 18px;
     font-weight: 800;
-    color: #fff;
-    cursor: pointer;
-    text-decoration: none;
-    box-shadow: 0 0 18px rgba(255,20,0,0.50), 0 0 38px rgba(255,60,0,0.12);
-    animation: glowPulse 3s infinite alternate ease-in-out;
-    transition: transform .2s;
-    margin-bottom: 14px;
-    -webkit-user-select: none;
-    user-select: none;
+    transition: transform .22s ease, box-shadow .22s ease;
+    box-shadow: 0 0 10px rgba(255,20,0,0.40), 0 0 24px rgba(255,60,0,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+    animation: glowPulse 3.2s infinite alternate ease-in-out;
+    overflow: hidden;
+    -webkit-user-select: none; user-select: none;
   }
 
-  .cta-btn:active { transform: scale(0.97); }
+  .button:active { transform: scale(0.96); animation-play-state: paused; }
 
-  .cta-icon { font-size: 22px; }
-
-  /* ── NOTA SAFARI ── */
-  .safari-note {
-    font-size: 13px;
-    color: rgba(255,255,255,0.50);
-    margin-top: 6px;
-    line-height: 1.5;
+  .button.convocato {
+    border-color: #00e676;
+    animation: greenPulse 1.8s infinite alternate ease-in-out;
   }
 
-  .safari-note a {
-    color: rgba(255,140,80,0.80);
-    text-decoration: none;
-  }
-
-  /* ── DIVIDER ── */
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 28px 0 22px;
-    color: rgba(255,255,255,0.30);
-    font-size: 13px;
-  }
-  .divider::before,
-  .divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: rgba(255,60,0,0.25);
-  }
-
-  /* ── FEATURE LIST ── */
-  .features {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .feature {
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,60,0,0.25);
-    border-radius: 16px;
-    padding: 14px 12px;
+  .button-label {
+    font-size: 20px;
+    flex-grow: 1;
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: 0.2px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.45);
+    position: relative; z-index: 1;
   }
 
-  .feature-emoji { font-size: 26px; margin-bottom: 6px; display: block; }
-  .feature-label { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.4; }
-
-  /* ── ANIMAZIONI ── */
-  @keyframes glowPulse {
-    0%   { box-shadow: 0 0 8px rgba(255,0,0,0.45), 0 0 18px rgba(255,70,0,0.10); }
-    50%  { box-shadow: 0 0 22px rgba(255,60,0,0.80), 0 0 40px rgba(255,110,0,0.22); }
-    100% { box-shadow: 0 0 8px rgba(255,0,0,0.45), 0 0 18px rgba(255,70,0,0.10); }
+  .clan-logo {
+    width: 75px; height: 75px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(255,0,0,0.4));
+    position: relative; z-index: 1;
   }
 
-  /* ── DESKTOP WARNING ── */
-  #desktopMsg {
+  .trophy-box {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 5px; min-width: 70px; margin-left: auto;
+    position: relative; z-index: 1; flex-shrink: 0;
+  }
+
+  .trophy-icon { width: 20px; height: 20px; object-fit: contain; opacity: 0.95; flex-shrink: 0; }
+
+  .trophy-value {
+    font-size: 18px; font-weight: 800; color: #ffd54a;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6); white-space: nowrap;
+  }
+
+  #verificaRisultato {
     display: none;
-    max-width: 440px;
-    margin: 80px auto;
-    padding: 28px 24px;
-    background: rgba(0,0,0,0.55);
+    margin-top: 14px; font-size: 17px; color: #fff;
+    text-align: center; line-height: 1.8; font-weight: 500;
+    word-break: break-word; overflow-wrap: anywhere;
+    padding: 14px 18px;
+    background: rgba(0,0,0,0.50);
     border: 1px solid rgba(255,60,0,0.40);
+    border-radius: 16px;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.30);
+  }
+
+  #verificaRisultato.trovato     { border-color: rgba(0,200,90,0.50); }
+  #verificaRisultato.non-trovato { border-color: rgba(255,40,40,0.45); color: #ff8a8a; }
+
+  .offline-box {
+    width: 100%; max-width: 400px;
+    margin: 52px auto 0; padding: 20px 18px;
     border-radius: 20px;
-    font-size: 17px;
-    line-height: 1.7;
-    color: rgba(255,255,255,0.85);
+    background: rgba(0,0,0,0.50);
+    border: 1px solid rgba(255,60,0,0.40);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04);
+    color: #fff; text-align: center; line-height: 1.6;
   }
 
-  /* ── ARROW ANIMATA (indica il tasto Share in basso) ── */
-  #arrowHint {
-    display: none;
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99;
-    animation: bounce 1.2s ease-in-out infinite;
-    pointer-events: none;
+  .offline-title { font-size: 22px; font-weight: 800; margin-bottom: 8px; text-shadow: 0 2px 5px rgba(0,0,0,0.45); }
+  .offline-text  { font-size: 17px; color: rgba(255,255,255,0.88); }
+
+  /* ─── OVERLAY NESSUN LINK ─────────────────────────────────── */
+  #noLinkOverlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  #noLinkOverlay.visible { display: flex; }
+
+  .nolink-card {
+    background: linear-gradient(160deg, rgba(30,0,0,0.97), rgba(60,10,10,0.95));
+    border: 2px solid rgba(255,60,0,0.55); border-radius: 26px;
+    padding: 34px 28px 28px; max-width: 320px; width: 90%;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(255,30,0,0.25), 0 8px 32px rgba(0,0,0,0.5);
+    animation: popIn .3s cubic-bezier(.34,1.56,.64,1) both;
   }
 
-  #arrowHint svg { filter: drop-shadow(0 0 8px rgba(255,80,0,0.8)); }
+  .nolink-emoji { font-size: 58px; line-height: 1; margin-bottom: 12px; display: block; animation: wobble 1.2s ease infinite; }
+  .nolink-title { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 16px; text-shadow: 0 2px 8px rgba(255,60,0,0.5); }
 
-  @keyframes bounce {
-    0%,100% { transform: translateX(-50%) translateY(0); }
-    50%      { transform: translateX(-50%) translateY(10px); }
+  .nolink-close {
+    display: inline-block; padding: 12px 32px;
+    background: linear-gradient(135deg, #ff1a1a, #ff5500);
+    border-radius: 14px; font-size: 16px; font-weight: 800; color: #fff;
+    cursor: pointer; box-shadow: 0 0 16px rgba(255,40,0,0.45);
+    transition: transform .18s;
+  }
+  .nolink-close:active { transform: scale(0.95); }
+
+  /* ─── ANIMAZIONI ─────────────────────────────────────────── */
+  @keyframes glowPulse {
+    0%   { box-shadow: 0 0 8px rgba(255,0,0,0.45),  0 0 18px rgba(255,70,0,0.10),  inset 0 1px 0 rgba(255,255,255,0.08); }
+    50%  { box-shadow: 0 0 20px rgba(255,60,0,0.80), 0 0 38px rgba(255,110,0,0.20), inset 0 1px 0 rgba(255,255,255,0.10); }
+    100% { box-shadow: 0 0 8px rgba(255,0,0,0.45),  0 0 18px rgba(255,70,0,0.10),  inset 0 1px 0 rgba(255,255,255,0.08); }
   }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 360px) {
-    .app-title { font-size: 24px; }
-    .features  { grid-template-columns: 1fr; }
+  @keyframes greenPulse {
+    0%   { box-shadow: 0 0 8px rgba(0,230,118,0.55), 0 0 18px rgba(0,200,90,0.15); }
+    50%  { box-shadow: 0 0 22px rgba(0,230,118,0.90), 0 0 40px rgba(0,255,120,0.28); }
+    100% { box-shadow: 0 0 8px rgba(0,230,118,0.55), 0 0 18px rgba(0,200,90,0.15); }
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes wobble {
+    0%,100% { transform: rotate(-6deg); }
+    50%     { transform: rotate(6deg); }
+  }
+
+  /* ─── RESPONSIVE ──────────────────────────────────────────── */
+  @media (max-width: 390px) {
+    #viewApp    { padding: 110px 10px 40px; }
+    .button     { gap: 12px; padding: 14px 14px; }
+    .button-label { font-size: 17px; }
+    .clan-logo  { width: 62px; height: 62px; }
+    .trophy-box { min-width: 58px; gap: 3px; }
+    .trophy-icon { width: 17px; height: 17px; }
+    .trophy-value { font-size: 14px; }
+    #verificaInput { font-size: 16px; padding: 13px 14px; }
   }
 </style>
 </head>
 <body>
 
-<div class="page" id="mainPage">
+<!-- ══════════════════════════════════════════════════════
+     VIEW A: schermata di installazione (prima volta)
+     Visibile finché non è installata come PWA
+═══════════════════════════════════════════════════════ -->
+<div class="view" id="viewInstall">
 
   <img class="app-icon"
        src="https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png"
        alt="Armata Rozza" />
 
-  <div class="app-title">Armata Rozza</div>
-  <div class="app-sub">L'app ufficiale della Family Rozza<br>per unirti ai clan su Clash Royale</div>
+  <div class="app-name">Armata Rozza</div>
+  <div class="app-tagline">L'app ufficiale della Family Rozza<br>per unirti ai clan su Clash Royale</div>
 
-  <!-- Feature grid -->
-  <div class="features">
-    <div class="feature">
-      <span class="feature-emoji">⚔️</span>
-      <div class="feature-label">Link clan sempre aggiornati</div>
-    </div>
-    <div class="feature">
-      <span class="feature-emoji">🏆</span>
-      <div class="feature-label">Verifica la tua convocazione</div>
-    </div>
-    <div class="feature">
-      <span class="feature-emoji">📲</span>
-      <div class="feature-label">Si installa come vera app</div>
-    </div>
-    <div class="feature">
-      <span class="feature-emoji">🔒</span>
-      <div class="feature-label">Sicura, nessun App Store</div>
-    </div>
-  </div>
-
-  <!-- Bottone apri app -->
-  <a class="cta-btn" id="openBtn" href="https://armata-app.pages.dev" target="_blank">
-    <span class="cta-icon">🚀</span>
-    <span>Apri l'App</span>
-  </a>
-  <div class="safari-note">
-    ⚠️ Aprila con <strong>Safari</strong> per poterla installare
-  </div>
-
-  <div class="divider">Come installarla</div>
-
-  <!-- Istruzioni -->
-  <div class="card">
-    <div class="card-title">📲 Aggiungi alla schermata Home</div>
+  <div class="install-card">
+    <div class="install-card-title">📲 Salvala sulla schermata Home</div>
 
     <div class="step">
       <div class="step-num">1</div>
-      <div class="step-text">
-        Tocca il bottone <strong>"Apri l'App"</strong> qui sopra.<br>
-        Si aprirà in <strong>Safari</strong>.
+      <div class="step-body">
+        Tocca il tasto
+        <svg class="share-svg" viewBox="0 0 24 24" fill="none" stroke="#ffd54a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        <strong>Condividi</strong> in basso su Safari.
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">2</div>
-      <div class="step-text">
-        In basso su Safari tocca il tasto
-        <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="#ffd54a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/>
-          <polyline points="16 6 12 2 8 6"/>
-          <line x1="12" y1="2" x2="12" y2="15"/>
-        </svg>
-        <strong>Condividi</strong>.
+      <div class="step-body">
+        Scorri e tocca <span class="tag-pill">Aggiungi a schermata Home</span>.
       </div>
     </div>
 
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-text">
-        Scorri il menu verso il basso e tocca<br>
-        <span class="tag">Aggiungi a schermata Home</span>.
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-text">
+      <div class="step-body">
         Tocca <strong>"Aggiungi"</strong> in alto a destra.<br>
-        L'icona apparirà nella schermata Home! ✅
+        L'app apparirà nella schermata Home! ✅
       </div>
     </div>
   </div>
 
-</div>
-
-<!-- Messaggio per desktop -->
-<div id="desktopMsg">
-  📱 Questa pagina è pensata per <strong>iPhone</strong>.<br>
-  Aprila dal tuo smartphone per scaricare l'app della Family Rozza.
-</div>
-
-<!-- Freccia animata verso il basso (mostra dove sta il tasto Share) -->
-<div id="arrowHint">
-  <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
-    <path d="M19 4 L19 30 M8 20 L19 32 L30 20" stroke="#ff4400" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Freccia verso il basso che indica il tasto Share di Safari -->
+  <svg class="arrow-down" viewBox="0 0 36 36" fill="none">
+    <path d="M18 4 L18 28 M7 18 L18 30 L29 18"
+          stroke="#ff4400" stroke-width="3.2"
+          stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
+
+  <div class="install-hint">⚠️ Funziona solo da <strong>Safari</strong> su iPhone</div>
 </div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     VIEW B: app vera e propria (dopo installazione)
+═══════════════════════════════════════════════════════ -->
+<div class="view" id="viewApp">
+
+  <div id="dynamicTop"></div>
+  <div id="linkContainer"></div>
+
+</div>
+
+
+<!-- Overlay: nessun link disponibile -->
+<div id="noLinkOverlay" onclick="this.classList.remove('visible')">
+  <div class="nolink-card" onclick="event.stopPropagation()">
+    <span class="nolink-emoji">😴</span>
+    <div class="nolink-title">Questa settimana<br>non si gioca qua!</div>
+    <div class="nolink-close" onclick="document.getElementById('noLinkOverlay').classList.remove('visible')">OK, ho capito!</div>
+  </div>
+</div>
+
 
 <script>
-  const isIOS      = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const isMobile   = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const standalone = window.navigator.standalone === true;
+  // ─── COSTANTI ────────────────────────────────────────────────
+  const WORKER_URL  = "https://nameless-brook-094f.cr-armatarozza.workers.dev/";
+  const REFERER     = "https://www.armatarozza.it";
+  const SHEET_ID    = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
+  const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing", "Baby Rozza"];
+  const TROPHY_ICON = "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/cw-trophy.png";
 
-  if (!isMobile) {
-    document.getElementById("mainPage").style.display = "none";
-    document.getElementById("desktopMsg").style.display = "block";
+  // ─── DECIDE QUALE VIEW MOSTRARE ──────────────────────────────
+  // Se aperta come PWA standalone → mostra l'app
+  // Se aperta in browser → mostra le istruzioni
+  const isStandalone = window.navigator.standalone === true
+    || window.matchMedia('(display-mode: standalone)').matches;
+
+  document.getElementById(isStandalone ? "viewApp" : "viewInstall").classList.add("active");
+
+  if (isStandalone) {
+    initApp();
   }
 
-  // Se già installata come PWA, porta direttamente all'app
-  if (standalone) {
-    window.location.href = "https://armata-app.pages.dev";
+  // ─── UTILS ───────────────────────────────────────────────────
+  function normalizeName(v) {
+    return String(v || "")
+      .normalize("NFKC")
+      .replace(/[\u200B-\u200D\uFEFF]/g, "")
+      .replace(/\u00A0/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
   }
 
-  // Aggiorna il link "Apri l'App" con l'URL corretto
-  // (cambia qui se usi un dominio personalizzato es. app.armatarozza.it)
-  const APP_URL = "https://armata-app.cr-armatarozza.workers.dev/";
-  document.getElementById("openBtn").href = APP_URL;
+  // ─── GOOGLE SHEETS ───────────────────────────────────────────
+  async function leggiFoglio(sheetName) {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&range=A1:B500&headers=0&tqx=out:json`;
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error();
+    const text = await res.text();
+    const json = JSON.parse(
+      text.replace(/^\/\*O_o\*\/\s*/, "")
+          .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+          .replace(/\);?\s*$/, "")
+    );
+    return json.table.rows || [];
+  }
+
+  async function leggiTrophyMap() {
+    try {
+      const url  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=A3:B6&tqx=out:json`;
+      const res  = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(
+        text.replace(/^\/\*O_o\*\/\s*/, "")
+            .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+            .replace(/\);?\s*$/, "")
+      );
+      const map = {};
+      for (const row of (json.table.rows || [])) {
+        const c = row.c || [];
+        const k = String((c[0] && c[0].v) || "").trim();
+        const v = String((c[1] && c[1].v) || "").trim();
+        if (k && v) map[normalizeName(k)] = v;
+      }
+      return map;
+    } catch { return {}; }
+  }
+
+  async function convocazioniAttive() {
+    try {
+      const url  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=B1&tqx=out:json`;
+      const res  = await fetch(url);
+      const text = await res.text();
+      const json = JSON.parse(
+        text.replace(/^\/\*O_o\*\/\s*/, "")
+            .replace(/^google\.visualization\.Query\.setResponse\(/, "")
+            .replace(/\);?\s*$/, "")
+      );
+      const v = String(json.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase();
+      return v === "on";
+    } catch { return true; }
+  }
+
+  // ─── CARICA BOTTONI CLAN ─────────────────────────────────────
+  async function caricaLink() {
+    try {
+      const [res, trophyMap] = await Promise.all([
+        fetch(WORKER_URL, { headers: { referer: REFERER } }),
+        leggiTrophyMap()
+      ]);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+
+      const container = document.getElementById("linkContainer");
+      for (const item of data) {
+        const div = document.createElement("div");
+        div.className = "button";
+        div.dataset.nomeClan = normalizeName(item.nome);
+        div.addEventListener("click", () => cliccaClan(item.id));
+
+        const img = document.createElement("img");
+        img.className = "clan-logo";
+        img.src = item.img;
+        img.alt = item.nome;
+
+        const span = document.createElement("span");
+        span.className = "button-label";
+        span.textContent = item.nome;
+
+        const trophyBox = document.createElement("div");
+        trophyBox.className = "trophy-box";
+        const ti = document.createElement("img");
+        ti.className = "trophy-icon";
+        ti.src = TROPHY_ICON;
+        ti.alt = "Coppe";
+        const tv = document.createElement("span");
+        tv.className = "trophy-value";
+        tv.textContent = trophyMap[normalizeName(item.nome)] || "-";
+        trophyBox.append(ti, tv);
+
+        div.append(img, span, trophyBox);
+        container.appendChild(div);
+      }
+    } catch {
+      document.getElementById("dynamicTop").innerHTML = `
+        <div class="offline-box">
+          <div class="offline-title">La war è iniziata ⚔️</div>
+          <div class="offline-text">I link non sono più disponibili</div>
+        </div>`;
+    }
+  }
+
+  // ─── CLICK CLAN ──────────────────────────────────────────────
+  async function cliccaClan(id) {
+    try {
+      const tokenRes  = await fetch(`${WORKER_URL}?id=${id}`, { headers: { referer: REFERER } });
+      if (!tokenRes.ok) throw new Error();
+      const tokenData = await tokenRes.json();
+      if (!tokenData.token) { alert("Token non ricevuto"); return; }
+      if (tokenData.empty) {
+        document.getElementById("noLinkOverlay").classList.add("visible");
+        return;
+      }
+      window.location.href = `${WORKER_URL}?id=${id}&token=${tokenData.token}`;
+    } catch {
+      alert("Errore apertura link. Riprova.");
+    }
+  }
+
+  // ─── VERIFICA CONVOCAZIONE ───────────────────────────────────
+  async function verificaConvocazione() {
+    const outputEl = document.getElementById("verificaRisultato");
+    const attive = await convocazioniAttive();
+    if (!attive) {
+      outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
+      outputEl.className = "";
+      outputEl.style.display = "block";
+      return;
+    }
+
+    let tag = document.getElementById("verificaInput").value.trim();
+    if (!tag) return;
+    tag = tag.replace(/^@+/, "").toUpperCase();
+    localStorage.setItem("ultimoTag", tag);
+
+    document.querySelectorAll("#linkContainer .button.convocato").forEach(b => b.classList.remove("convocato"));
+
+    outputEl.innerHTML = "⏳ Controllo in corso...";
+    outputEl.className = "";
+    outputEl.style.display = "block";
+
+    try {
+      const risultati = [];
+      const clanConvocati = new Set();
+
+      for (const sheetName of CLAN_SHEETS) {
+        const rows = await leggiFoglio(sheetName);
+        for (let i = 1; i < rows.length; i++) {
+          const c   = (rows[i].c || []);
+          const raw = c[1] != null ? c[1].v : null;
+          if (!raw) continue;
+          const nome    = String((c[0] && c[0].v) || "").trim();
+          const tagCell = String(raw).replace(/^@+/, "").toUpperCase().trim();
+          if (tagCell === tag) {
+            risultati.push(`• Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
+            clanConvocati.add(normalizeName(sheetName));
+          }
+        }
+      }
+
+      document.querySelectorAll("#linkContainer .button").forEach(btn => {
+        if (clanConvocati.has(btn.dataset.nomeClan)) btn.classList.add("convocato");
+      });
+
+      if (risultati.length) {
+        outputEl.innerHTML = risultati.join("<br>");
+        outputEl.className = "trovato";
+      } else {
+        outputEl.innerHTML = `❌ Tag "<strong>${tag}</strong>" non trovato nelle convocazioni`;
+        outputEl.className = "non-trovato";
+      }
+    } catch {
+      outputEl.innerHTML = "Errore caricamento dati";
+      outputEl.className = "non-trovato";
+    }
+    outputEl.style.display = "block";
+  }
+
+  // ─── INIT APP ────────────────────────────────────────────────
+  function initApp() {
+    // Costruisce la sezione verifica
+    const top = document.getElementById("dynamicTop");
+    const wrap = document.createElement("div");
+    wrap.id = "verificaContainer";
+
+    const input = document.createElement("input");
+    input.id = "verificaInput";
+    input.type = "text";
+    input.placeholder = "Inserisci il tuo tag Telegram";
+    input.autocomplete = "off";
+    input.autocorrect = "off";
+    input.autocapitalize = "characters";
+    input.spellcheck = false;
+    const savedTag = localStorage.getItem("ultimoTag");
+    if (savedTag) input.value = savedTag;
+    input.addEventListener("keydown", e => { if (e.key === "Enter") verificaConvocazione(); });
+
+    const btn = document.createElement("div");
+    btn.className = "button";
+    btn.style.justifyContent = "center";
+    btn.addEventListener("click", verificaConvocazione);
+    const bl = document.createElement("span");
+    bl.className = "button-label";
+    bl.textContent = "Verifica convocazione";
+    btn.appendChild(bl);
+
+    const out = document.createElement("div");
+    out.id = "verificaRisultato";
+
+    wrap.append(input, btn, out);
+    top.appendChild(wrap);
+
+    caricaLink();
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(console.error);
+    }
+  }
+
+  document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 
 </body>

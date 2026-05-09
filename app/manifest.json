@@ -1,0 +1,22 @@
+{
+  "name": "Armata Rozza",
+  "short_name": "ArmataCR",
+  "description": "Unisciti ai clan dell'Armata Rozza su Clash Royale",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a0000",
+  "theme_color": "#0a0000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
