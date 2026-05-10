@@ -30,7 +30,7 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* ── BODY con sfondo — identico al sito ufficiale ── */
+/* ── BODY con sfondo identico al sito ufficiale ── */
 body {
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -49,7 +49,7 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ── Gradienti decorativi fissi — solo overlay, non lo sfondo ── */
+/* ── Gradienti decorativi fissi ── */
 body::before {
   content: "";
   position: fixed;
@@ -75,7 +75,6 @@ body::before {
 #viewInstall {
   position: relative;
   z-index: 1;
-  /* occupa tutta la viewport incluse le safe area */
   min-height: 100vh;
   min-height: -webkit-fill-available;
   width: 100%;
@@ -83,11 +82,10 @@ body::before {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  /* safe-area-inset per la barra di Safari */
-  padding-top: max(18vh, calc(env(safe-area-inset-top, 0px) + 16vh));
+  padding-top: 18vh;
   padding-left: 16px;
   padding-right: 16px;
-  padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+  padding-bottom: 40px;
 }
 
 #viewInstall-inner {
@@ -135,7 +133,6 @@ body::before {
 }
 
 .install-card-title {
-  /* su una riga sola */
   font-size: 15px;
   font-weight: 800;
   color: #ffd54a;
@@ -461,7 +458,8 @@ body::before {
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          Clicca <strong>"Aggiungi"</strong> in alto a destra ✅</div>
+          Clicca <strong>"Aggiungi"</strong> in alto a destra ✅
+        </div>
       </div>
     </div>
 
@@ -495,10 +493,9 @@ body::before {
   const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing", "Baby Rozza"];
   const TROPHY_ICON = "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/cw-trophy.png";
 
+  // Detection standalone — uguale a quella che funzionava
   const isStandalone = window.navigator.standalone === true
-    || window.matchMedia('(display-mode: standalone)').matches
-    || window.matchMedia('(display-mode: fullscreen)').matches
-    || document.referrer.includes('android-app://');
+    || window.matchMedia('(display-mode: standalone)').matches;
 
   document.getElementById(isStandalone ? "viewApp" : "viewInstall").classList.add("active");
   if (isStandalone) initApp();
@@ -673,7 +670,9 @@ body::before {
     top.appendChild(wrap);
     caricaLink();
 
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(console.error);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(console.error);
+    }
   }
 
   document.addEventListener("contextmenu", e => e.preventDefault());
