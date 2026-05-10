@@ -78,15 +78,6 @@ body::before {
   z-index: 0;
 }
 
-#mobileContent.offline {
-  padding-top: 40px;
-  min-height: unset;
-}
-
-#mobileContent.offline::before {
-  display: none;
-}
-
 #dynamicTop,
 #linkContainer {
   position: relative;
@@ -463,10 +454,6 @@ body::before {
     padding: 180px 12px 16px;
   }
 
-  #mobileContent.offline {
-    padding-top: 40px;
-  }
-
   #mobileContent::before {
     width: calc(100% - 18px);
   }
@@ -547,11 +534,13 @@ async function leggiFoglio(sheetName) {
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&range=A1:B500&headers=0&tqx=out:json`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
+
   const text = await res.text();
   const jsonText = text
     .replace(/^\/\*O_o\*\/\s*/, "")
     .replace(/^google\.visualization\.Query\.setResponse\(/, "")
     .replace(/\);?\s*$/, "");
+
   const data = JSON.parse(jsonText);
   return data.table.rows || [];
 }
@@ -561,15 +550,19 @@ async function leggiSettingCompleto() {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=A3:B6&tqx=out:json`;
     const res = await fetch(url);
     if (!res.ok) throw new Error("Errore lettura setting");
+
     const text = await res.text();
     const jsonText = text
       .replace(/^\/\*O_o\*\/\s*/, "")
       .replace(/^google\.visualization\.Query\.setResponse\(/, "")
       .replace(/\);?\s*$/, "");
+
     const data = JSON.parse(jsonText);
     const rows = data.table.rows || [];
+
     const trophyMap = {};
     const trophyMapNormalized = {};
+
     for (const row of rows) {
       const cells = row.c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
@@ -578,6 +571,7 @@ async function leggiSettingCompleto() {
       trophyMap[colA] = colB;
       trophyMapNormalized[normalizeName(colA)] = colB;
     }
+
     return { trophyMap, trophyMapNormalized };
   } catch {
     return { trophyMap: {}, trophyMapNormalized: {} };
@@ -589,11 +583,13 @@ async function convocazioniAttive() {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=B1&tqx=out:json`;
     const res = await fetch(url);
     if (!res.ok) return true;
+
     const text = await res.text();
     const jsonText = text
       .replace(/^\/\*O_o\*\/\s*/, "")
       .replace(/^google\.visualization\.Query\.setResponse\(/, "")
       .replace(/\);?\s*$/, "");
+
     const data = JSON.parse(jsonText);
     const valore = String(data.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase();
     return valore === "on";
@@ -622,18 +618,15 @@ async function caricaLink() {
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if (!tokenRes.ok) throw new Error();
+
           const tokenData = await tokenRes.json();
           if (!tokenData.token) return alert("Token non ricevuto");
+
           if (tokenData.empty) {
-            const title = document.querySelector('.nolink-title');
-            if (tokenData.allEmpty) {
-              title.innerHTML = "I link non sono<br>ancora disponibili";
-            } else {
-              title.innerHTML = "Questa settimana<br>non si gioca qua!";
-            }
             document.getElementById('noLinkOverlay').classList.add('visible');
             return;
           }
+
           window.location.href = `https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`;
         } catch {
           alert("Errore apertura link");
@@ -659,18 +652,19 @@ async function caricaLink() {
 
       const trophyValue = document.createElement("span");
       trophyValue.className = "trophy-value";
+
       const nomePulito = normalizeName(item.nome);
       trophyValue.textContent = setting.trophyMapNormalized[nomePulito] || "-";
 
       trophyBox.appendChild(trophyIcon);
       trophyBox.appendChild(trophyValue);
+
       div.appendChild(img);
       div.appendChild(span);
       div.appendChild(trophyBox);
       container.appendChild(div);
     }
   } catch {
-    document.getElementById("mobileContent").classList.add("offline");
     document.getElementById("dynamicTop").innerHTML = `
       <div class="offline-box">
         <div class="offline-title">La war è iniziata</div>
@@ -683,46 +677,60 @@ async function caricaLink() {
 
 async function verificaConvocazione() {
   const outputEl = document.getElementById("verificaRisultato");
+
   const attive = await convocazioniAttive();
+
   if (!attive) {
     outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
     outputEl.className = "";
     outputEl.style.display = "block";
     return;
   }
+
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
+
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
+
   document.querySelectorAll("#linkContainer .button.convocato").forEach(btn => {
     btn.classList.remove("convocato");
   });
+
   try {
     outputEl.innerHTML = "Controllo in corso...";
     outputEl.className = "";
     outputEl.style.display = "block";
+
     let risultati = [];
     const clanConvocati = new Set();
+
     for (const sheetName of CLAN_SHEETS) {
       const rows = await leggiFoglio(sheetName);
+
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         const cells = row.c || [];
+
         const rawTag = cells[1] != null ? cells[1].v : null;
         if (!rawTag) continue;
+
         let nome = String((cells[0] && cells[0].v) || "").trim();
         let tagCell = String(rawTag).replace(/^@+/, "").toUpperCase().trim();
+
         if (tagCell && tagCell === tag) {
           risultati.push(`• Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
           clanConvocati.add(normalizeName(sheetName));
         }
       }
     }
+
     document.querySelectorAll("#linkContainer .button").forEach(btn => {
       if (clanConvocati.has(btn.dataset.nomeClan)) {
         btn.classList.add("convocato");
       }
     });
+
     if (risultati.length) {
       outputEl.innerHTML = risultati.join("<br>");
       outputEl.className = "trovato";
@@ -730,7 +738,9 @@ async function verificaConvocazione() {
       outputEl.innerHTML = `❌ Tag "${tag}" non trovato nelle convocazioni`;
       outputEl.className = "non-trovato";
     }
+
     outputEl.style.display = "block";
+
   } catch (e) {
     console.error("Errore:", e);
     outputEl.innerHTML = "Errore caricamento dati";
@@ -745,30 +755,41 @@ window.onload = function () {
     document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
+
   const container = document.getElementById("dynamicTop");
   const verificaDiv = document.createElement("div");
   verificaDiv.id = "verificaContainer";
+
   const input = document.createElement("input");
   input.id = "verificaInput";
   input.placeholder = "Inserisci il tuo tag Telegram";
   verificaDiv.appendChild(input);
+
   setTimeout(() => {
     const ultimoTag = localStorage.getItem("ultimoTag");
-    if (ultimoTag) input.value = ultimoTag;
+    if (ultimoTag) {
+      input.value = ultimoTag;
+    }
   }, 0);
+
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
   btn.onclick = verificaConvocazione;
+
   const btnLabel = document.createElement("span");
   btnLabel.className = "button-label";
   btnLabel.textContent = "Verifica convocazione";
   btn.appendChild(btnLabel);
+
   verificaDiv.appendChild(btn);
+
   const output = document.createElement("div");
   output.id = "verificaRisultato";
   verificaDiv.appendChild(output);
+
   container.appendChild(verificaDiv);
+
   caricaLink();
 };
 
