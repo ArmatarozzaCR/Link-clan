@@ -1,4 +1,4 @@
-const CACHE_NAME = 'armata-rozza-v3';
+const CACHE_NAME = 'armata-rozza-v4';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
@@ -16,5 +16,10 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Serve sempre dalla rete — niente cache per l'HTML
+  if (e.request.url.includes('index.html') || e.request.url.endsWith('/app/') || e.request.url.endsWith('/app')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match('./index.html')));
+    return;
+  }
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
