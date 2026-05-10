@@ -671,6 +671,7 @@ async function caricaLink() {
       container.appendChild(div);
     }
   } catch {
+    document.getElementById("mobileContent").classList.add("offline");
     document.getElementById("dynamicTop").innerHTML = `
       <div class="offline-box">
         <div class="offline-title">La war è iniziata</div>
