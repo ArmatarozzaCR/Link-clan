@@ -623,9 +623,15 @@ async function caricaLink() {
           if (!tokenData.token) return alert("Token non ricevuto");
 
           if (tokenData.empty) {
-            document.getElementById('noLinkOverlay').classList.add('visible');
-            return;
-          }
+  const title = document.querySelector('.nolink-title');
+  if (tokenData.allEmpty) {
+    title.innerHTML = "I link non sono<br>ancora disponibili";
+  } else {
+    title.innerHTML = "Questa settimana<br>non si gioca qua!";
+  }
+  document.getElementById('noLinkOverlay').classList.add('visible');
+  return;
+}
 
           window.location.href = `https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`;
         } catch {
