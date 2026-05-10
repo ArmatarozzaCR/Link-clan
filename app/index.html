@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#120000" />
 <title>Family Rozza</title>
 <link rel="manifest" href="./manifest.json" />
-<link rel="apple-touch-icon" href="./Icona.png" />
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/Icona.png" />
 <style>
 
 /* ── RESET identico al sito ufficiale ── */
@@ -454,14 +454,14 @@ body::before {
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
-          Clicca <span class="tag-pill">Aggiungi a schermata Home</span>
+          Premi <span class="tag-pill">Aggiungi a schermata Home</span>
         </div>
       </div>
 
       <div class="step">
         <div class="step-num">3</div>
         <div class="step-body">
-          Tocca <strong>"Aggiungi"</strong> in alto a destra ✅</div>
+          Clicca <strong>"Aggiungi"</strong> in alto a destra ✅</div>
       </div>
     </div>
 
@@ -496,7 +496,9 @@ body::before {
   const TROPHY_ICON = "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/cw-trophy.png";
 
   const isStandalone = window.navigator.standalone === true
-    || window.matchMedia('(display-mode: standalone)').matches;
+    || window.matchMedia('(display-mode: standalone)').matches
+    || window.matchMedia('(display-mode: fullscreen)').matches
+    || document.referrer.includes('android-app://');
 
   document.getElementById(isStandalone ? "viewApp" : "viewInstall").classList.add("active");
   if (isStandalone) initApp();

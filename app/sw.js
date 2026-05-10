@@ -1,4 +1,4 @@
-const CACHE_NAME = 'armata-rozza-v2';
+const CACHE_NAME = 'armata-rozza-v3';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
