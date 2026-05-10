@@ -487,13 +487,14 @@ body::before {
 
 
 <script>
+  document.addEventListener("DOMContentLoaded", function() {
+
   const WORKER_URL  = "https://nameless-brook-094f.cr-armatarozza.workers.dev/";
   const REFERER     = "https://www.armatarozza.it";
   const SHEET_ID    = "1p97tgykgc5dxsweiPSvSGY53hmrL3j-duQkSk_zd30A";
   const CLAN_SHEETS = ["Armata Rozza", "I Tori Feroci", "Dog Rider", "Warlosing", "Baby Rozza"];
   const TROPHY_ICON = "https://raw.githubusercontent.com/ArmatarozzaCR/Link-clan/main/cw-trophy.png";
 
-  // Detection standalone — uguale a quella che funzionava
   const isStandalone = window.navigator.standalone === true
     || window.matchMedia('(display-mode: standalone)').matches;
 
@@ -676,6 +677,8 @@ body::before {
   }
 
   document.addEventListener("contextmenu", e => e.preventDefault());
+
+  }); // fine DOMContentLoaded
 </script>
 </body>
 </html>
