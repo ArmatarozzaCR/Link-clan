@@ -75,9 +75,18 @@ body::before {
 #viewInstall {
   position: relative;
   z-index: 1;
-  max-width: 480px;
-  margin: 0 auto;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   padding: 18vh 18px 60px;
+}
+
+#viewInstall-inner {
+  width: 100%;
+  max-width: 480px;
 }
 
 .app-icon {
