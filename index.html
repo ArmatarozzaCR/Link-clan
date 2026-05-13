@@ -78,10 +78,6 @@ body::before {
   z-index: 0;
 }
 
-#mobileContent.offline::before {
-  display: none;
-}
-
 #dynamicTop,
 #linkContainer {
   position: relative;
@@ -374,85 +370,6 @@ body::before {
   }
 }
 
-#noLinkOverlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0,0,0,0.72);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  align-items: center;
-  justify-content: center;
-}
-
-#noLinkOverlay.visible {
-  display: flex;
-}
-
-.nolink-card {
-  background: linear-gradient(160deg, rgba(30,0,0,0.97), rgba(60,10,10,0.95));
-  border: 2px solid rgba(255,60,0,0.55);
-  border-radius: 26px;
-  padding: 34px 28px 28px;
-  max-width: 320px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 0 40px rgba(255,30,0,0.25), 0 8px 32px rgba(0,0,0,0.5);
-  animation: popIn .3s cubic-bezier(.34,1.56,.64,1) both;
-}
-
-@keyframes popIn {
-  from { transform: scale(0.7); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
-}
-
-.nolink-emoji {
-  font-size: 58px;
-  line-height: 1;
-  margin-bottom: 12px;
-  display: block;
-  animation: wobble 1.2s ease infinite;
-}
-
-@keyframes wobble {
-  0%,100% { transform: rotate(-6deg); }
-  50%      { transform: rotate(6deg);  }
-}
-
-.nolink-title {
-  font-size: 22px;
-  font-weight: 900;
-  color: #fff;
-  margin-bottom: 8px;
-  text-shadow: 0 2px 8px rgba(255,60,0,0.5);
-}
-
-.nolink-sub {
-  font-size: 15px;
-  color: rgba(255,255,255,0.75);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.nolink-close {
-  display: inline-block;
-  padding: 12px 32px;
-  background: linear-gradient(135deg, #ff1a1a, #ff5500);
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 800;
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 0 16px rgba(255,40,0,0.45);
-  transition: transform .18s, box-shadow .18s;
-}
-
-.nolink-close:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 26px rgba(255,60,0,0.65);
-}
-
 @media (max-width: 420px) {
   #mobileContent {
     padding: 180px 12px 16px;
@@ -535,14 +452,16 @@ function normalizeName(value) {
 }
 
 async function leggiFoglio(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&range=A1:B500&headers=0&tqx=out:json`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Errore lettura foglio ${sheetName}`);
+
   const text = await res.text();
   const jsonText = text
     .replace(/^\/\*O_o\*\/\s*/, "")
     .replace(/^google\.visualization\.Query\.setResponse\(/, "")
-    .replace(/\);?\s*$/, "");
+    .replace(/\);$/, "");
+
   const data = JSON.parse(jsonText);
   return data.table.rows || [];
 }
@@ -550,25 +469,33 @@ async function leggiFoglio(sheetName) {
 async function leggiSettingCompleto() {
   try {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=A3:B6&tqx=out:json`;
+
     const res = await fetch(url);
     if (!res.ok) throw new Error("Errore lettura setting");
+
     const text = await res.text();
     const jsonText = text
       .replace(/^\/\*O_o\*\/\s*/, "")
       .replace(/^google\.visualization\.Query\.setResponse\(/, "")
-      .replace(/\);?\s*$/, "");
+      .replace(/\);$/, "");
+
     const data = JSON.parse(jsonText);
     const rows = data.table.rows || [];
+
     const trophyMap = {};
     const trophyMapNormalized = {};
+
     for (const row of rows) {
       const cells = row.c || [];
       const colA = String((cells[0] && cells[0].v) || "").trim();
       const colB = String((cells[1] && cells[1].v) || "").trim();
+
       if (!colA || !colB) continue;
+
       trophyMap[colA] = colB;
       trophyMapNormalized[normalizeName(colA)] = colB;
     }
+
     return { trophyMap, trophyMapNormalized };
   } catch {
     return { trophyMap: {}, trophyMapNormalized: {} };
@@ -580,14 +507,21 @@ async function convocazioniAttive() {
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=setting&range=B1&tqx=out:json`;
     const res = await fetch(url);
     if (!res.ok) return true;
+
     const text = await res.text();
     const jsonText = text
       .replace(/^\/\*O_o\*\/\s*/, "")
       .replace(/^google\.visualization\.Query\.setResponse\(/, "")
-      .replace(/\);?\s*$/, "");
+      .replace(/\);$/, "");
+
     const data = JSON.parse(jsonText);
-    const valore = String(data.table.rows?.[0]?.c?.[0]?.v || "").trim().toLowerCase();
+
+    const valore = String(
+      data.table.rows?.[0]?.c?.[0]?.v || ""
+    ).trim().toLowerCase();
+
     return valore === "on";
+
   } catch {
     return true;
   }
@@ -600,7 +534,9 @@ async function caricaLink() {
       leggiSettingCompleto()
     ]);
 
-    if (!res.ok) throw new Error();
+    if (!res.ok) {
+      throw new Error();
+    }
 
     const data = await res.json();
     const container = document.getElementById("linkContainer");
@@ -613,19 +549,22 @@ async function caricaLink() {
         try {
           const tokenRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}`, { headers: { referer: location.origin } });
           if (!tokenRes.ok) throw new Error();
+
           const tokenData = await tokenRes.json();
           if (!tokenData.token) return alert("Token non ricevuto");
-          if (tokenData.empty) {
-            const title = document.querySelector('.nolink-title');
-            if (tokenData.allEmpty) {
-              title.innerHTML = "I link non sono<br>ancora disponibili";
-            } else {
-              title.innerHTML = "Questa settimana<br>non si gioca qua!";
-            }
-            document.getElementById('noLinkOverlay').classList.add('visible');
-            return;
+
+          const urlRes = await fetch(`https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`, { headers: { referer: location.origin } });
+          if (!urlRes.ok) {
+            const text = await urlRes.text();
+            return alert("Errore apertura link: " + text);
           }
-          window.location.href = `https://nameless-brook-094f.cr-armatarozza.workers.dev/?id=${item.id}&token=${tokenData.token}`;
+
+          const urlData = await urlRes.json();
+          if (urlData.url) {
+            window.location.href = urlData.url;
+          } else {
+            alert("Link non disponibile");
+          }
         } catch {
           alert("Errore apertura link");
         }
@@ -650,18 +589,19 @@ async function caricaLink() {
 
       const trophyValue = document.createElement("span");
       trophyValue.className = "trophy-value";
+
       const nomePulito = normalizeName(item.nome);
       trophyValue.textContent = setting.trophyMapNormalized[nomePulito] || "-";
 
       trophyBox.appendChild(trophyIcon);
       trophyBox.appendChild(trophyValue);
+
       div.appendChild(img);
       div.appendChild(span);
       div.appendChild(trophyBox);
       container.appendChild(div);
     }
   } catch {
-    document.getElementById("mobileContent").classList.add("offline");
     document.getElementById("dynamicTop").innerHTML = `
       <div class="offline-box">
         <div class="offline-title">La war è iniziata</div>
@@ -674,46 +614,57 @@ async function caricaLink() {
 
 async function verificaConvocazione() {
   const outputEl = document.getElementById("verificaRisultato");
+
   const attive = await convocazioniAttive();
+
   if (!attive) {
     outputEl.innerHTML = "Le convocazioni non sono ancora disponibili";
     outputEl.className = "";
     outputEl.style.display = "block";
     return;
   }
+
   let tag = document.getElementById("verificaInput").value.trim();
   if (!tag) return;
+
   tag = tag.replace(/^@+/, "").toUpperCase();
   localStorage.setItem("ultimoTag", tag);
+
   document.querySelectorAll("#linkContainer .button.convocato").forEach(btn => {
     btn.classList.remove("convocato");
   });
+
   try {
     outputEl.innerHTML = "Controllo in corso...";
     outputEl.className = "";
     outputEl.style.display = "block";
+
     let risultati = [];
     const clanConvocati = new Set();
+
     for (const sheetName of CLAN_SHEETS) {
       const rows = await leggiFoglio(sheetName);
+
       for (let i = 1; i < rows.length; i++) {
         const row = rows[i];
         const cells = row.c || [];
-        const rawTag = cells[1] != null ? cells[1].v : null;
-        if (!rawTag) continue;
+
         let nome = String((cells[0] && cells[0].v) || "").trim();
-        let tagCell = String(rawTag).replace(/^@+/, "").toUpperCase().trim();
+        let tagCell = String((cells[1] && cells[1].v) || "").replace(/^@+/, "").toUpperCase().trim();
+
         if (tagCell && tagCell === tag) {
           risultati.push(`• Sei convocato in <strong>${sheetName}</strong> con l'account ${nome}`);
           clanConvocati.add(normalizeName(sheetName));
         }
       }
     }
+
     document.querySelectorAll("#linkContainer .button").forEach(btn => {
       if (clanConvocati.has(btn.dataset.nomeClan)) {
         btn.classList.add("convocato");
       }
     });
+
     if (risultati.length) {
       outputEl.innerHTML = risultati.join("<br>");
       outputEl.className = "trovato";
@@ -721,7 +672,9 @@ async function verificaConvocazione() {
       outputEl.innerHTML = `❌ Tag "${tag}" non trovato nelle convocazioni`;
       outputEl.className = "non-trovato";
     }
+
     outputEl.style.display = "block";
+
   } catch (e) {
     console.error("Errore:", e);
     outputEl.innerHTML = "Errore caricamento dati";
@@ -736,30 +689,41 @@ window.onload = function () {
     document.body.innerHTML = `<div style="font-size:22px; line-height:1.5; padding:20px; box-sizing:border-box; color:white; background:black;">⚠️ Questo sito può essere aperto solo da dispositivi mobili con installato Clash Royale.<br>Per favore aprilo sul tuo smartphone o tablet.</div>`;
     return;
   }
+
   const container = document.getElementById("dynamicTop");
   const verificaDiv = document.createElement("div");
   verificaDiv.id = "verificaContainer";
+
   const input = document.createElement("input");
   input.id = "verificaInput";
   input.placeholder = "Inserisci il tuo tag Telegram";
   verificaDiv.appendChild(input);
+
   setTimeout(() => {
     const ultimoTag = localStorage.getItem("ultimoTag");
-    if (ultimoTag) input.value = ultimoTag;
+    if (ultimoTag) {
+      input.value = ultimoTag;
+    }
   }, 0);
+
   const btn = document.createElement("div");
   btn.className = "button";
   btn.id = "verificaBtn";
   btn.onclick = verificaConvocazione;
+
   const btnLabel = document.createElement("span");
   btnLabel.className = "button-label";
   btnLabel.textContent = "Verifica convocazione";
   btn.appendChild(btnLabel);
+
   verificaDiv.appendChild(btn);
+
   const output = document.createElement("div");
   output.id = "verificaRisultato";
   verificaDiv.appendChild(output);
+
   container.appendChild(verificaDiv);
+
   caricaLink();
 };
 
@@ -781,14 +745,6 @@ document.addEventListener('keydown', e => {
   <div id="mobileContent">
     <div id="dynamicTop"></div>
     <div id="linkContainer"></div>
-  </div>
-
-  <div id="noLinkOverlay" onclick="this.classList.remove('visible')">
-    <div class="nolink-card" onclick="event.stopPropagation()">
-      <span class="nolink-emoji">😴</span>
-      <div class="nolink-title">Questa settimana<br>non si gioca qua!</div>
-      <div class="nolink-close" onclick="document.getElementById('noLinkOverlay').classList.remove('visible')">OK, ho capito!</div>
-    </div>
   </div>
 </body>
 </html>
